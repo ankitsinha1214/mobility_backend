@@ -402,6 +402,25 @@ const deleteUserVehicle = async (req, res) => {
     }
 };
 
+// check weather user is registered or not
+const checkUserRegistration = async (req, res) => {
+    const { phoneNumber } = req.params;
+  
+    try {
+      const user = await User.findOne({ phoneNumber }, { password: 0 }); // Exclude password from the result
+  
+      if (user) {
+        return res.json({ success: true, data: user, message: "User is registered" });
+      } else {
+        return res.json({ success: false, message: "User is not registered" });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
+    }
+  };
+
+
 module.exports = {
     addUser,
     getUser,
@@ -416,5 +435,6 @@ module.exports = {
     getUserVehicles,
     getUserVehicleById,
     updateUserVehicle,
-    deleteUserVehicle
+    deleteUserVehicle,
+    checkUserRegistration
 };

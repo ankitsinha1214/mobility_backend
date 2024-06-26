@@ -7,11 +7,20 @@ const createLocation = async (req, res) => {
     const { country, state, city } = req.body;
 
     try {
-        const newLocation = await Location.create({ country, state, city });
-        res.json({ success: true, data: newLocation });
+      // Check if the combination of country, state, and city already exists
+      const existingLocation = await Location.findOne({ country, state, city });
+  
+      if (existingLocation) {
+        return res.status(400).json({ success: false, message: 'Location already exists' });
+      }
+  
+      const newLocation = new Location({ country, state, city });
+      await newLocation.save();
+  
+      return res.status(201).json({ success: true, data: newLocation, message: 'Location created successfully' });
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to create location', error: error.message });
+      console.error('Error:', error);
+      return res.status(500).json({ success: false, message: 'Failed to create location', error: error.message });
     }
 };
 
@@ -41,6 +50,38 @@ const getLocationById = async (req, res) => {
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ success: false, message: 'Failed to retrieve location', error: error.message });
+    }
+};
+// get all location with state and city as nested objects
+const getAllLocations = async (req, res) => {
+    try {
+        const locations = await Location.find({});
+
+        const structuredLocations = locations.reduce((acc, loc) => {
+            let countryEntry = acc.find(entry => entry[loc.country]);
+            if (!countryEntry) {
+                countryEntry = { [loc.country]: [] };
+                acc.push(countryEntry);
+            }
+
+            let stateEntry = countryEntry[loc.country].find(entry => entry[loc.state]);
+            if (!stateEntry) {
+                stateEntry = { [loc.state]: [] };
+                countryEntry[loc.country].push(stateEntry);
+            }
+
+            if (!stateEntry[loc.state].includes(loc.city)) {
+                stateEntry[loc.state].push(loc.city);
+            }
+
+            return acc;
+        }, []);
+
+        res.json({ success: true, data: structuredLocations });
+        // res.json({ success: true, data: locations });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to retrieve locations', error: error.message });
     }
 };
 
@@ -86,5 +127,6 @@ module.exports = {
     getLocations,
     getLocationById,
     updateLocation,
-    deleteLocation
+    deleteLocation,
+    getAllLocations
 };

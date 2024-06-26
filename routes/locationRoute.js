@@ -1,20 +1,13 @@
 // routes/locationRoutes.js
-
-const express = require('express');
-const router = express.Router();
-const {
-    createLocation,
-    getLocations,
-    getLocationById,
-    updateLocation,
-    deleteLocation
-} = require('../controllers/locationController');
+const locationController = require("../controllers/locationController");
+const router = require("express").Router();
 
 // Routes
-router.post('/', createLocation);
-router.get('/', getLocations);
-router.get('/:id', getLocationById);
-router.put('/:id', updateLocation);
-router.delete('/:id', deleteLocation);
+router.post('/', locationController.createLocation);
+router.get('/', locationController.getLocations);
+router.get('/:id', locationController.getLocationById);
+router.put('/:id', locationController.updateLocation);
+router.delete('/:id', locationController.deleteLocation);
+router.get('/structured/all', locationController.getAllLocations);
 
 module.exports = router;

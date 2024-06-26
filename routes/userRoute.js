@@ -26,6 +26,8 @@ router.get(
   userController.getUserById
 );
 
+router.get('/check-registration/:phoneNumber', userController.checkUserRegistration);
+
 router.patch(
   "/:id",
 //    upload.fields([{
