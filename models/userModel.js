@@ -141,16 +141,16 @@ const userSchema = new Schema({
       message: 'Email cannot be empty'
     }
   },
-  password: {
-    type: String,
-    required: true,
-    validate: {
-      validator: function(v) {
-        return /\S+/.test(v); // Ensures it's not just whitespace
-      },
-      message: 'Password cannot be empty'
-    }
-  },
+  // password: {
+  //   type: String,
+  //   required: true,
+  //   validate: {
+  //     validator: function(v) {
+  //       return /\S+/.test(v); // Ensures it's not just whitespace
+  //     },
+  //     message: 'Password cannot be empty'
+  //   }
+  // },
   profilePic: {
     type: String,
     default: null
@@ -162,18 +162,18 @@ const userSchema = new Schema({
 }, { timestamps: true });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
-  try {
-    if (!this.isModified('password')) {
-      return next();
-    }
-    const hashedPassword = await bcrypt.hash(this.password, 10);
-    this.password = hashedPassword;
-    return next();
-  } catch (error) {
-    return next(error);
-  }
-});
+// userSchema.pre('save', async function(next) {
+//   try {
+//     if (!this.isModified('password')) {
+//       return next();
+//     }
+//     const hashedPassword = await bcrypt.hash(this.password, 10);
+//     this.password = hashedPassword;
+//     return next();
+//   } catch (error) {
+//     return next(error);
+//   }
+// });
 
 // Create a Mongoose model based on the schema
 const User = mongoose.model('User', userSchema);

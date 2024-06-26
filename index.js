@@ -24,8 +24,8 @@ app.get('/', (_req, res) => {
   res.send({ message: 'Welcome to Backend of Esyasoft Mobility!!' });
 });
 
-app.use('/user', require('./routes/userRoute')); // Adjust route paths as per your file structure
-// app.use('/service', require('./routes/serviceRoute'));
+app.use('/users', require('./routes/userRoute')); // Adjust route paths as per your file structure
+app.use('/location', require('./routes/locationRoute'));
 // app.use('/subservice', require('./routes/subServiceRoute'));
 
 // Start the server
