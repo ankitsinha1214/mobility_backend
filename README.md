@@ -6,7 +6,7 @@ This Node.js application provides user management functionality including signup
 ## Installation
 1. Clone the repository to your local machine:
 ```bash
-git clone https://github.com/ankitsinha1112/delite_frontend.git
+git clone https://github.com/ankitsinha1214/mobility_backend.git
 ```
 2. Install the required dependencies, run the following command:
 ```bash
