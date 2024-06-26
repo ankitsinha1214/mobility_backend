@@ -1,0 +1,18 @@
+{
+  "DATABASE": {
+    "ERROR_CONNECTING": "error connecting database",
+    "CONNECTED": "Database Connection Established",
+    "SYNC": "Yes re-sync done!",
+    "ERROR_SYNC": "Error while sync the database."
+  },
+  "USER": {
+    "NO_FEED_BACK": "No Feed Back :(",
+    "USER_NOT_FOUND": "Records not found",
+    "WRONG_CREDENTIAL": "Wrong Credential",
+    "USER_EXIST": "Records exists",
+    "EMAIL_EXIST": "Email already exists",
+    "USER_CREATED": "Records created",
+    "USER_DELETED": "Records is deleted!",
+    "UPADTE_USER": "Records updated sucessfully."
+  }
+}
