@@ -26,6 +26,7 @@ app.get('/', (_req, res) => {
 
 app.use('/users', require('./routes/userRoute')); // Adjust route paths as per your file structure
 app.use('/location', require('./routes/locationRoute'));
+app.use('/vehicle', require('./routes/vehicleRoute'));
 // app.use('/subservice', require('./routes/subServiceRoute'));
 
 // Start the server
