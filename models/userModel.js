@@ -36,14 +36,14 @@ const userVehicleSchema = new Schema({
   vehicle_reg: {
     type: String,
     required: true,
-    unique: true,  // Ensures vehicle_reg is unique
-    immutable: true, 
-    validate: {
-      validator: function(v) {
-        return /\S+/.test(v); // Ensures it's not just whitespace
-      },
-      message: 'Vehicle Registration cannot be empty'
-    }
+    // unique: true,  // Ensures vehicle_reg is unique
+    // immutable: true, 
+    // validate: {
+    //   validator: function(v) {
+    //     return /\S+/.test(v); // Ensures it's not just whitespace
+    //   },
+      // message: 'Vehicle Registration cannot be empty'
+    // }
   },
   range: {
     type: String,
