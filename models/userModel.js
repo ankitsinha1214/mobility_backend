@@ -35,7 +35,7 @@ const userVehicleSchema = new Schema({
   },
   vehicle_reg: {
     type: String,
-    required: true,
+    // required: true,
     // unique: true,  // Ensures vehicle_reg is unique
     // immutable: true, 
     // validate: {

@@ -170,12 +170,12 @@ const addUser = async (req, res) => {
         return res.json({ success: true, data: userDataToSend, message: USER.USER_CREATED });
     } catch (error) {
         console.error('Error:', error);
-        if(error.keyValue.email){
+        if(error.keyValue){
             return res.status(500).json({ success: false, message: `${error.keyValue.email} Email already exist. Please check!`, error: error.message });
         }
-        if(error.keyValue){
-            return res.status(500).json({ success: false, message: `${error.keyValue['user_vehicle.vehicle_reg']} Vehicle Registeration already exist. Please check!`, error: error.message });
-        }
+        // if(error.keyValue){
+        //     return res.status(500).json({ success: false, message: `${error.keyValue['user_vehicle.vehicle_reg']} Vehicle Registeration already exist. Please check!`, error: error.message });
+        // }
         return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
     }
 };
@@ -217,7 +217,7 @@ const getUserById = async (req, res) => {
 
 // Update user by ID
 const updateUser = async (req, res) => {
-    const { id } = req.params;
+    const { phoneNumber } = req.params;
 
     try {
         const updatedUser = await User.findByIdAndUpdate(id, req.body, { new: true });
