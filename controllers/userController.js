@@ -229,16 +229,25 @@ const updateUser = async (req, res) => {
     }
 
     try {
+        const userBeforeUpdate = await User.findOne({ phone: phoneNumber });
+
+        if (!userBeforeUpdate) {
+            return res.json({ success: false, message: "User not found" });
+        }
+
         const updatedUser = await User.findOneAndUpdate(
             { phone: phoneNumber },
             updateFields,
             { new: true }
         );
 
-        if (updatedUser) {
+        // Check if any fields were actually updated
+        const fieldsUpdated = Object.keys(updateFields).some(key => userBeforeUpdate[key] !== updatedUser[key]);
+
+        if (fieldsUpdated) {
             return res.json({ success: true, message: "User updated successfully", user: updatedUser });
         } else {
-            return res.json({ success: false, message: "User not found" });
+            return res.json({ success: false, message: "No fields were updated" });
         }
     } catch (error) {
         console.error('Error:', error);

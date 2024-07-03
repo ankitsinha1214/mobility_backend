@@ -29,7 +29,7 @@ router.get(
 router.get('/check-registration/:phoneNumber', userController.checkUserRegistration);
 
 router.patch(
-  "/:id",
+  "/:phoneNumber",
 //    upload.fields([{
 //   name: 'avatar', maxCount: 1
 // }
