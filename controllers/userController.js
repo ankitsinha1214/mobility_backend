@@ -170,7 +170,7 @@ const addUser = async (req, res) => {
         return res.json({ success: true, data: userDataToSend, message: USER.USER_CREATED });
     } catch (error) {
         console.error('Error:', error);
-        if(error.keyValue){
+        if (error.keyValue) {
             return res.status(500).json({ success: false, message: `${error.keyValue.email} Email already exist. Please check!`, error: error.message });
         }
         // if(error.keyValue){
@@ -218,12 +218,25 @@ const getUserById = async (req, res) => {
 // Update user by ID
 const updateUser = async (req, res) => {
     const { phoneNumber } = req.params;
+    const { gender, email, date_of_birth, ...updateFields } = req.body;
+
+    // Check if restricted fields are in the request body
+    if (gender || email || date_of_birth) {
+        return res.json({
+            success: false,
+            message: "Updating gender, email, or date of birth is not allowed"
+        });
+    }
 
     try {
-        const updatedUser = await User.findByIdAndUpdate(id, req.body, { new: true });
+        const updatedUser = await User.findOneAndUpdate(
+            { phone: phoneNumber },
+            updateFields,
+            { new: true }
+        );
 
         if (updatedUser) {
-            return res.json({ success: true, message: "User updated successfully" });
+            return res.json({ success: true, message: "User updated successfully", user: updatedUser });
         } else {
             return res.json({ success: false, message: "User not found" });
         }
@@ -232,6 +245,7 @@ const updateUser = async (req, res) => {
         return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
     }
 };
+
 
 // Delete user by ID
 const deleteUser = async (req, res) => {
@@ -253,40 +267,51 @@ const deleteUser = async (req, res) => {
 // add a new vehicle for user
 const addUserVehicle = async (req, res) => {
     const { phoneNumber } = req.params;
-    const { make, model, variant, vehicle_reg, range } = req.body;
-  
+    const { make, model, variant, vehicle_reg, range, vehicle_img } = req.body;
+
     try {
-      // Check if the vehicle registration already exists
-      const existingVehicle = await User.findOne({
-        phoneNumber,
-        'user_vehicle.vehicle_reg': vehicle_reg
-      });
-  
-      if (existingVehicle) {
-        return res.status(400).json({ success: false, message: 'Vehicle registration already exists' });
-      }
-  
-      // Create a new vehicle object
-      const newVehicle = { make, model, variant, vehicle_reg, range };
-  
-      // Push the new vehicle object to the user's user_vehicle array
-      const user = await User.findOneAndUpdate(
-        { phoneNumber },
-        { $push: { user_vehicle: newVehicle } },
-        { new: true }
-      );
-  
-      if (!user) {
-        return res.status(404).json({ success: false, message: 'User not found' });
-      }
-  
-      return res.json({ success: true, data: newVehicle, message: 'Vehicle added successfully' });
+        // Check if the vehicle registration already exists
+        //   const existingVehicle = await User.findOne({
+        //     phoneNumber
+        //     ,
+        //     'user_vehicle.vehicle_reg': vehicle_reg
+        //   });
+
+        //   if (existingVehicle) {
+        //     return res.status(400).json({ success: false, message: 'Vehicle registration already exists' });
+        //   }
+        const existingVehicle = await User.findOne({
+            phoneNumber,
+            'user_vehicle.make': make,
+            'user_vehicle.model': model,
+            'user_vehicle.variant': variant
+        });
+
+        if (existingVehicle) {
+            return res.status(400).json({ success: false, message: 'Vehicle with the same make, model, and variant already exists for this user' });
+        }
+
+        // Create a new vehicle object
+        const newVehicle = { make, model, variant, vehicle_reg, range, vehicle_img };
+
+        // Push the new vehicle object to the user's user_vehicle array
+        const user = await User.findOneAndUpdate(
+            { phoneNumber },
+            { $push: { user_vehicle: newVehicle } },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        return res.json({ success: true, data: newVehicle, message: 'Vehicle added successfully' });
     } catch (error) {
-      console.error('Error:', error);
-      return res.status(500).json({ success: false, message: 'Something went wrong', error: error.message });
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Something went wrong', error: error.message });
     }
-  };
-  
+};
+
 
 
 // get all vehicle of a user
@@ -333,7 +358,7 @@ const getUserVehicleById = async (req, res) => {
 // update a vehicle
 const updateUserVehicle = async (req, res) => {
     const { phoneNumber, vehicleId } = req.params;
-    const { make, model, variant, vehicle_reg, range } = req.body;
+    const { make, model, variant, vehicle_reg, range, vehicle_img } = req.body;
 
     try {
         const user = await User.findOne({ phoneNumber });
@@ -352,7 +377,8 @@ const updateUserVehicle = async (req, res) => {
             vehicle.make !== make ||
             vehicle.model !== model ||
             vehicle.variant !== variant ||
-            // vehicle.vehicle_reg !== vehicle_reg ||
+            vehicle.vehicle_reg !== vehicle_reg ||
+            vehicle.vehicle_img !== vehicle_img ||
             vehicle.range !== range
         );
 
@@ -364,7 +390,8 @@ const updateUserVehicle = async (req, res) => {
         vehicle.make = make;
         vehicle.model = model;
         vehicle.variant = variant;
-        // vehicle.vehicle_reg = vehicle_reg;
+        vehicle.vehicle_reg = vehicle_reg;
+        vehicle.vehicle_img = vehicle_img;
         vehicle.range = range;
 
         await user.save();
@@ -411,20 +438,20 @@ const deleteUserVehicle = async (req, res) => {
 // check weather user is registered or not
 const checkUserRegistration = async (req, res) => {
     const { phoneNumber } = req.params;
-  
+
     try {
-      const user = await User.findOne({ phoneNumber }, { password: 0 }); // Exclude password from the result
-  
-      if (user) {
-        return res.json({ success: true, data: user, message: "User is registered" });
-      } else {
-        return res.json({ success: false, message: "User is not registered" });
-      }
+        const user = await User.findOne({ phoneNumber }, { password: 0 }); // Exclude password from the result
+
+        if (user) {
+            return res.json({ success: true, data: user, message: "User is registered" });
+        } else {
+            return res.json({ success: false, message: "User is not registered" });
+        }
     } catch (error) {
-      console.error('Error:', error);
-      return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
     }
-  };
+};
 
 
 module.exports = {

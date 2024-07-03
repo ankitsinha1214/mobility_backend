@@ -54,6 +54,16 @@ const userVehicleSchema = new Schema({
       },
       message: 'Range cannot be empty'
     }
+  },
+  vehicle_img: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function(v) {
+        return /\S+/.test(v); // Ensures it's not just whitespace
+      },
+      message: 'image url cannot be empty'
+    }
   }
 });
 // }, { _id: false });
