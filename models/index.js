@@ -3,6 +3,7 @@ const dbConfig = require('../db'); // Assuming you have a db configuration file
 
 // Import Mongoose models
 const User = require('./userModel'); // Update the path as necessary for other models
+const SandmUser = require('./userSandmModel'); // Update the path as necessary for other models
 const Location = require('./locationModel'); // Update the path as necessary for other models
 const Vehicle = require('./vehicleModel'); // Update the path as necessary for other models
 
@@ -20,6 +21,7 @@ mongoose.connect(dbConfig.mongoURI, {
 // Export models
 module.exports = {
   User,
+  SandmUser,
   Location,
   Vehicle
 };
