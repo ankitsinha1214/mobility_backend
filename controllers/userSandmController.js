@@ -89,7 +89,7 @@ const updateUserDetails = async (req, res) => {
 
         // Check if the provided values are the same as the current values
         if (user.name === name && user.email === email && user.phone === phone) {
-            return res.json({ success: false, message: 'Nothing to update, values are the same as previous' });
+            return res.json({ success: false, message: 'No changes detected. Please update at least one field.' });
         }
 
         // Update user details in the database
@@ -103,7 +103,16 @@ const updateUserDetails = async (req, res) => {
         delete updatedUserData.password;
         res.json({ success: true, data: updatedUserData, message: 'User data updated successfully' });
     } catch (error) {
-        console.error('Error:', error);
+        // console.error('Error:', error);
+        if(error.keyValue){
+            console.log(error.keyValue)
+            if(error.keyValue?.phone){
+                res.json({ success: false, message: `${error.keyValue?.phone} this to be unique` });
+            }
+            else if(error.keyValue?.email){
+                res.json({ success: false, message: `${error.keyValue?.email} this to be unique` });
+            }
+        }
         res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
     }
 };
