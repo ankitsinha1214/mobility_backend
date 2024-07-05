@@ -98,8 +98,10 @@ const updateUserDetails = async (req, res) => {
             { name, email, phone },
             { new: true }
         );
-
-        res.json({ success: true, data: updatedUser, message: 'User data updated successfully' });
+        // Remove the password field from the updatedUser object
+        const updatedUserData = updatedUser.toObject();
+        delete updatedUserData.password;
+        res.json({ success: true, data: updatedUserData, message: 'User data updated successfully' });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
