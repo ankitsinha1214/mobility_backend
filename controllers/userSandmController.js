@@ -50,7 +50,7 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ username });
 
         if (!user) {
-            return res.status(401).json({ success: false, message: 'Authentication failed' });
+            return res.json({ success: false, message: 'User Not Found' });
         }
 
         // Compare the provided password with the stored encrypted password
@@ -63,7 +63,7 @@ const loginUser = async (req, res) => {
             delete userData.password;
             res.json({ success: true, data: userData, message: 'Authentication successful' });
         } else {
-            res.status(401).json({ success: false, message: 'Authentication failed' });
+            res.json({ success: false, message: 'Authentication failed' });
         }
     } catch (error) {
         console.error('Error:', error);
