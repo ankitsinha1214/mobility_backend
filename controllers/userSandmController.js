@@ -7,10 +7,10 @@ const bcrypt = require('bcryptjs');
 const registerUser = async (req, res) => {
     //   const { username, password, company, department } = req.body;
     const { username, password, company, department, name, email, phone } = req.body;
-
+    const { prefix, number } = phone;
     try {
         // Check if username or email already exists
-        const existingUser = await User.findOne({ $or: [{ username }, { email }, { phone }] });
+        const existingUser = await User.findOne({ $or: [{ username }, { email }, { 'phone.number': number }] });
         // const existingUser = await User.findOne({ $or: [{ username }, { email }, { phone }] });
         if (existingUser) {
             return res.json({ success: false, message: 'Username, email, or phone number already exists' });
@@ -74,6 +74,7 @@ const loginUser = async (req, res) => {
 // Controller function to update user details
 const updateUserDetails = async (req, res) => {
     const { username, name, email, phone } = req.body;
+    const { prefix, number } = phone;
 
     if (!username) {
         return res.status(400).json({ success: false, message: 'Username is required to update' });
@@ -88,14 +89,14 @@ const updateUserDetails = async (req, res) => {
         }
 
         // Check if the provided values are the same as the current values
-        if (user.name === name && user.email === email && user.phone === phone) {
+        if (user.name === name && user.email === email && user.phone.prefix === prefix && user.phone.number === number) {
             return res.json({ success: false, message: 'No changes detected. Please update at least one field.' });
         }
 
         // Update user details in the database
         const updatedUser = await User.findOneAndUpdate(
             { username },
-            { name, email, phone },
+            { name, email, phone: { prefix, number } },
             { new: true }
         );
         // Remove the password field from the updatedUser object
@@ -106,8 +107,8 @@ const updateUserDetails = async (req, res) => {
         // console.error('Error:', error);
         if(error.keyValue){
             console.log(error.keyValue)
-            if(error.keyValue?.phone){
-                res.json({ success: false, message: `${error.keyValue?.phone} this to be unique` });
+            if (error.keyValue?.['phone.number']) {
+                res.json({ success: false, message: `${error.keyValue['phone.number']} this phone number is already in use` });
             }
             else if(error.keyValue?.email){
                 res.json({ success: false, message: `${error.keyValue?.email} this to be unique` });

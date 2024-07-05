@@ -68,15 +68,38 @@ const sandmUserSchema = new Schema({
       message: 'Email cannot be empty'
     }
   },
+//   phone: {
+//     type: String,
+//     // required: true,
+//     unique: true,
+//     validate: {
+//       validator: function(v) {
+//         return /\S+/.test(v); // Ensures it's not just whitespace
+//       },
+//       message: 'Phone Number cannot be empty'
+//     }
+//   }
   phone: {
-    type: String,
-    // required: true,
-    unique: true,
-    validate: {
-      validator: function(v) {
-        return /\S+/.test(v); // Ensures it's not just whitespace
-      },
-      message: 'Phone Number cannot be empty'
+    prefix: {
+      type: String,
+    //   required: true,
+      validate: {
+        validator: function(v) {
+          return /\S+/.test(v); // Ensures it's not just whitespace
+        },
+        message: 'Phone prefix cannot be empty'
+      }
+    },
+    number: {
+      type: String,
+    //   required: true,
+      unique: true,
+      validate: {
+        validator: function(v) {
+          return /\S+/.test(v); // Ensures it's not just whitespace
+        },
+        message: 'Phone number cannot be empty'
+      }
     }
   }
 }, { timestamps: true });
