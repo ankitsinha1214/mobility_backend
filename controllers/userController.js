@@ -306,6 +306,7 @@ const deleteUser = async (req, res) => {
             }
             updatedUser.phoneNumber = user._id;
             updatedUser.email = user._id;
+            updatedUser.status = "Inactive";
             // Update the user document
             await User.findByIdAndUpdate(user._id, updatedUser, { new: true });
 
