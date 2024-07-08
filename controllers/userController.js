@@ -258,16 +258,60 @@ const updateUser = async (req, res) => {
 
 
 // Delete user by ID
+// const deleteUser = async (req, res) => {
+//     const { id } = req.params;
+
+//     try {
+//         const deletedUser = await User.findByIdAndDelete(id);
+
+//         if (deletedUser) {
+//             return res.json({ success: true, message: USER.USER_DELETED });
+//         } else {
+//             return res.json({ success: false, message: USER.USER_NOT_FOUND });
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//         return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
+//     }
+// };
+
 const deleteUser = async (req, res) => {
-    const { id } = req.params;
+    const { phoneNumber } = req.params;
 
     try {
-        const deletedUser = await User.findByIdAndDelete(id);
+        // Find the user by phoneNumber
+        const user = await User.findOne({ phoneNumber });
 
-        if (deletedUser) {
-            return res.json({ success: true, message: USER.USER_DELETED });
+        if (user) {
+            // Create an object with only the fields to keep
+            // const updatedUser = {
+            //     user_vehicle: user.user_vehicle
+            // };
+
+            const updatedUser = {
+                user_vehicle: user.user_vehicle.map(vehicle => {
+                    const { vehicle_reg, ...rest } = vehicle._doc || vehicle;
+                    return rest;
+                })
+            };
+
+            // Iterate over the user object and set all other fields to null, including phoneNumber
+            for (const key in user._doc) {
+                if (key !== '_id' && key !== 'user_vehicle') {
+                    updatedUser[key] = null;
+                }
+                // else if(key === 'phoneNumber'){&& key !== 'phoneNumber'
+                //     updateUser[key] = user._id;
+                // }
+            }
+            updatedUser.phoneNumber = user._id;
+            updatedUser.email = user._id;
+            // Update the user document
+            await User.findByIdAndUpdate(user._id, updatedUser, { new: true });
+
+            return res.json({ success: true, message: USER.USER_DELETED  });
         } else {
-            return res.json({ success: false, message: USER.USER_NOT_FOUND });
+            return res.json({ success: false, message: 'User not found' });
         }
     } catch (error) {
         console.error('Error:', error);

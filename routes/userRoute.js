@@ -38,7 +38,7 @@ router.patch(
 );
 
 router.delete(
-  "/:id",
+  "/:phoneNumber",
   userController.deleteUser
 );
 
