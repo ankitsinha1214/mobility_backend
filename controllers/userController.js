@@ -229,8 +229,9 @@ const updateUser = async (req, res) => {
     }
 
     try {
-        const userBeforeUpdate = await User.findOne({ phone: phoneNumber });
-
+        // console.log(phoneNumber);
+        const userBeforeUpdate = await User.findOne({ phoneNumber: phoneNumber });
+        // console.log(userBeforeUpdate);
         if (!userBeforeUpdate) {
             return res.json({ success: false, message: "User not found" });
         }

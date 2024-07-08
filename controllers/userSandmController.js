@@ -7,10 +7,10 @@ const bcrypt = require('bcryptjs');
 const registerUser = async (req, res) => {
     //   const { username, password, company, department } = req.body;
     const { username, password, company, department, name, email, phone } = req.body;
-    const { prefix, number } = phone;
+    // const { prefix, number } = phone;
     try {
         // Check if username or email already exists
-        const existingUser = await User.findOne({ $or: [{ username }, { email }, { 'phone.number': number }] });
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         // const existingUser = await User.findOne({ $or: [{ username }, { email }, { phone }] });
         if (existingUser) {
             return res.json({ success: false, message: 'Username, email, or phone number already exists' });
@@ -111,7 +111,7 @@ const updateUserDetails = async (req, res) => {
                 res.json({ success: false, message: `${error.keyValue['phone.number']} this phone number is already in use` });
             }
             else if(error.keyValue?.email){
-                res.json({ success: false, message: `${error.keyValue?.email} this to be unique` });
+                res.json({ success: false, message: `${error.keyValue?.email} this email is already in use` });
             }
         }
         res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
