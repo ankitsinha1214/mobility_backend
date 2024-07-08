@@ -237,7 +237,7 @@ const updateUser = async (req, res) => {
         }
 
         const updatedUser = await User.findOneAndUpdate(
-            { phone: phoneNumber },
+            { phoneNumber: phoneNumber },
             updateFields,
             { new: true }
         );
