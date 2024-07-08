@@ -89,6 +89,11 @@ const userSchema = new Schema({
       message: 'Last Name cannot be empty'
     }
   },
+  status: {
+    type: String,
+    required: true, // Adjust as per your requirement
+    default: 'active' // Example default status
+  },
   phoneNumber: {
     type: String,
     required: true,
