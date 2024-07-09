@@ -28,6 +28,7 @@ app.use('/users', require('./routes/userRoute')); // Adjust route paths as per y
 app.use('/user-service-and-maintenance', require('./routes/userSandmRoute')); // Adjust route paths as per your file structure
 app.use('/location', require('./routes/locationRoute'));
 app.use('/vehicle', require('./routes/vehicleRoute'));
+app.use('/charger-locations', require('./routes/chargerLocationRoute'));
 // app.use('/subservice', require('./routes/subServiceRoute'));
 
 // Start the server
