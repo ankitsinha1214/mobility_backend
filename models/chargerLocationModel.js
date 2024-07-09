@@ -63,6 +63,10 @@ const chargerInfoSchema = new Schema({
     }
 });
 
+const validateFacilities = function (value) {
+    return Array.isArray(value) && value.length > 0;
+};
+
 const chargerLocationSchema = new Schema({
     locationName: {
         type: String,
@@ -103,6 +107,7 @@ const chargerLocationSchema = new Schema({
     },
     facilities: {
         type: [facilitySchema],
+        validate: [validateFacilities, 'At least one facility is required'],
         required: true,
     },
     status: {
@@ -112,6 +117,7 @@ const chargerLocationSchema = new Schema({
     },
     chargerInfo: {
         type: [chargerInfoSchema],
+        validate: [validateFacilities, 'At least one Charger Information is required'],
         required: true,
     },
     workingHours: {
