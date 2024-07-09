@@ -3,9 +3,8 @@ module.exports = {
     options: {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    //   useCreateIndex: true,
-    //   useFindAndModify: false 
+      // useCreateIndex: true,
+      // useFindAndModify: false 
+    // strictQuery: false,
     }
   };
-  
-  
