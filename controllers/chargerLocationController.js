@@ -154,6 +154,26 @@ const getAllLocations = async (req, res) => {
     }
 };
 
+const getLocationsByStateCityStatus = async (req, res) => {
+    const { state, city, status } = req.body;
+
+    try {
+        const filter = {};
+        if (state) filter.state = state;
+        if (city) filter.city = city;
+        if (status) filter.status = status;
+
+        const locations = await ChargerLocation.find(filter);
+        if (locations.length === 0) {
+            return res.json({ success: false, message: 'No locations found' });
+        }
+        return res.json({ success: true, data: locations });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 module.exports = {
     createChargerLocation,
     getChargerLocations,
@@ -162,5 +182,6 @@ module.exports = {
     updateChargerLocation,
     deleteChargerLocation,
     getAllLocations,
-    changeChargerStatus
+    changeChargerStatus,
+    getLocationsByStateCityStatus
 };
