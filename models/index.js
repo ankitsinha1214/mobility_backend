@@ -7,6 +7,7 @@ const SandmUser = require('./userSandmModel'); // Update the path as necessary f
 const Location = require('./locationModel'); // Update the path as necessary for other models
 const Vehicle = require('./vehicleModel'); // Update the path as necessary for other models
 const ChargerLocation = require('./chargerLocationModel'); // Update the path as necessary for other models
+const sandmNotification = require('./notificationSandmModel'); // Update the path as necessary for other models
 
 const { DATABASE } = require('../message.json');
 
@@ -25,5 +26,6 @@ module.exports = {
   SandmUser,
   Location,
   Vehicle,
-  ChargerLocation
+  ChargerLocation,
+  sandmNotification
 };

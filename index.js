@@ -26,6 +26,7 @@ app.get('/', (_req, res) => {
 
 app.use('/users', require('./routes/userRoute')); // Adjust route paths as per your file structure
 app.use('/user-service-and-maintenance', require('./routes/userSandmRoute')); // Adjust route paths as per your file structure
+app.use('/notifcation-service-and-maintenance', require('./routes/notificationSandmRoute')); // Adjust route paths as per your file structure
 app.use('/location', require('./routes/locationRoute'));
 app.use('/vehicle', require('./routes/vehicleRoute'));
 app.use('/charger-locations', require('./routes/chargerLocationRoute'));
