@@ -9,5 +9,6 @@ router.get('/all-location', chargerLocationController.getAllLocations);
 router.get('/:id', chargerLocationController.getChargerLocationById);
 router.put('/:id', chargerLocationController.updateChargerLocation);
 router.delete('/:id', chargerLocationController.deleteChargerLocation);
+router.post('/:id', chargerLocationController.changeChargerStatus);
 
 module.exports = router;

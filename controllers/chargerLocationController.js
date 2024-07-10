@@ -84,6 +84,27 @@ const deleteChargerLocation = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+// Change Charger Status by ID
+const changeChargerStatus = async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    try {
+        const chargerLocation = await ChargerLocation.findById(id);
+        if (!chargerLocation) {
+            return res.json({ success: false, message: 'Charger location not found' });
+        }
+
+        chargerLocation.status = status;
+        await chargerLocation.save();
+
+        return res.json({ success: true, message: `Charger location status changed to ${status} successfully` });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 
 // Get all charger locations with nested state, city, and detailed locations
 const getAllLocations = async (req, res) => {
@@ -140,5 +161,6 @@ module.exports = {
     getChargerLocationById,
     updateChargerLocation,
     deleteChargerLocation,
-    getAllLocations
+    getAllLocations,
+    changeChargerStatus
 };
