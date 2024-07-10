@@ -124,21 +124,21 @@ const getAllLocations = async (req, res) => {
                 stateEntry.cities.push(cityEntry);
             }
 
-            cityEntry.locations.push({
-                locationName: loc.locationName,
-                locationType: loc.locationType,
-                address: loc.address,
-                direction: loc.direction,
-                salesManager: loc.salesManager,
-                dealer: loc.dealer,
-                facilities: loc.facilities,
-                status: loc.status,
-                chargerInfo: loc.chargerInfo,
-                workingHours: loc.workingHours,
-                locationImage: loc.locationImage,
-                createdAt: loc.createdAt,
-                updatedAt: loc.updatedAt
-            });
+            // cityEntry.locations.push({
+            //     locationName: loc.locationName,
+            //     locationType: loc.locationType,
+            //     address: loc.address,
+            //     direction: loc.direction,
+            //     salesManager: loc.salesManager,
+            //     dealer: loc.dealer,
+            //     facilities: loc.facilities,
+            //     status: loc.status,
+            //     chargerInfo: loc.chargerInfo,
+            //     workingHours: loc.workingHours,
+            //     locationImage: loc.locationImage,
+            //     createdAt: loc.createdAt,
+            //     updatedAt: loc.updatedAt
+            // });
 
             return acc;
         }, []);
