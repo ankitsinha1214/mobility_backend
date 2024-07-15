@@ -51,7 +51,22 @@ const chargerInfoSchema = new Schema({
         required: true,
         trim: true,
     },
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+    },
     type: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    subtype: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    powerOutput: {
         type: String,
         required: true,
         trim: true,
