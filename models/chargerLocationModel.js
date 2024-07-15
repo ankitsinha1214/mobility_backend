@@ -139,6 +139,12 @@ const chargerLocationSchema = new Schema({
         type: String,
         required: true,
         trim: true,
+        default: 'Everyday'
+    },
+    workingDays: {
+        type: String,
+        required: true,
+        trim: true,
     },
     locationImage: {
         type: String,
