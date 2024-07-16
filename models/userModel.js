@@ -173,6 +173,10 @@ const userSchema = new Schema({
   user_vehicle: {
     type: [userVehicleSchema], // This makes user_vehicle an array of userVehicleSchema
     required: false // This is optional based on your needs
+  },
+  user_favourite_charger_locations: {
+    type: [], 
+    required: false
   }
 }, { timestamps: true });
 

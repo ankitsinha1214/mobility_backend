@@ -508,6 +508,33 @@ const checkUserRegistration = async (req, res) => {
     }
 };
 
+// add location to favourite
+const addFavouriteLocation = async (req, res) => {
+    const { phoneNumber } = req.params;
+    const { locationId } = req.body;
+  
+    if (!phoneNumber || !locationId) {
+      return res.json({status: false, message: 'Phone Number and Location ID are required' });
+    }
+      try {
+        const user = await User.findOne({ phoneNumber });
+    
+        if (!user) {
+          return res.status(404).json({status: false,  message: 'User not found' });
+        }
+    
+        // Add the location ID to the array if it doesn't already exist
+        if (!user.user_favourite_charger_locations.includes(locationId)) {
+          user.user_favourite_charger_locations.push(locationId);
+          await user.save();
+        }
+    
+        res.status(200).json({ message: 'Location added to favourites', user });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+      }
+  };
 
 module.exports = {
     addUser,
@@ -524,5 +551,6 @@ module.exports = {
     getUserVehicleById,
     updateUserVehicle,
     deleteUserVehicle,
-    checkUserRegistration
+    checkUserRegistration,
+    addFavouriteLocation
 };
