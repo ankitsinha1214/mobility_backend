@@ -76,4 +76,7 @@ router.delete('/:phoneNumber/vehicles/:vehicleId', userController.deleteUserVehi
 
 router.post('/:phoneNumber/add-favourite', userController.addFavouriteLocation);
 
+// Get all user favourite list
+router.get('/:phoneNumber/get-favourite', userController.getUserFavouriteLocations);
+
 module.exports = router;
