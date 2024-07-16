@@ -2,6 +2,7 @@
 
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
+const ChargerLocation = require('../models/chargerLocationModel');
 const { USER } = require("../message.json");
 
 // Update user password
@@ -512,29 +513,63 @@ const checkUserRegistration = async (req, res) => {
 const addFavouriteLocation = async (req, res) => {
     const { phoneNumber } = req.params;
     const { locationId } = req.body;
-  
+
     if (!phoneNumber || !locationId) {
-      return res.json({status: false, message: 'Phone Number and Location ID are required' });
+        return res.json({ status: false, message: 'Phone Number and Location ID are required' });
     }
-      try {
-        const user = await User.findOne({ phoneNumber });
-    
-        if (!user) {
-          return res.status(404).json({status: false,  message: 'User not found' });
+
+    try {
+        // Check if the location exists
+        const location = await ChargerLocation.findById(locationId);
+        if (!location) {
+            return res.json({ status: false, message: 'Location not found' });
         }
-    
+
+        // Find the user by phone number
+        const user = await User.findOne({ phoneNumber });
+        if (!user) {
+            return res.json({ status: false, message: 'User not found' });
+        }
+
         // Add the location ID to the array if it doesn't already exist
         if (!user.user_favourite_charger_locations.includes(locationId)) {
-          user.user_favourite_charger_locations.push(locationId);
-          await user.save();
+            user.user_favourite_charger_locations.push(locationId);
+            await user.save();
         }
-    
-        res.status(200).json({ message: 'Location added to favourites', user });
-      } catch (error) {
+
+        res.json({ status: true, message: 'Location added to favourites', user });
+    } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
-      }
-  };
+        res.status(500).json({ status: false, message: 'Server error' });
+    }
+};
+
+const getUserFavouriteLocations = async (req, res) => {
+    const { phoneNumber } = req.params;
+
+    if (!phoneNumber) {
+        return res.json({ status: false, message: 'Phone Number is required' });
+    }
+
+    try {
+        // Find the user by phone number
+        const user = await User.findOne({ phoneNumber });
+
+        if (!user) {
+            return res.json({ status: false, message: 'User not found' });
+        }
+
+        // Get the detailed information for each favorite location
+        const favouriteLocations = await ChargerLocation.find({
+            _id: { $in: user.user_favourite_charger_locations }
+        });
+
+        res.json({ status: true, message: 'Favourite locations retrieved successfully', data: favouriteLocations });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: false, message: 'Server error' });
+    }
+};
 
 module.exports = {
     addUser,
@@ -552,5 +587,6 @@ module.exports = {
     updateUserVehicle,
     deleteUserVehicle,
     checkUserRegistration,
-    addFavouriteLocation
+    addFavouriteLocation,
+    getUserFavouriteLocations
 };
