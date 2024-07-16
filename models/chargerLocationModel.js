@@ -13,6 +13,16 @@ const locationSchema = new Schema({
         required: true,
     }
 });
+const freepaidSchema = new Schema({
+    parking: {
+        type: Boolean,
+        required: true,
+    },
+    charging: {
+        type: Boolean,
+        required: true,
+    }
+});
 
 const contactSchema = new Schema({
     name: {
@@ -110,6 +120,10 @@ const chargerLocationSchema = new Schema({
     },
     direction: {
         type: locationSchema,
+        required: true,
+    },
+    freepaid: {
+        type: freepaidSchema,
         required: true,
     },
     salesManager: {
