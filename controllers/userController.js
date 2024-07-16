@@ -571,6 +571,41 @@ const getUserFavouriteLocations = async (req, res) => {
     }
 };
 
+const removeFavouriteLocation = async (req, res) => {
+    const { phoneNumber } = req.params;
+    const { locationId } = req.body;
+
+    if (!phoneNumber || !locationId) {
+        return res.json({ status: false, message: 'Phone Number and Location ID are required' });
+    }
+
+    try {
+        // Check if the location ID exists
+        const locationExists = await ChargerLocation.findById(locationId);
+        if (!locationExists) {
+            return res.json({ status: false, message: 'Location ID not found' });
+        }
+
+        // Find the user by phone number
+        const user = await User.findOne({ phoneNumber });
+        if (!user) {
+            return res.json({ status: false, message: 'User not found' });
+        }
+
+        // Check if the location ID is in the user's favorites and remove it
+        const index = user.user_favourite_charger_locations.indexOf(locationId);
+        if (index > -1) {
+            user.user_favourite_charger_locations.splice(index, 1);
+            await user.save();
+        }
+
+        res.json({ message: 'Location removed from favourites', user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: false, message: 'Server error' });
+    }
+};
+
 module.exports = {
     addUser,
     getUser,
@@ -588,5 +623,6 @@ module.exports = {
     deleteUserVehicle,
     checkUserRegistration,
     addFavouriteLocation,
-    getUserFavouriteLocations
+    getUserFavouriteLocations,
+    removeFavouriteLocation
 };

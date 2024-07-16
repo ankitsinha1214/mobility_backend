@@ -74,9 +74,13 @@ router.put('/:phoneNumber/vehicles/:vehicleId', userController.updateUserVehicle
 // DELETE - Delete user vehicle by ID
 router.delete('/:phoneNumber/vehicles/:vehicleId', userController.deleteUserVehicle);
 
+// Add a location to favourite
 router.post('/:phoneNumber/add-favourite', userController.addFavouriteLocation);
 
 // Get all user favourite list
 router.get('/:phoneNumber/get-favourite', userController.getUserFavouriteLocations);
+
+// remove a location to favourite
+router.delete('/user/:phoneNumber/favourite', userController.removeFavouriteLocation);
 
 module.exports = router;
