@@ -11,5 +11,6 @@ router.put('/:id', chargerLocationController.updateChargerLocation);
 router.delete('/:id', chargerLocationController.deleteChargerLocation);
 router.post('/:id', chargerLocationController.changeChargerStatus);
 router.post('/location/filter', chargerLocationController.getLocationsByStateCityStatus);
+router.post('/location/range', chargerLocationController.getChargerLocationsInRange);
 
 module.exports = router;

@@ -173,6 +173,81 @@ const getLocationsByStateCityStatus = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+// Get charger locations within a specific range
+// const getChargerLocationsInRange = async (req, res) => {
+//     const { latitude, longitude, status, range } = req.body;
+
+//     if (!latitude || !longitude || !status || !range) {
+//         return res.json({ success: false, message: 'All fields (latitude, longitude, status, range) are required' });
+//     }
+
+//     try {
+//         const locations = await ChargerLocation.find({
+//             status,
+//             location: {
+//                 $geoWithin: {
+//                     $centerSphere: [
+//                         [longitude, latitude],
+//                         range / 6378.1 // Range in radians (Earth radius in km)
+//                     ]
+//                 }
+//             }
+//         });
+
+//         if (locations.length === 0) {
+//             return res.json({ success: false, message: 'No charger locations found within the specified range' });
+//         }
+
+//         return res.json({ success: true, data: locations });
+//     } catch (error) {
+//         console.error('Error:', error);
+//         return res.status(500).json({ success: false, message: 'Internal server error' });
+//     }
+// };
+const getChargerLocationsInRange = async (req, res) => {
+    const { latitude, longitude, status, range } = req.body;
+
+    if (!latitude || !longitude || !range) {
+        return res.json({ success: false, message: 'Latitude, longitude, and range are required' });
+    }
+
+    try {
+        // Convert range from kilometers to meters
+        const rangeInMeters = range * 1000;
+
+        // Get all charger locations
+        const locations = await ChargerLocation.find(status ? { status } : {});
+
+        // Filter locations within the specified range using Haversine formula
+        const locationsInRange = locations.filter(location => {
+            const distance = calculateDistance(latitude, longitude, location.direction.latitude, location.direction.longitude);
+            return distance <= rangeInMeters;
+        });
+
+        if (locationsInRange.length === 0) {
+            return res.json({ success: false, message: 'No charger locations found within the specified range' });
+        }
+
+        return res.json({ success: true, data: locationsInRange });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+// Haversine formula to calculate the distance between two points
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const toRadians = (degree) => degree * Math.PI / 180;
+
+    const R = 6371000; // Radius of the Earth in meters
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in meters
+};
 
 module.exports = {
     createChargerLocation,
@@ -183,5 +258,6 @@ module.exports = {
     deleteChargerLocation,
     getAllLocations,
     changeChargerStatus,
-    getLocationsByStateCityStatus
+    getLocationsByStateCityStatus,
+    getChargerLocationsInRange
 };
