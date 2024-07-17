@@ -81,6 +81,6 @@ router.post('/:phoneNumber/add-favourite', userController.addFavouriteLocation);
 router.get('/:phoneNumber/get-favourite', userController.getUserFavouriteLocations);
 
 // remove a location to favourite
-router.delete('/user/:phoneNumber/favourite', userController.removeFavouriteLocation);
+router.delete('/:phoneNumber/favourite', userController.removeFavouriteLocation);
 
 module.exports = router;

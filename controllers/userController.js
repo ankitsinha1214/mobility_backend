@@ -592,14 +592,16 @@ const removeFavouriteLocation = async (req, res) => {
             return res.json({ status: false, message: 'User not found' });
         }
 
-        // Check if the location ID is in the user's favorites and remove it
+        // Check if the location ID is in the user's favorites
         const index = user.user_favourite_charger_locations.indexOf(locationId);
         if (index > -1) {
+            // Remove the location ID from the user's favorites list
             user.user_favourite_charger_locations.splice(index, 1);
             await user.save();
+            return res.json({status: true, message: 'Location removed from favourites', user });
+        } else {
+            return res.json({ status: false, message: 'Location ID not found in user\'s favourites' });
         }
-
-        res.json({ message: 'Location removed from favourites', user });
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: false, message: 'Server error' });
