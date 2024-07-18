@@ -207,6 +207,9 @@ const getLocationsByStateCityStatus = async (req, res) => {
 const getChargerLocationsInRange = async (req, res) => {
     const { latitude, longitude, status, range } = req.body;
 
+    if(range === 0){
+        return res.json({ success: true, data: null, message: 'No charger found!' });
+    }
     if (!latitude || !longitude || !range) {
         return res.json({ success: false, message: 'Latitude, longitude, and range are required' });
     }
