@@ -256,7 +256,7 @@ const searchChargerLocations = async (req, res) => {
     const { query } = req.query;
 
     if (!query) {
-        return res.status(400).json({ success: false, message: 'Query parameter is required' });
+        return res.json({ success: false, message: 'Query parameter is required' });
     }
     // console.log(query)
     try {
