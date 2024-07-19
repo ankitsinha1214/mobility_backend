@@ -252,6 +252,34 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
     return R * c; // Distance in meters
 };
 
+const searchChargerLocations = async (req, res) => {
+    const { query } = req.query;
+
+    if (!query) {
+        return res.status(400).json({ success: false, message: 'Query parameter is required' });
+    }
+    // console.log(query)
+    try {
+        const regex = new RegExp(query, 'i');
+        const chargerLocations = await ChargerLocation.find({
+            $or: [
+                { locationName: { $regex: regex } },
+                { address: { $regex: regex } }
+            ]
+        });
+
+        if (chargerLocations.length === 0) {
+            return res.json({ success: false, message: 'No charger locations found' });
+        }
+
+        return res.json({ success: true, data: chargerLocations });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+
 module.exports = {
     createChargerLocation,
     getChargerLocations,
@@ -262,5 +290,6 @@ module.exports = {
     getAllLocations,
     changeChargerStatus,
     getLocationsByStateCityStatus,
-    getChargerLocationsInRange
+    getChargerLocationsInRange,
+    searchChargerLocations
 };
