@@ -6,6 +6,15 @@ const faqSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    category: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    url: {
+        type: String,
+        trim: true
+    },
     answer: {
         type: String,
         required: true,
