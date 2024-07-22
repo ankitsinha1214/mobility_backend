@@ -12,7 +12,7 @@ router.get('/', faqController.getFAQs);
 router.get('/all-faq-category', faqController.getCategoryFaq);
 
 // Get all FAQs by category
-router.get('/faq-category', faqController.faqByCategory);
+router.post('/faq-category', faqController.faqByCategory);
 
 // Get a single FAQ by ID
 router.get('/:id', faqController.getFAQById);
