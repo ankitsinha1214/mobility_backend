@@ -30,6 +30,8 @@ app.use('/notifcation-service-and-maintenance', require('./routes/notificationSa
 app.use('/location', require('./routes/locationRoute'));
 app.use('/vehicle', require('./routes/vehicleRoute'));
 app.use('/charger-locations', require('./routes/chargerLocationRoute'));
+app.use('/faq', require('./routes/faqRoute'));
+
 // app.use('/subservice', require('./routes/subServiceRoute'));
 
 // Start the server
