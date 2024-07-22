@@ -12,6 +12,36 @@ const createFAQ = async (req, res) => {
     }
 };
 
+// Get all FAQs with a given category
+const faqByCategory = async (req, res) => {
+    const { category } = req.body;
+    if (!category) {
+        return res.json({ success: false, message: 'Category is required' });
+    }
+    try {
+        const faqs = await FAQ.find({ category });
+        if (faqs.length === 0) {
+            return res.json({ success: false, message: 'No FAQs of given category found' });
+        }
+        return res.json({ success: true, data: faqs });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Get all unique categories
+const getCategoryFaq = async (req, res) => {
+    try {
+        const categories = await FAQ.distinct('category');
+        if (categories.length === 0) {
+            return res.json({ success: false, message: 'No FAQs Category found' });
+        }
+        return res.json({ success: true, data: categories });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 // Get all FAQs
 const getFAQs = async (req, res) => {
     try {
@@ -74,6 +104,8 @@ const deleteFAQ = async (req, res) => {
 module.exports = {
     createFAQ,
     getFAQs,
+    getCategoryFaq,
+    faqByCategory,
     getFAQById,
     updateFAQ,
     deleteFAQ
