@@ -152,7 +152,7 @@ const addUser = async (req, res) => {
         // const newUser = new User(req.body);
         // await newUser.save();
 
-        
+
         // Remove _id from each vehicle object in user_vehicle array
         const cleanedUserVehicle = user_vehicle.map(vehicle => {
             const { _id, ...cleanedVehicle } = vehicle;
@@ -481,11 +481,13 @@ const deleteUserVehicle = async (req, res) => {
         const user = await User.findOne({ phoneNumber });
 
         if (!user) {
-            return res.status(404).json({ success: false, message: "User not found" });
+            return res.json({ success: false, message: "User not found" });
         }
 
-        const vehicle = user.user_vehicle.id(vehicleId);
-        if (!vehicle) {
+        // Find the vehicle by ID
+        const vehicleIndex = user.user_vehicle.findIndex(vehicle => vehicle._id.toString() === vehicleId);
+
+        if (vehicleIndex === -1) {
             return res.status(404).json({ success: false, message: "Vehicle not found" });
         }
 
@@ -494,7 +496,20 @@ const deleteUserVehicle = async (req, res) => {
             return res.status(400).json({ success: false, message: "User must have at least one vehicle" });
         }
 
-        vehicle.remove();
+        // Remove the vehicle from the array
+        user.user_vehicle.splice(vehicleIndex, 1);
+
+
+        // const vehicle = user.user_vehicle.id(vehicleId);
+        // if (!vehicle) {
+        //     return res.status(404).json({ success: false, message: "Vehicle not found" });
+        // }
+
+        // // Check if this is the last vehicle
+        // if (user.user_vehicle.length === 1) {
+        //     return res.status(400).json({ success: false, message: "User must have at least one vehicle" });
+        // }
+        // vehicle.remove();
         await user.save();
 
         return res.json({ success: true, message: "Vehicle deleted successfully" });
