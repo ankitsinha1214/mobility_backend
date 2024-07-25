@@ -148,20 +148,22 @@ const addUser = async (req, res) => {
         if (existingUser) {
             return res.json({ success: false, message: "User already exists" });
         }
-
-        const newUser = new User(req.body);
-        await newUser.save();
-        // Remove _id from each vehicle object in user_vehicle array
-        // const cleanedUserVehicle = user_vehicle.map(vehicle => {
-        //     const { _id, ...cleanedVehicle } = vehicle;
-        //     return cleanedVehicle;
-        // });
-        // Prepare user data, including cleaned user_vehicle
-        // const { _id: ignoredId, user_vehicle: _, ...userData } = req.body;
-        // userData.user_vehicle = cleanedUserVehicle;
-
-        // const newUser = new User(userData);
+        // prev code
+        // const newUser = new User(req.body);
         // await newUser.save();
+
+        
+        // Remove _id from each vehicle object in user_vehicle array
+        const cleanedUserVehicle = user_vehicle.map(vehicle => {
+            const { _id, ...cleanedVehicle } = vehicle;
+            return cleanedVehicle;
+        });
+        // Prepare user data, including cleaned user_vehicle
+        const { _id: ignoredId, user_vehicle: _, ...userData } = req.body;
+        userData.user_vehicle = cleanedUserVehicle;
+
+        const newUser = new User(userData);
+        await newUser.save();
 
         const userDataToSend = {
             id: newUser._id,
