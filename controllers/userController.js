@@ -149,11 +149,27 @@ const addUser = async (req, res) => {
             return res.json({ success: false, message: "User already exists" });
         }
 
-        const newUser = new User(req.body);
+        // const newUser = new User(req.body);
+        // await newUser.save();
+        // Remove _id from each vehicle object in user_vehicle array
+        const cleanedUserVehicle = user_vehicle.map(vehicle => {
+            const { _id, ...cleanedVehicle } = vehicle;
+            return cleanedVehicle;
+        });
+        // Prepare user data, including cleaned user_vehicle
+        const { _id: ignoredId, user_vehicle: _, ...userData } = req.body;
+        userData.user_vehicle = cleanedUserVehicle;
+
+        const newUser = new User(userData);
         await newUser.save();
+        // const { _id, ...userData } = req.body;
+        // const newUser = new User(userData);
+        // await newUser.save();
+
+
 
         const userDataToSend = {
-            id: newUser.id,
+            id: newUser._id,
             firstName: newUser.firstName,
             lastName: newUser.lastName,
             phoneNumber: newUser.phoneNumber,
@@ -311,7 +327,7 @@ const deleteUser = async (req, res) => {
             // Update the user document
             await User.findByIdAndUpdate(user._id, updatedUser, { new: true });
 
-            return res.json({ success: true, message: USER.USER_DELETED  });
+            return res.json({ success: true, message: USER.USER_DELETED });
         } else {
             return res.json({ success: false, message: 'User not found' });
         }
@@ -598,7 +614,7 @@ const removeFavouriteLocation = async (req, res) => {
             // Remove the location ID from the user's favorites list
             user.user_favourite_charger_locations.splice(index, 1);
             await user.save();
-            return res.json({status: true, message: 'Location removed from favourites', user });
+            return res.json({ status: true, message: 'Location removed from favourites', user });
         } else {
             return res.json({ status: false, message: 'Location ID not found in user\'s favourites' });
         }
