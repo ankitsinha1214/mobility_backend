@@ -9,6 +9,7 @@ const Vehicle = require('./vehicleModel'); // Update the path as necessary for o
 const ChargerLocation = require('./chargerLocationModel'); // Update the path as necessary for other models
 const faq = require('./faqModel'); // Update the path as necessary for other models
 const predeliveryQuestion = require('./preDeliveryQuestionModel'); // Update the path as necessary for other models
+const preDeliveryChargebox = require('./preDeliveryChargeboxResponseModel'); // Update the path as necessary for other models
 const sandmNotification = require('./notificationSandmModel'); // Update the path as necessary for other models
 
 const { DATABASE } = require('../message.json');
@@ -31,5 +32,6 @@ module.exports = {
   ChargerLocation,
   sandmNotification,
   faq,
-  predeliveryQuestion
+  predeliveryQuestion,
+  preDeliveryChargebox
 };
