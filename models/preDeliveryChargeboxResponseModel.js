@@ -28,7 +28,8 @@ const eachResponseSchema = new Schema({
 const preDeliveryChargeboxSchema = new Schema({
     chargebox_id: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
     },
     responses: {
         type: [eachResponseSchema],
