@@ -139,3 +139,27 @@ exports.getPreDeliveryChargeboxResponsesByUserId = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 };
+
+// Check if chargebox_id already exists
+exports.checkChargeboxIdExists = async (req, res) => {
+    try {
+        const { chargebox_id } = req.params;
+
+        // Validate that chargebox_id is provided
+        if (!chargebox_id) {
+            return res.json({ success: false, message: 'Chargebox ID is required' });
+        }
+
+        // Check if the chargebox_id exists
+        const existingResponse = await PreDeliveryChargeboxResponse.findOne({ chargebox_id });
+
+        if (existingResponse) {
+            return res.json({ success: true, message: 'Chargebox ID already exists' });
+        } else {
+            return res.json({ success: false, message: 'Chargebox ID does not exist' });
+        }
+    } catch (error) {
+        console.error('Error checking chargebox_id:', error);
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
