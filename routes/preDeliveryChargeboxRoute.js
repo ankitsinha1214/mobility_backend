@@ -5,7 +5,8 @@ const {
     getAllPreDeliveryChargeboxResponses,
     getPreDeliveryChargeboxResponseById,
     updatePreDeliveryChargeboxResponse,
-    deletePreDeliveryChargeboxResponse
+    deletePreDeliveryChargeboxResponse,
+    getPreDeliveryChargeboxResponsesByUserId
 } = require('../controllers/preDeliveryChargeboxController'); // Adjust the path as needed
 
 // Route to create a new PreDeliveryChargeboxResponse
@@ -22,5 +23,8 @@ router.put('/:id', updatePreDeliveryChargeboxResponse);
 
 // Route to delete a PreDeliveryChargeboxResponse by ID
 router.delete('/:id', deletePreDeliveryChargeboxResponse);
+
+// Get PreDeliveryChargeboxResponses by User ID
+router.get('/user/:userId', getPreDeliveryChargeboxResponsesByUserId);
 
 module.exports = router;

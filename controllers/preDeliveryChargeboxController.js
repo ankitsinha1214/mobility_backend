@@ -119,3 +119,20 @@ exports.deletePreDeliveryChargeboxResponse = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 };
+
+// Get PreDeliveryChargeboxResponses by User ID
+exports.getPreDeliveryChargeboxResponsesByUserId = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const responses = await PreDeliveryChargeboxResponse.find({ userServiceAndMaintenance: userId });
+
+        if (responses.length === 0) {
+            return res.json({ success: false, message: 'No PreDeliveryChargeboxResponses found for the given user' });
+        }
+
+        res.json({ success: true, data: responses });
+    } catch (error) {
+        console.error('Error retrieving PreDeliveryChargeboxResponses by user ID:', error);
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
