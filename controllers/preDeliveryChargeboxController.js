@@ -61,10 +61,25 @@ exports.getPreDeliveryChargeboxResponseById = async (req, res) => {
     try {
         const { id } = req.params;
         const response = await PreDeliveryChargeboxResponse.findById(id);
+        // const dataTosend = response;
         if (!response) {
             return res.json({ success: false, message: 'PreDeliveryChargeboxResponse not found' });
         }
-        res.json({ success: true, data: response });
+        // Fetch question details for each response
+        const responsesWithQuestions = await Promise.all(response.responses.map(async (res) => {
+            const question = await PreDeliveryQuestion.findById(res.question_id);
+            if (!question) {
+                return res.json({ success: false, message: `Question with ID ${res.question_id} not found` });
+            }
+            return {
+                ...res.toObject(), // Convert to plain JavaScript object
+                question_name: question.question // Add question name
+            };
+        }));
+
+        // Send the response with populated question names
+        res.json({ success: true, data: { ...response.toObject(), responses: responsesWithQuestions } });
+
     } catch (error) {
         console.error('Error getting PreDeliveryChargeboxResponse by ID:', error);
         res.status(500).json({ success: false, message: 'Server error', error: error.message });
