@@ -161,9 +161,9 @@ const chargerLocationSchema = new Schema({
         trim: true,
     },
     locationImage: {
-        type: String,
+        type: [String],
         required: true,
-        trim: true,
+        validate: [validateFacilities, 'At least one image URL is required']
     },
 }, { timestamps: true });
 

@@ -1,8 +1,15 @@
 const chargerLocationController = require("../controllers/chargerLocationController");
 const router = require("express").Router();
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Routes
-router.post('/', chargerLocationController.createChargerLocation);
+router.post('/',
+    upload.fields([{
+        name: 'locationImage', maxCount: 6
+    }
+    ]), chargerLocationController.createChargerLocation);
 router.get('/', chargerLocationController.getChargerLocations);
 router.get('/type', chargerLocationController.getLocationTypes);
 router.get('/all-location', chargerLocationController.getAllLocations);

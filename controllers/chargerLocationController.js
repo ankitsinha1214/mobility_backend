@@ -1,9 +1,50 @@
 const ChargerLocation = require('../models/chargerLocationModel');
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const s3 = new S3Client({
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+    region: process.env.AWS_BUCKET_REGION
+})
+
 
 // Create a charger location
 const createChargerLocation = async (req, res) => {
     try {
-        const chargerLocation = new ChargerLocation(req.body);
+        if (!req.files || !req.files.locationImage || req.files.locationImage.length === 0) {
+            return res.json({ success: false, message: 'No image file uploaded' });
+        }
+        const imageKeys = [];
+
+        for (const file of req.files.locationImage) {
+            const arr1 = file.mimetype.split("/");
+            const awsImgKey = `locationImg/locationImg-${Date.now()}.${arr1[1]}`;
+            const params4 = {
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Key: awsImgKey,
+                Body: file.buffer,
+                ContentType: file.mimetype
+            };
+            const command4 = new PutObjectCommand(params4);
+            await s3.send(command4);
+            imageKeys.push(awsImgKey);
+        }
+        // const arr1 = req.files.locationImage[0].mimetype.split("/")
+
+        // var awsImgKey = `locationImg/locationImg-${Date.now()}` + "." + arr1[1];
+
+        // const params4 = {
+        //     Bucket: process.env.AWS_BUCKET_NAME,
+        //     Key: awsImgKey,
+        //     Body: req.files.locationImage[0].buffer,
+        //     ContentType: req.files.locationImage[0].mimetype
+        // }
+        // const command4 = new PutObjectCommand(params4);
+        // await s3.send(command4);
+        // const chargerLocation = new ChargerLocation({...req.body, locationImage : awsImgKey});
+        const chargerLocation = new ChargerLocation({...req.body, locationImage : imageKeys});
+        // const chargerLocation = new ChargerLocation(req.body);
         await chargerLocation.save();
         return res.json({ success: true, data: chargerLocation, message: 'Charger location created successfully' });
     } catch (error) {
