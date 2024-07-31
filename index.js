@@ -31,6 +31,7 @@ app.use('/location', require('./routes/locationRoute'));
 app.use('/vehicle', require('./routes/vehicleRoute'));
 app.use('/charger-locations', require('./routes/chargerLocationRoute'));
 app.use('/faq', require('./routes/faqRoute'));
+app.use('/reviews', require('./routes/ratingUserLocationRoute'));
 app.use('/pre-delivery-question', require('./routes/preDeliveryQuestionRoute'));
 app.use('/pre-delivery-chargebox-response', require('./routes/preDeliveryChargeboxRoute'));
 

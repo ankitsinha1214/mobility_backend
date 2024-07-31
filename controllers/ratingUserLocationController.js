@@ -1,0 +1,85 @@
+const Review = require('../models/ratingUserLocationModel');
+const User = require('../models/userModel');
+const ChargerLocation = require('../models/chargerLocationModel');
+
+// Create a review
+exports.createReview = async (req, res) => {
+    try {
+        const { phoneNumber, location, charging_exp, charging_location, review } = req.body;
+
+        // Validate user
+        const user = await User.findOne({ phoneNumber });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Validate location
+        const locationExists = await ChargerLocation.findById(location);
+        if (!locationExists) {
+            return res.status(404).json({ success: false, message: 'Location not found' });
+        }
+
+        // Create review
+        const newReview = new Review({
+            user: user._id,
+            location,
+            charging_exp,
+            charging_location,
+            review
+        });
+
+        await newReview.save();
+        res.json({ success: true, message: 'Review created successfully', data: newReview });
+    } catch (error) {
+        console.error('Error creating review:', error);
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+// Get all reviews by user
+exports.getReviewsByUser = async (req, res) => {
+    try {
+        const { phoneNumber } = req.params;
+
+        // Validate user
+        const user = await User.findOne({ phoneNumber });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Get reviews
+        const reviews = await Review.find({ user: user._id });
+        if (reviews.length === 0) {
+            return res.json({ success: false, message: 'No reviews found for this user' });
+        }
+
+        res.json({ success: true, data: reviews });
+    } catch (error) {
+        console.error('Error getting reviews by user:', error);
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+// Get all reviews by location
+exports.getReviewsByLocation = async (req, res) => {
+    try {
+        const { locationId } = req.params;
+
+        // Validate location
+        const locationExists = await ChargerLocation.findById(locationId);
+        if (!locationExists) {
+            return res.status(404).json({ success: false, message: 'Location not found' });
+        }
+
+        // Get reviews
+        const reviews = await Review.find({ location: locationId });
+        if (reviews.length === 0) {
+            return res.json({ success: false, message: 'No reviews found for this location' });
+        }
+
+        res.json({ success: true, data: reviews });
+    } catch (error) {
+        console.error('Error getting reviews by location:', error);
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
