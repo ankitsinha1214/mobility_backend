@@ -27,7 +27,6 @@ const reviewSchema = new Schema({
     },
     review: {
         type: String,
-        required: true,
         trim: true
     }
 }, { timestamps: true });
