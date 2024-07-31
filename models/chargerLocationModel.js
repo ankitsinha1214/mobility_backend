@@ -58,8 +58,9 @@ const facilitySchema = new Schema({
 const chargerInfoSchema = new Schema({
     status: {
         type: String,
-        required: true,
-        trim: true,
+        // required: true,
+        // trim: true,
+        default: 'Inactive'
     },
     name: {
         type: String,
