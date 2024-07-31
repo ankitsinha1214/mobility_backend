@@ -12,11 +12,17 @@ const s3 = new S3Client({
 // Create a charger location
 const createChargerLocation = async (req, res) => {
     try {
+        const { direction, freepaid, salesManager, dealer, facilities, chargerInfo } = req.body;
+        const parsedDirection = JSON.parse(direction);
+        const parsedFreepaid = JSON.parse(freepaid);
+        const parsedSalesManager = JSON.parse(salesManager);
+        const parsedDealer = JSON.parse(dealer);
+        const parsedFacilities = JSON.parse(facilities);
+        const parsedChargerInfo = JSON.parse(chargerInfo);
         if (!req.files || !req.files.locationImage || req.files.locationImage.length === 0) {
             return res.json({ success: false, message: 'No image file uploaded' });
         }
         const imageKeys = [];
-
         for (const file of req.files.locationImage) {
             const arr1 = file.mimetype.split("/");
             const awsImgKey = `locationImg/locationImg-${Date.now()}.${arr1[1]}`;
@@ -43,7 +49,8 @@ const createChargerLocation = async (req, res) => {
         // const command4 = new PutObjectCommand(params4);
         // await s3.send(command4);
         // const chargerLocation = new ChargerLocation({...req.body, locationImage : awsImgKey});
-        const chargerLocation = new ChargerLocation({...req.body, locationImage : imageKeys});
+        const chargerLocation = new ChargerLocation({ ...req.body, locationImage: imageKeys, direction: parsedDirection,
+            freepaid: parsedFreepaid, salesManager: parsedSalesManager, dealer: parsedDealer, facilities: parsedFacilities, chargerInfo: parsedChargerInfo  });
         // const chargerLocation = new ChargerLocation(req.body);
         await chargerLocation.save();
         return res.json({ success: true, data: chargerLocation, message: 'Charger location created successfully' });
@@ -248,7 +255,7 @@ const getLocationsByStateCityStatus = async (req, res) => {
 const getChargerLocationsInRange = async (req, res) => {
     const { latitude, longitude, status, range } = req.body;
 
-    if(range === 0){
+    if (range === 0) {
         return res.json({ success: true, data: null, message: 'No charger found!' });
     }
     if (!latitude || !longitude || !range) {
