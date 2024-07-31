@@ -1,9 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const vehicleModelController = require('../controllers/vehicleController');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Create a new vehicle model
-router.post('/', vehicleModelController.createVehicleModel);
+router.post('/',
+    upload.fields([{
+        name: 'image', maxCount: 6
+    }
+    ]),
+    vehicleModelController.createVehicleModel);
 
 // Get all vehicle models
 router.get('/', vehicleModelController.getAllVehicleModels);

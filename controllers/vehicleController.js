@@ -1,4 +1,12 @@
 const VehicleModel = require('../models/vehicleModel');
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const s3 = new S3Client({
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+    region: process.env.AWS_BUCKET_REGION
+})
 
 // Get vehicle make, model, and variant hierarchy
 const getVehicleHierarchy = async (req, res) => {
@@ -53,8 +61,19 @@ const createVehicleModel = async (req, res) => {
         if (existingModel) {
             return res.status(400).json({ success: false, message: 'Vehicle model already exists' });
         }
+        const arr1 = req.files.image[0].mimetype.split("/")
 
-        const newVehicleModel = new VehicleModel({ make, model, variant, ARAI_range, claimed_range, image });
+        var awsImgKey = `vechileImg/vehicleImg-${Date.now()}` + "." + arr1[1];
+
+        const params4 = {
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: awsImgKey,
+            Body: req.files.image[0].buffer,
+            ContentType: req.files.image[0].mimetype
+        }
+        const command4 = new PutObjectCommand(params4);
+        await s3.send(command4);
+        const newVehicleModel = new VehicleModel({ make, model, variant, ARAI_range, claimed_range, image : awsImgKey });
         await newVehicleModel.save();
 
         return res.json({ success: true, data: newVehicleModel, message: "Vehicle model created successfully" });
