@@ -10,13 +10,19 @@ exports.createReview = async (req, res) => {
         // Validate user
         const user = await User.findOne({ phoneNumber });
         if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+            return res.json({ success: false, message: 'User not found' });
         }
 
         // Validate location
         const locationExists = await ChargerLocation.findById(location);
         if (!locationExists) {
-            return res.status(404).json({ success: false, message: 'Location not found' });
+            return res.json({ success: false, message: 'Location not found' });
+        }
+
+        // Check if the user has already reviewed this location
+        const existingReview = await Review.findOne({ user: user._id, location });
+        if (existingReview) {
+            return res.json({ success: false, message: 'User has already reviewed this location' });
         }
 
         // Create review
@@ -36,6 +42,35 @@ exports.createReview = async (req, res) => {
     }
 };
 
+// Check if a user has reviewed a location
+exports.hasUserReviewedLocation = async (req, res) => {
+    try {
+        const { phoneNumber, locationId } = req.params;
+
+        // Check if the user exists
+        const user = await User.findOne({ phoneNumber });
+        if (!user) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        // Check if the location exists
+        const location = await ChargerLocation.findById(locationId);
+        if (!location) {
+            return res.json({ success: false, message: 'Location not found' });
+        }
+
+        // Check if the user has reviewed this location
+        const review = await Review.findOne({ user: user._id, location: locationId });
+        const hasReviewed = !!review; // Convert to boolean
+
+        res.json({ success: true, hasReviewed });
+
+    } catch (error) {
+        console.error('Error checking if user reviewed location:', error);
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
 // Get all reviews by user
 exports.getReviewsByUser = async (req, res) => {
     try {
@@ -44,7 +79,7 @@ exports.getReviewsByUser = async (req, res) => {
         // Validate user
         const user = await User.findOne({ phoneNumber });
         if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+            return res.json({ success: false, message: 'User not found' });
         }
 
         // Get reviews
@@ -68,7 +103,7 @@ exports.getReviewsByLocation = async (req, res) => {
         // Validate location
         const locationExists = await ChargerLocation.findById(locationId);
         if (!locationExists) {
-            return res.status(404).json({ success: false, message: 'Location not found' });
+            return res.json({ success: false, message: 'Location not found' });
         }
 
         // Get reviews
