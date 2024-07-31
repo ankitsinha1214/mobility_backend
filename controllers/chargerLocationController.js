@@ -19,14 +19,15 @@ const createChargerLocation = async (req, res) => {
         const parsedDealer = JSON.parse(dealer);
         const parsedFacilities = JSON.parse(facilities);
         const parsedChargerInfo = JSON.parse(chargerInfo);
-        // if (!req.files || !req.files.locationImage || req.files.locationImage.length === 0) {
-        //     return res.json({ success: false, message: 'No image file uploaded' });
-        // }
-        if (!req.files || req.files.length === 0) {
+        if (!req.files || !req.files.locationImage || req.files.locationImage.length === 0) {
             return res.json({ success: false, message: 'No image file uploaded' });
         }
+        // if (!req.files || req.files.length === 0) {
+        //     return res.json({ success: false, message: 'No image file uploaded' });
+        // }
         const imageKeys = [];
-        for (const file of req.files) {
+        // console.log(req.files.locationImage)
+        for (const file of req.files.locationImage) {
             const arr1 = file.mimetype.split("/");
             const awsImgKey = `locationImg/locationImg-${Date.now()}.${arr1[1]}`;
             const params4 = {
