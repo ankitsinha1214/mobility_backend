@@ -1,3 +1,7 @@
+const SiteSurvey = require('../models/siteSurveyModel');
+const SandmUser = require('../models/userSandmModel'); // Import the SandmUser model
+const ChargerLocation = require('../models/chargerLocationModel'); 
+
 const createSiteSurvey = async (req, res) => {
     try {
         const { userId, locationId } = req.body;
