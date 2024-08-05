@@ -11,6 +11,7 @@ const faq = require('./faqModel'); // Update the path as necessary for other mod
 const predeliveryQuestion = require('./preDeliveryQuestionModel'); // Update the path as necessary for other models
 const preDeliveryChargebox = require('./preDeliveryChargeboxResponseModel'); // Update the path as necessary for other models
 const sandmNotification = require('./notificationSandmModel'); // Update the path as necessary for other models
+const chargingSession = require('./chargerSessionModel'); // Update the path as necessary for other models
 
 const { DATABASE } = require('../message.json');
 
@@ -33,5 +34,6 @@ module.exports = {
   sandmNotification,
   faq,
   predeliveryQuestion,
-  preDeliveryChargebox
+  preDeliveryChargebox,
+  chargingSession
 };

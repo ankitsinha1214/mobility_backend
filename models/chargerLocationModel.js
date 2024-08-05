@@ -86,6 +86,12 @@ const chargerInfoSchema = new Schema({
         type: String,
         required: true,
         trim: true,
+    },
+    maxCurrent: {
+        type: Number, // Max current in amps
+    },
+    maxVoltage: {
+        type: Number, // Max voltage in volts
     }
 });
 
