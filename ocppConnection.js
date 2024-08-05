@@ -8,7 +8,7 @@ const ws = new WebSocket.Server({ port: 8000 }); // Local WebSocket server runni
 ws.on('open', () => {
     console.log('Connected to OCPP server');
 });
-
+ 
 ws.on('message', (data) => {
     handleOcppMessage(JSON.parse(data)); // Handle incoming OCPP messages
 });
