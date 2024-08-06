@@ -34,11 +34,11 @@ const civilSchema = new Schema({
 
 const meterRoomSchema = new Schema({
     electricMeter: {
-        type: String,
+        type: [String],
         required: true,
     },
     electricBill: {
-        type: String,
+        type: [String],
         required: true,
     },
 }, { _id: false }); // Set _id to false to avoid creating an _id field for this sub-document
