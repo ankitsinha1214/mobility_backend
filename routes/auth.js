@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const res = require("express/lib/response");
-const JWT_SECRET = 'ankitsinha1234';
+const JWT_SECRET = '#serviceAndMaintenance123';
 var fetchuser = require('../middleware/fetchuser');
 
 // Function to generate a random OTP

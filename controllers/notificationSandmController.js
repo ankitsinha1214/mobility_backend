@@ -132,11 +132,34 @@ const getNotificationsByUserId = async (req, res) => {
     }
 };
 
+// Get all notifications by userServiceAndMaintenance ID which are unread
+const getNotificationsUnreadByUserId = async (req, res) => {
+    const { userId } = req.body;
+
+    try {
+        // Fetch unread notifications for the specified user
+        const notifications = await NotificationServiceMaintenance.find({ 
+            userServiceAndMaintenance: userId,
+            isRead: false // Filter for unread notifications
+        });
+
+        if (notifications.length === 0) {
+            return res.json({ success: false, message: 'No unread notifications found for the given user ID' });
+        }
+
+        return res.json({ success: true, data: notifications });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 module.exports = {
     createNotification,
     getNotifications,
     getNotificationById,
     updateNotification,
     deleteNotification,
-    getNotificationsByUserId
+    getNotificationsByUserId,
+    getNotificationsUnreadByUserId
 };

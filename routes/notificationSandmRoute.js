@@ -10,5 +10,6 @@ router.get('/:id', notificationController.getNotificationById);
 router.put('/:id', notificationController.updateNotification);
 router.delete('/:id', notificationController.deleteNotification);
 router.post('/user', notificationController.getNotificationsByUserId);
+router.post('/user/unread', notificationController.getNotificationsUnreadByUserId);
 
 module.exports = router;
