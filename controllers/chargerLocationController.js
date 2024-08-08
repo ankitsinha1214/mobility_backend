@@ -1,4 +1,5 @@
 const ChargerLocation = require('../models/chargerLocationModel');
+const SiteSurvey = require('../models/siteSurveyModel'); 
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const s3 = new S3Client({
     credentials: {
@@ -225,6 +226,42 @@ const getLocationsByStateCityStatus = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+
+const getLocationsByStateCityStatusSitesurvey = async (req, res) => {
+    const { state, city, status } = req.body;
+
+    try {
+        const filter = {};
+        if (state) filter.state = state;
+        if (city) filter.city = city;
+        if (status) filter.status = status;
+
+        // Retrieve locations based on the filter
+        const locations = await ChargerLocation.find(filter);
+        if (locations.length === 0) {
+            return res.json({ success: false, message: 'No locations found' });
+        }
+
+        // Extract location IDs from the results
+        const locationIds = locations.map(location => location._id);
+
+        // Find site surveys that exist for these locations
+        const siteSurveys = await SiteSurvey.find({ locationId: { $in: locationIds } });
+        const siteSurveyLocationIds = new Set(siteSurveys.map(survey => survey.locationId.toString()));
+
+        // Filter out locations that have associated site surveys
+        const filteredLocations = locations.filter(location => !siteSurveyLocationIds.has(location._id.toString()));
+
+        if (filteredLocations.length === 0) {
+            return res.json({ success: false, message: 'No locations available after filtering out those with existing site surveys' });
+        }
+
+        return res.json({ success: true, data: filteredLocations });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
 // Get charger locations within a specific range
 // const getChargerLocationsInRange = async (req, res) => {
 //     const { latitude, longitude, status, range } = req.body;
@@ -342,6 +379,7 @@ module.exports = {
     getAllLocations,
     changeChargerStatus,
     getLocationsByStateCityStatus,
+    getLocationsByStateCityStatusSitesurvey,
     getChargerLocationsInRange,
     searchChargerLocations
 };
