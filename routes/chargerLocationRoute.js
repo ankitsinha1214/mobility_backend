@@ -18,7 +18,7 @@ router.put('/:id', chargerLocationController.updateChargerLocation);
 router.delete('/:id', chargerLocationController.deleteChargerLocation);
 router.post('/:id', chargerLocationController.changeChargerStatus);
 router.post('/location/filter', chargerLocationController.getLocationsByStateCityStatus);
-router.post('/location/filter/site-survey', chargerLocationController.getLocationsByStateCityStatusSitesurvey);
+router.post('/location/filter/:checkType', chargerLocationController.getLocationsByStateCityStatusSitesurvey);
 router.post('/location/range', chargerLocationController.getChargerLocationsInRange);
 router.get('/location/search', chargerLocationController.searchChargerLocations);
 

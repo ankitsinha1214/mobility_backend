@@ -1,5 +1,6 @@
 const ChargerLocation = require('../models/chargerLocationModel');
 const SiteSurvey = require('../models/siteSurveyModel'); 
+const PreInstallation = require('../models/preInstallationModel'); 
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const s3 = new S3Client({
     credentials: {
@@ -229,6 +230,7 @@ const getLocationsByStateCityStatus = async (req, res) => {
 
 const getLocationsByStateCityStatusSitesurvey = async (req, res) => {
     const { state, city, status } = req.body;
+    const { checkType } = req.params;
 
     try {
         const filter = {};
@@ -236,27 +238,30 @@ const getLocationsByStateCityStatusSitesurvey = async (req, res) => {
         if (city) filter.city = city;
         if (status) filter.status = status;
 
-        // Retrieve locations based on the filter
-        const locations = await ChargerLocation.find(filter);
+        // Find locations based on the filter
+        let locations = await ChargerLocation.find(filter);
         if (locations.length === 0) {
             return res.json({ success: false, message: 'No locations found' });
         }
 
-        // Extract location IDs from the results
-        const locationIds = locations.map(location => location._id);
-
-        // Find site surveys that exist for these locations
-        const siteSurveys = await SiteSurvey.find({ locationId: { $in: locationIds } });
-        const siteSurveyLocationIds = new Set(siteSurveys.map(survey => survey.locationId.toString()));
-
-        // Filter out locations that have associated site surveys
-        const filteredLocations = locations.filter(location => !siteSurveyLocationIds.has(location._id.toString()));
-
-        if (filteredLocations.length === 0) {
-            return res.json({ success: false, message: 'No locations available after filtering out those with existing site surveys' });
+        // Depending on checkType, filter out locations that have existing site surveys or pre-installations
+        if (checkType === 'site-survey') {
+            const surveyedLocations = await SiteSurvey.find({ locationId: { $in: locations.map(loc => loc._id) } });
+            const surveyedLocationIds = surveyedLocations.map(survey => survey.locationId.toString());
+            console.log(surveyedLocationIds);
+            locations = locations.filter(loc => !surveyedLocationIds.includes(loc._id.toString()));
+        } else if (checkType === 'pre-installation') {
+            const preInstalledLocations = await PreInstallation.find({ locationId: { $in: locations.map(loc => loc._id) } });
+            const preInstalledLocationIds = preInstalledLocations.map(preInstall => preInstall.locationId.toString());
+            console.log(preInstalledLocationIds);
+            locations = locations.filter(loc => !preInstalledLocationIds.includes(loc._id.toString()));
         }
 
-        return res.json({ success: true, data: filteredLocations });
+        if (locations.length === 0) {
+            return res.json({ success: false, message: 'No available locations found' });
+        }
+
+        return res.json({ success: true, data: locations });
     } catch (error) {
         console.error('Error:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
