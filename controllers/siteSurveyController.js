@@ -30,7 +30,10 @@ const createSiteSurvey = async (req, res) => {
 
 const getAllSiteSurveys = async (req, res) => {
     try {
-        const siteSurveys = await SiteSurvey.find();
+        const siteSurveys = await SiteSurvey.find()
+            .populate('userId', 'username email phone')  // Adjust fields as needed
+            .populate('locationId', 'locationName address city state status'); // Adjust fields as needed
+        // const siteSurveys = await SiteSurvey.find();
         if (siteSurveys.length === 0) {
             return res.json({ status: false, message: 'No site surveys found' });
         }
