@@ -248,12 +248,12 @@ const getLocationsByStateCityStatusSitesurvey = async (req, res) => {
         if (checkType === 'site-survey') {
             const surveyedLocations = await SiteSurvey.find({ locationId: { $in: locations.map(loc => loc._id) } });
             const surveyedLocationIds = surveyedLocations.map(survey => survey.locationId.toString());
-            console.log(surveyedLocationIds);
+            // console.log(surveyedLocationIds);
             locations = locations.filter(loc => !surveyedLocationIds.includes(loc._id.toString()));
         } else if (checkType === 'pre-installation') {
             const preInstalledLocations = await PreInstallation.find({ locationId: { $in: locations.map(loc => loc._id) } });
             const preInstalledLocationIds = preInstalledLocations.map(preInstall => preInstall.locationId.toString());
-            console.log(preInstalledLocationIds);
+            // console.log(preInstalledLocationIds);
             locations = locations.filter(loc => !preInstalledLocationIds.includes(loc._id.toString()));
         }
 

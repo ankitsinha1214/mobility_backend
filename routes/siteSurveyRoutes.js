@@ -5,7 +5,8 @@ const {
     getAllSiteSurveys,
     getSiteSurveyById,
     getSiteSurveysByUserId,
-    deleteSiteSurveyById
+    deleteSiteSurveyById,
+    getSiteSurveyByLocationId
 } = require('../controllers/siteSurveyController');
 
 // Route to create a new site survey
@@ -19,6 +20,9 @@ router.get('/:id', getSiteSurveyById);
 
 // Route to get all site surveys by user ID
 router.get('/user/:userId', getSiteSurveysByUserId);
+
+// Route to get all approved site surveys by Location ID
+router.post('/location', getSiteSurveyByLocationId);
 
 // Route to delete a site survey by ID
 router.delete('/:id', deleteSiteSurveyById);

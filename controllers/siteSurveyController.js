@@ -82,10 +82,31 @@ const deleteSiteSurveyById = async (req, res) => {
     }
 };
 
+const getSiteSurveyByLocationId = async (req, res) => {
+    const { locationId } = req.body;
+
+    try {
+        // Find the site survey by locationId with status 'Approved'
+        const siteSurvey = await SiteSurvey.findOne({ locationId, status: 'Approved' });
+
+        if (!siteSurvey) {
+            return res.json({ success: false, message: 'No approved site survey found for this location' });
+        }
+        return res.json({
+            success: true,
+            data: siteSurvey
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 module.exports = { 
     createSiteSurvey, 
     getAllSiteSurveys, 
     getSiteSurveyById, 
     getSiteSurveysByUserId, 
-    deleteSiteSurveyById 
+    deleteSiteSurveyById,
+    getSiteSurveyByLocationId
 };
