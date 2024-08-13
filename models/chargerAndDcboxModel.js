@@ -47,6 +47,10 @@ const chargerAndDcBoxSchema = new Schema({
         type: String,
         default: 'Waiting for approval'
     },
+    Reason: {
+        type: String,
+        default: ''
+    },
     chargers: {
         type: chargersSchema,
         required: true,

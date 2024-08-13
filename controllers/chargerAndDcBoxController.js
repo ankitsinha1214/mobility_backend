@@ -2,6 +2,7 @@ const ChargerAndDcBox = require('../models/chargerAndDcboxModel');
 const SandmUser = require('../models/userSandmModel'); // Import the SandmUser model
 const ChargerLocation = require('../models/chargerLocationModel'); // Import the ChargerLocation model
 const PreInstallation = require('../models/preInstallationModel'); // Import the PreInstallation model
+const SiteSurvey = require('../models/siteSurveyModel'); // Import the PreInstallation model
 
 // Create a new ChargerAndDcBox
 const createChargerAndDcBox = async (req, res) => {
@@ -122,10 +123,73 @@ const getFilteredLocationsWithApprovedPreInstallation = async (req, res) => {
     }
 };
 
+const updateStatusByType = async (req, res) => {
+    const { id, status, reason, type } = req.body;
+
+    try {
+        // Validate input
+        if (!id || !status || !type) {
+            return res.json({ success: false, message: 'ID, status, and type are required' });
+        }
+
+        // Check if status is "Rejected" and reason is provided
+        if (status === 'Rejected' && !reason) {
+            return res.json({ success: false, message: 'Reason is required when status is "Rejected"' });
+        }
+
+        let record;
+
+        // Update the record based on type
+        if (type === 'site-survey') {
+            record = await SiteSurvey.findById(id);
+            if (!record) {
+                return res.json({ success: false, message: 'Site survey not found' });
+            }
+            record.status = status;
+            if (status === 'Rejected') {
+                record.Reason = reason;
+            }
+            await record.save();
+        } else if (type === 'pre-installation') {
+            record = await PreInstallation.findById(id);
+            if (!record) {
+                return res.json({ success: false, message: 'Pre-installation not found' });
+            }
+            record.status = status;
+            if (status === 'Rejected') {
+                record.Reason = reason;
+            }
+            await record.save();
+        } else if (type === 'charger-dc-box') {
+            record = await ChargerAndDcBox.findById(id);
+            if (!record) {
+                return res.json({ success: false, message: 'Charger and DC Box not found' });
+            }
+            record.status = status;
+            if (status === 'Rejected') {
+                record.Reason = reason;
+            }
+            await record.save();
+        } else {
+            return res.json({ success: false, message: 'Invalid type provided' });
+        }
+
+        return res.json({
+            success: true,
+            message: `${type} status updated successfully`,
+            data: record
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 module.exports = {
     createChargerAndDcBox,
     getAllChargerAndDcBox,
     getChargerAndDcBoxById,
     deleteChargerAndDcBoxById,
-    getFilteredLocationsWithApprovedPreInstallation
+    getFilteredLocationsWithApprovedPreInstallation,
+    updateStatusByType
 };

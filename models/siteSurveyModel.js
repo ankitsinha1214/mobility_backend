@@ -108,6 +108,10 @@ const siteSurveySchema = new Schema({
         type: String,
         default: 'Waiting for approval'
     },
+    Reason: {
+        type: String,
+        default: ''
+    },
     meterRoom: {
         type: meterRoomSchema,
         required: true,
