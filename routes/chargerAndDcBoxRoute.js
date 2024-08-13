@@ -4,7 +4,8 @@ const {
     createChargerAndDcBox,
     getAllChargerAndDcBox,
     getChargerAndDcBoxById,
-    deleteChargerAndDcBoxById
+    deleteChargerAndDcBoxById,
+    getFilteredLocationsWithApprovedPreInstallation
 } = require('../controllers/chargerAndDcBoxController');
 
 // Create a new ChargerAndDcBox
@@ -18,5 +19,8 @@ router.get('/:id', getChargerAndDcBoxById);
 
 // Delete ChargerAndDcBox by ID
 router.delete('/:id', deleteChargerAndDcBoxById);
+
+// filtering location who have approved preInstallation
+router.post('/filtered-locations-approved', getFilteredLocationsWithApprovedPreInstallation);
 
 module.exports = router;

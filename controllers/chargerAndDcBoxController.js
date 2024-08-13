@@ -1,6 +1,7 @@
 const ChargerAndDcBox = require('../models/chargerAndDcboxModel');
 const SandmUser = require('../models/userSandmModel'); // Import the SandmUser model
 const ChargerLocation = require('../models/chargerLocationModel'); // Import the ChargerLocation model
+const PreInstallation = require('../models/preInstallationModel'); // Import the PreInstallation model
 
 // Create a new ChargerAndDcBox
 const createChargerAndDcBox = async (req, res) => {
@@ -70,9 +71,61 @@ const deleteChargerAndDcBoxById = async (req, res) => {
     }
 };
 
+const getFilteredLocationsWithApprovedPreInstallation = async (req, res) => {
+    const { state, city, status } = req.body;
+
+    try {
+        // Filter locations based on state, city, and status
+        const filter = {};
+        if (state) filter.state = state;
+        if (city) filter.city = city;
+        if (status) filter.status = status;
+
+        // Find locations based on the filter
+        let locations = await ChargerLocation.find(filter);
+        if (locations.length === 0) {
+            return res.json({ success: false, message: 'No locations found' });
+        }
+
+        // Find pre-installations with 'Approved' status for these locations
+        const approvedPreInstallations = await PreInstallation.find({
+            locationId: { $in: locations.map(loc => loc._id) },
+            status: 'Approved'
+        });
+
+        // Get location IDs that have at least one approved pre-installation
+        const approvedLocationIds = new Set(approvedPreInstallations.map(preInstall => preInstall.locationId.toString()));
+
+        // Find locations with 'Approved' charger and DC box status
+        const approvedChargerAndDcBox = await ChargerAndDcBox.find({
+            locationId: { $in: locations.map(loc => loc._id) },
+            status: 'Approved'
+        });
+
+        // Get location IDs that have approved charger and DC box
+        const approvedChargerAndDcBoxLocationIds = new Set(approvedChargerAndDcBox.map(cb => cb.locationId.toString()));
+
+        // Filter locations to include only those with approved pre-installations and exclude those with approved charger and DC box
+        locations = locations.filter(loc => 
+            approvedLocationIds.has(loc._id.toString()) &&
+            !approvedChargerAndDcBoxLocationIds.has(loc._id.toString())
+        );
+
+        if (locations.length === 0) {
+            return res.json({ success: false, message: 'No locations with approved pre-installations found' });
+        }
+
+        return res.json({ success: true, data: locations });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 module.exports = {
     createChargerAndDcBox,
     getAllChargerAndDcBox,
     getChargerAndDcBoxById,
-    deleteChargerAndDcBoxById
+    deleteChargerAndDcBoxById,
+    getFilteredLocationsWithApprovedPreInstallation
 };
