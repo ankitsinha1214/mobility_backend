@@ -6,7 +6,8 @@ const {
     getChargerAndDcBoxById,
     deleteChargerAndDcBoxById,
     getFilteredLocationsWithApprovedPreInstallation,
-    updateStatusByType
+    updateStatusByType,
+    checkChargerAndDcBoxWaitingForApproval
 } = require('../controllers/chargerAndDcBoxController');
 
 // Create a new ChargerAndDcBox
@@ -26,5 +27,8 @@ router.post('/filtered-locations-approved', getFilteredLocationsWithApprovedPreI
 
 // change the status
 router.post('/change-status', updateStatusByType);
+
+// check charger and dc box already exist or not
+router.post('/check-already-exist', checkChargerAndDcBoxWaitingForApproval);
 
 module.exports = router;

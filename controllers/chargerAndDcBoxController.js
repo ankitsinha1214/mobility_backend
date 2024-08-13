@@ -185,11 +185,27 @@ const updateStatusByType = async (req, res) => {
     }
 };
 
+const checkChargerAndDcBoxWaitingForApproval = async (req, res) => {
+    const { locationId } = req.body;
+
+    try {
+        // Check if there is already a Charger and DC Box entry with status 'Waiting for approval' for this location
+        const existingEntry = await ChargerAndDcBox.findOne({ locationId, status: 'Waiting for approval' });
+        if (existingEntry) {
+            return res.json({ status: true, message: 'There is a Charger and DC Box entry waiting for approval at this location' });
+        }
+        return res.json({ status: false, message: 'No Charger and DC Box entry waiting for approval at this location' });
+    } catch (error) {
+        res.status(500).json({ status: false, error: error.message });
+    }
+};
+
 module.exports = {
     createChargerAndDcBox,
     getAllChargerAndDcBox,
     getChargerAndDcBoxById,
     deleteChargerAndDcBoxById,
     getFilteredLocationsWithApprovedPreInstallation,
-    updateStatusByType
+    updateStatusByType,
+    checkChargerAndDcBoxWaitingForApproval
 };
