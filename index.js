@@ -37,6 +37,7 @@ app.use('/pre-delivery-question', require('./routes/preDeliveryQuestionRoute'));
 app.use('/site-surveys', require('./routes/siteSurveyRoutes'));
 app.use('/pre-delivery-chargebox-response', require('./routes/preDeliveryChargeboxRoute'));
 app.use('/pre-installations', require('./routes/preInstallationRoute'));
+app.use('/charger-dc-box', require('./routes/chargerAndDcBoxRoute'));
 
 // app.use('/subservice', require('./routes/subServiceRoute'));
 
