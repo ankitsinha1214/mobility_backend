@@ -1,5 +1,8 @@
 // userSandmController.js
-
+const SiteSurvey = require('../models/siteSurveyModel');
+const PreInstallation = require('../models/preInstallationModel');
+const ChargerAndDcBox = require('../models/chargerAndDcboxModel');
+const PreDelivery = require('../models/preDeliveryChargeboxResponseModel');
 const User = require('../models/userSandmModel');
 const bcrypt = require('bcryptjs');
 
@@ -138,9 +141,43 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const getAllUserRecords = async (req, res) => {
+    const { userId } = req.body;
+
+    try {
+        // Check if the user exists
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.json({ status: false, message: 'User not found' });
+        }
+
+        // Retrieve all records for site surveys, preinstallations, and charger & DC box
+        const siteSurveys = await SiteSurvey.find({ userId });
+        const preInstallations = await PreInstallation.find({ userId });
+        const chargerAndDcBoxes = await ChargerAndDcBox.find({ userId });
+
+        // Retrieve all pre-delivery records associated with the user
+        const preDeliveries = await PreDelivery.find({ userServiceAndMaintenance: userId });
+
+        return res.json({
+            status: true,
+            data: {
+                siteSurveys,
+                preInstallations,
+                chargerAndDcBoxes,
+                preDeliveries
+            }
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+};
+
 module.exports = {
     registerUser,
     loginUser,
     updateUserDetails,
-    deleteUser
+    deleteUser,
+    getAllUserRecords
 };
