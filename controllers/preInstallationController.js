@@ -32,7 +32,9 @@ const createPreInstallation = async (req, res) => {
 // Get all PreInstallations
 const getAllPreInstallations = async (req, res) => {
     try {
-        const preInstallations = await PreInstallation.find();
+        const preInstallations = await PreInstallation.find() 
+        .populate('userId', 'username email phone')  // Adjust fields as needed
+        .populate('locationId', 'locationName address city state status'); // Adjust fields as needed;
         if (preInstallations.length === 0) {
             return res.json({ status: false, message: 'No pre-installations found' });
         }
