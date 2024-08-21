@@ -1,6 +1,6 @@
 const ChargerLocation = require('../models/chargerLocationModel');
-const SiteSurvey = require('../models/siteSurveyModel'); 
-const PreInstallation = require('../models/preInstallationModel'); 
+const SiteSurvey = require('../models/siteSurveyModel');
+const PreInstallation = require('../models/preInstallationModel');
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const s3 = new S3Client({
     credentials: {
@@ -55,8 +55,10 @@ const createChargerLocation = async (req, res) => {
         // const command4 = new PutObjectCommand(params4);
         // await s3.send(command4);
         // const chargerLocation = new ChargerLocation({...req.body, locationImage : awsImgKey});
-        const chargerLocation = new ChargerLocation({ ...req.body, locationImage: imageKeys, direction: parsedDirection,
-            freepaid: parsedFreepaid, salesManager: parsedSalesManager, dealer: parsedDealer, facilities: parsedFacilities, chargerInfo: parsedChargerInfo  });
+        const chargerLocation = new ChargerLocation({
+            ...req.body, locationImage: imageKeys, direction: parsedDirection,
+            freepaid: parsedFreepaid, salesManager: parsedSalesManager, dealer: parsedDealer, facilities: parsedFacilities, chargerInfo: parsedChargerInfo
+        });
         // const chargerLocation = new ChargerLocation(req.body);
         await chargerLocation.save();
         return res.json({ success: true, data: chargerLocation, message: 'Charger location created successfully' });
@@ -246,10 +248,17 @@ const getLocationsByStateCityStatusSitesurvey = async (req, res) => {
 
         // Depending on checkType, filter out locations that have existing site surveys or pre-installations
         if (checkType === 'site-survey') {
-            const surveyedLocations = await SiteSurvey.find({ locationId: { $in: locations.map(loc => loc._id) } });
-            const surveyedLocationIds = surveyedLocations.map(survey => survey.locationId.toString());
+            // const surveyedLocations = await SiteSurvey.find({ locationId: { $in: locations.map(loc => loc._id) } });
+            // const surveyedLocationIds = surveyedLocations.map(survey => survey.locationId.toString());
+
+            const excludedSurveys = await SiteSurvey.find({
+                locationId: { $in: locations.map(loc => loc._id) },
+                status: { $in: ["Approved", "Waiting for approval"] }
+            });
+            const excludedLocationIds = excludedSurveys.map(survey => survey.locationId.toString());
+            locations = locations.filter(loc => !excludedLocationIds.includes(loc._id.toString()));
             // console.log(surveyedLocationIds);
-            locations = locations.filter(loc => !surveyedLocationIds.includes(loc._id.toString()));
+            // locations = locations.filter(loc => !surveyedLocationIds.includes(loc._id.toString()));
         } else if (checkType === 'pre-installation') {
             const preInstalledLocations = await PreInstallation.find({ locationId: { $in: locations.map(loc => loc._id) } });
             const preInstalledLocationIds = preInstalledLocations.map(preInstall => preInstall.locationId.toString());
