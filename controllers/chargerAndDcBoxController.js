@@ -150,6 +150,15 @@ const updateStatusByType = async (req, res) => {
                 record.Reason = reason;
             }
             await record.save();
+
+            // If the site survey is approved, update the corresponding location's status to "Pending"
+            if (status === 'Approved') {
+                const location = await ChargerLocation.findById(record.locationId);
+                if (location) {
+                    location.status = 'Pending';
+                    await location.save();
+                }
+            }
         } else if (type === 'pre-installation') {
             record = await PreInstallation.findById(id);
             if (!record) {
