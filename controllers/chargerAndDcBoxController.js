@@ -34,7 +34,9 @@ const createChargerAndDcBox = async (req, res) => {
 // Get all ChargerAndDcBox entries
 const getAllChargerAndDcBox = async (req, res) => {
     try {
-        const chargerAndDcBoxes = await ChargerAndDcBox.find();
+        const chargerAndDcBoxes = await ChargerAndDcBox.find()
+        .populate('userId', 'username email phone')  // Adjust fields as needed
+        .populate('locationId', 'locationName address city state status'); // Adjust fields as needed;
         if (chargerAndDcBoxes.length === 0) {
             return res.json({ status: false, message: 'No Charger and DC Box entries found' });
         }
