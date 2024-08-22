@@ -152,9 +152,9 @@ const getAllUserRecords = async (req, res) => {
         }
 
         // Retrieve all records for site surveys, preinstallations, and charger & DC box
-        const siteSurveys = await SiteSurvey.find({ userId }).populate('locationId', 'locationName');
-        const preInstallations = await PreInstallation.find({ userId }).populate('locationId', 'locationName');
-        const chargerAndDcBoxes = await ChargerAndDcBox.find({ userId }).populate('locationId', 'locationName');
+        const siteSurveys = await SiteSurvey.find({ userId }).populate('locationId', 'locationName address');
+        const preInstallations = await PreInstallation.find({ userId }).populate('locationId', 'locationName address');
+        const chargerAndDcBoxes = await ChargerAndDcBox.find({ userId }).populate('locationId', 'locationName address');
 
         // Retrieve all pre-delivery records associated with the user
         const preDeliveries = await PreDelivery.find({ userServiceAndMaintenance: userId });
