@@ -45,7 +45,8 @@ exports.createPreDeliveryChargeboxResponse = async (req, res) => {
 // Get all PreDeliveryChargeboxResponses
 exports.getAllPreDeliveryChargeboxResponses = async (req, res) => {
     try {
-        const responses = await PreDeliveryChargeboxResponse.find();
+        const responses = await PreDeliveryChargeboxResponse.find()
+        .populate('userServiceAndMaintenance', 'username email phone');  // Adjust fields as needed
         if (responses.length === 0) {
             return res.json({ success: false, message: 'No PreDeliveryChargeboxResponses found' });
         }
