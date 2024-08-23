@@ -260,10 +260,17 @@ const getLocationsByStateCityStatusSitesurvey = async (req, res) => {
             // console.log(surveyedLocationIds);
             // locations = locations.filter(loc => !surveyedLocationIds.includes(loc._id.toString()));
         } else if (checkType === 'pre-installation') {
-            const preInstalledLocations = await PreInstallation.find({ locationId: { $in: locations.map(loc => loc._id) } });
-            const preInstalledLocationIds = preInstalledLocations.map(preInstall => preInstall.locationId.toString());
+            // const preInstalledLocations = await PreInstallation.find({ locationId: { $in: locations.map(loc => loc._id) } });
+            // const preInstalledLocationIds = preInstalledLocations.map(preInstall => preInstall.locationId.toString());
+            // locations = locations.filter(loc => !preInstalledLocationIds.includes(loc._id.toString()));
             // console.log(preInstalledLocationIds);
-            locations = locations.filter(loc => !preInstalledLocationIds.includes(loc._id.toString()));
+
+            const excludedPre = await PreInstallation.find({
+                locationId: { $in: locations.map(loc => loc._id) },
+                status: { $in: ["Approved", "Waiting for approval"] }
+            });
+            const excludedLocationIds = excludedPre.map(pre => pre.locationId.toString());
+            locations = locations.filter(loc => !excludedLocationIds.includes(loc._id.toString()));
         }
 
         if (locations.length === 0) {
