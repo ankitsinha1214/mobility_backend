@@ -7,9 +7,10 @@ const {
     getPreInstallationsByUserId,
     deletePreInstallationById
 } = require('../controllers/preInstallationController');
+const checkUserStatus = require('../middleware/checkuserstatus');
 
 // Create a new PreInstallation
-router.post('/', createPreInstallation);
+router.post('/', checkUserStatus, createPreInstallation);
 
 // Get all PreInstallations
 router.get('/', getAllPreInstallations);

@@ -9,8 +9,10 @@ const {
     getSiteSurveyByLocationId
 } = require('../controllers/siteSurveyController');
 
+const checkUserStatus = require('../middleware/checkuserstatus');
+
 // Route to create a new site survey
-router.post('/', createSiteSurvey);
+router.post('/', checkUserStatus, createSiteSurvey);
 
 // Route to get all site surveys
 router.get('/', getAllSiteSurveys);

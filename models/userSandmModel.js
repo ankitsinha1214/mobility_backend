@@ -6,6 +6,11 @@ const Schema = mongoose.Schema;
 
 // Define the main user schema
 const sandmUserSchema = new Schema({
+  status: {
+    type: String,
+    required: true, // Adjust as per your requirement
+    default: 'active' // Example default status
+  },
   username: {
     type: String,
     required: true,
