@@ -195,7 +195,7 @@ const updateUserStatus = async (req, res) => {
         }
 
         // Find the user by ID
-        const user = await UserServiceAndMaintenance.findById(userId);
+        const user = await User.findById(userId);
         if (!user) {
             return res.json({ success: false, message: 'User not found' });
         }
