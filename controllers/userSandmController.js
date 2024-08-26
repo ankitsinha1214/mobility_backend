@@ -185,11 +185,43 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+const updateUserStatus = async (req, res) => {
+    const { userId, status } = req.body;
+
+    try {
+        // Validate input
+        if (!userId || !status) {
+            return res.json({ success: false, message: 'User ID and status are required' });
+        }
+
+        // Find the user by ID
+        const user = await UserServiceAndMaintenance.findById(userId);
+        if (!user) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        // Update the user's status
+        user.status = status;
+        await user.save();
+
+        return res.json({
+            success: true,
+            message: 'User status updated successfully',
+            data: { userId: user._id, status: user.status }
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
+    }
+};
+
+
 module.exports = {
     registerUser,
     loginUser,
     updateUserDetails,
     deleteUser,
     getAllUserRecords,
-    getAllUsers
+    getAllUsers,
+    updateUserStatus
 };

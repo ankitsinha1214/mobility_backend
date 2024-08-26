@@ -14,6 +14,9 @@ router.post('/get-history', UserController.getAllUserRecords);
 // Get all the user
 router.get('/', UserController.getAllUsers);
 
+// Update status of user
+router.post('/update-status', UserController.updateUserStatus);
+
 // Update user details
 router.post('/updateuserdetails', UserController.updateUserDetails);
 
