@@ -11,6 +11,9 @@ router.post('/login', UserController.loginUser);
 // Get all history of the user
 router.post('/get-history', UserController.getAllUserRecords);
 
+// Get all the user
+router.get('/', UserController.getAllUsers);
+
 // Update user details
 router.post('/updateuserdetails', UserController.updateUserDetails);
 

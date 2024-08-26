@@ -174,10 +174,22 @@ const getAllUserRecords = async (req, res) => {
     }
 };
 
+const getAllUsers = async (req, res) => {
+    try {
+        // Retrieve all users, excluding the password field
+        const users = await User.find({}, '-password');
+        res.json({ success: true, data: users, message: 'Users retrieved successfully' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
+    }
+};
+
 module.exports = {
     registerUser,
     loginUser,
     updateUserDetails,
     deleteUser,
-    getAllUserRecords
+    getAllUserRecords,
+    getAllUsers
 };
