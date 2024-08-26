@@ -8,17 +8,17 @@ const checkUserStatus = async (req, res, next) => {
         const user = await UserServiceAndMaintenance.findById(userId);
 
         if (!user) {
-            return res.json({ success: false, message: 'User not found' });
+            return res.json({ status: false, message: 'User not found' });
         }
 
         if (user.status !== 'Active') {
-            return res.json({ success: false, message: 'User is Inactive' });
+            return res.json({ status: false, message: 'User is Inactive' });
         }
 
         next();
     } catch (error) {
         console.error('Error checking user status:', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        return res.status(500).json({ status: false, message: 'Internal server error' });
     }
 };
 
