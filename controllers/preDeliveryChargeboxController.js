@@ -13,7 +13,7 @@ exports.createPreDeliveryChargeboxResponse = async (req, res) => {
             return res.json({ success: false, message: 'User not found' });
         }
         if (user.status !== 'Active') {
-            return res.json({ success: false, message: 'User is Inactive' });
+            return res.json({ success: false, message: 'Your account is inactive. Please contact support to resolve this issue.' });
         }
 
         // Validate that responses array is not empty
