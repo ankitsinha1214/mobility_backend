@@ -5,6 +5,7 @@ const ChargerAndDcBox = require('../models/chargerAndDcboxModel');
 const PreDelivery = require('../models/preDeliveryChargeboxResponseModel');
 const User = require('../models/userSandmModel');
 const bcrypt = require('bcryptjs');
+const { generateToken } = require('../utils/jwtUtil');
 
 // Controller function to register a new user
 const registerUser = async (req, res) => {
@@ -62,9 +63,11 @@ const loginUser = async (req, res) => {
         if (passwordMatch) {
             // Convert user document to a plain JavaScript object
             const userData = user.toObject();
+            const userId = user._id;
             // Remove the password field
             delete userData.password;
-            res.json({ success: true, data: userData, message: 'Authentication successful' });
+            const { token } = generateToken(userId);
+            res.json({ success: true, data: userData, message: 'Authentication successful', token: token });
         } else {
             res.json({ success: false, message: 'Authentication failed' });
         }

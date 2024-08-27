@@ -1,6 +1,7 @@
 // userSandmRoute.js
 const router = require("express").Router();
 const UserController = require('../controllers/userSandmController');
+const fetchUser = require('../middleware/fetchuser');
 
 // Register a new user
 router.post('/register', UserController.registerUser);
@@ -9,7 +10,7 @@ router.post('/register', UserController.registerUser);
 router.post('/login', UserController.loginUser);
 
 // Get all history of the user
-router.post('/get-history', UserController.getAllUserRecords);
+router.post('/get-history',fetchUser, UserController.getAllUserRecords);
 
 // Get all the user
 router.get('/', UserController.getAllUsers);
