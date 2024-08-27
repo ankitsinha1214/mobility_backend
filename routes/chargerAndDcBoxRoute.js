@@ -10,9 +10,10 @@ const {
     checkChargerAndDcBoxWaitingForApproval
 } = require('../controllers/chargerAndDcBoxController');
 const checkUserStatus = require('../middleware/checkuserstatus');
+const fetchUser = require('../middleware/fetchuser');
 
 // Create a new ChargerAndDcBox
-router.post('/', checkUserStatus, createChargerAndDcBox);
+router.post('/', fetchUser, checkUserStatus, createChargerAndDcBox);
 
 // Get all ChargerAndDcBox entries
 router.get('/', getAllChargerAndDcBox);

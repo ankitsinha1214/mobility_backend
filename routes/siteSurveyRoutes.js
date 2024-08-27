@@ -10,9 +10,10 @@ const {
 } = require('../controllers/siteSurveyController');
 
 const checkUserStatus = require('../middleware/checkuserstatus');
+const fetchUser = require('../middleware/fetchuser');
 
 // Route to create a new site survey
-router.post('/', checkUserStatus, createSiteSurvey);
+router.post('/', fetchUser , checkUserStatus, createSiteSurvey);
 
 // Route to get all site surveys
 router.get('/', getAllSiteSurveys);

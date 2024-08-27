@@ -10,9 +10,11 @@ const {
     checkChargeboxIdExists
 } = require('../controllers/preDeliveryChargeboxController'); // Adjust the path as needed
 // const checkUserStatus = require('../middleware/checkuserstatus');
+const fetchUser = require('../middleware/fetchuser');
+
 
 // Route to create a new PreDeliveryChargeboxResponse
-router.post('/', createPreDeliveryChargeboxResponse);
+router.post('/',fetchUser, createPreDeliveryChargeboxResponse);
 
 // Route to get all PreDeliveryChargeboxResponses
 router.get('/', getAllPreDeliveryChargeboxResponses);
