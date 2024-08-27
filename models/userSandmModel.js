@@ -9,7 +9,7 @@ const sandmUserSchema = new Schema({
   status: {
     type: String,
     required: true, // Adjust as per your requirement
-    default: 'active' // Example default status
+    default: 'Active' // Example default status
   },
   username: {
     type: String,
