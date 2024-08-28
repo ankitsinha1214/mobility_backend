@@ -114,10 +114,10 @@ const updateUserDetails = async (req, res) => {
         if(error.keyValue){
             console.log(error.keyValue)
             if (error.keyValue?.['phone.number']) {
-                res.json({ success: false, message: `${error.keyValue['phone.number']} this phone number is already in use` });
+                return res.json({ success: false, message: `${error.keyValue['phone.number']} this phone number is already in use` });
             }
             else if(error.keyValue?.email){
-                res.json({ success: false, message: `${error.keyValue?.email} this email is already in use` });
+                return res.json({ success: false, message: `${error.keyValue?.email} this email is already in use` });
             }
         }
         res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
