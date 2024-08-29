@@ -12,7 +12,7 @@ const fetchUser = (req, res, next) => {
     try {
         const data = jwt.verify(token, JWT_SECRET);
         console.log(data);
-        req.user = data.userId;
+        req.user = data.role;
         req.userid = data._id;
         req.phn = data.phoneNumber;
         // console.log(req);

@@ -64,10 +64,14 @@ const loginUser = async (req, res) => {
         if (passwordMatch) {
             // Convert user document to a plain JavaScript object
             const userData = user.toObject();
-            const userId = user._id;
+            // const userId = user._id;
+            const userId = {
+                _id : user._id,
+                role : user.role
+            };
             // Remove the password field
             delete userData.password;
-            const { token } = generateToken({userId});
+            const { token } = generateToken(userId);
             res.json({ success: true, data: userData, message: 'Authentication successful', token: token });
         } else {
             res.json({ success: false, message: 'Authentication failed' });
