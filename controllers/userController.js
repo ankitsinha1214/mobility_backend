@@ -240,7 +240,9 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
     const { phoneNumber } = req.params;
     const { gender, email, date_of_birth, ...updateFields } = req.body;
-
+    if(phoneNumber !== req.phn){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
     // Check if restricted fields are in the request body
     if (gender || email || date_of_birth) {
         return res.json({

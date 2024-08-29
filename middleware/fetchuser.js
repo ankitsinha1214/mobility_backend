@@ -6,17 +6,19 @@ const fetchUser = (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
     if (!token) {
-        return res.status(401).json({ error: "Token Not Found!" });
+        return res.status(401).json({success: false, message: "Token Not Found!" });
     }
 
     try {
         const data = jwt.verify(token, JWT_SECRET);
         console.log(data);
         req.user = data.userId;
-        console.log(req.user);
+        req.userid = data._id;
+        req.phn = data.phoneNumber;
+        // console.log(req);
         next();
     } catch (error) {
-        return res.status(401).json({ error: "Please Authenticate using a Valid Token." });
+        return res.status(401).json({success:false, message: "Please Authenticate using a Valid Token." });
     }
 };
 

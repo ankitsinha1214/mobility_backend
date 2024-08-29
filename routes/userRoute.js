@@ -1,4 +1,5 @@
 const userController = require("../controllers/userController");
+const fetchUser = require("../middleware/fetchuser");
 // const multer = require('multer');
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage: storage });
@@ -34,6 +35,7 @@ router.patch(
 //   name: 'avatar', maxCount: 1
 // }
 // ]),
+  fetchUser,
   userController.updateUser
 );
 
