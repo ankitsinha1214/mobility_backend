@@ -10,7 +10,7 @@ const generateRandomSecret = () => {
 const generateToken = (userId) => {
     // const secretKey = generateRandomSecret();
     const JWT_SECRET = process.env.JWT_SECRET;
-    const token = jwt.sign({ userId }, JWT_SECRET );
+    const token = jwt.sign( userId, JWT_SECRET );
     // const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
     return { token };
 };

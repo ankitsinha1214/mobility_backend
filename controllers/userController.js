@@ -4,6 +4,7 @@ const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const ChargerLocation = require('../models/chargerLocationModel');
 const { USER } = require("../message.json");
+const { generateToken } = require('../utils/jwtUtil');
 
 // Update user password
 const updatepassword = async (req, res) => {
@@ -180,8 +181,14 @@ const addUser = async (req, res) => {
             createdAt: newUser.createdAt,
             updatedAt: newUser.updatedAt,
         };
+        const userId = {
+            _id : newUser._id,
+            phoneNumber : newUser.phoneNumber
+        };
+        console.log(userId);
+        const { token } = generateToken(userId);
 
-        return res.json({ success: true, data: userDataToSend, message: USER.USER_CREATED });
+        return res.json({ success: true, data: userDataToSend, message: USER.USER_CREATED, token: token });
     } catch (error) {
         console.error('Error:', error);
         if (error.keyValue) {
@@ -527,7 +534,14 @@ const checkUserRegistration = async (req, res) => {
         const user = await User.findOne({ phoneNumber }, { password: 0 }); // Exclude password from the result
 
         if (user) {
-            return res.json({ success: true, data: user, message: "User is registered" });
+            const userId = {
+                _id : user._id,
+                // _id : user._id.toString(),
+                phoneNumber : user.phoneNumber
+            };
+            console.log(userId);
+            const { token } = generateToken(userId);
+            return res.json({ success: true, data: user, message: "User is registered", token: token });
         } else {
             return res.json({ success: false, message: "User is not registered" });
         }

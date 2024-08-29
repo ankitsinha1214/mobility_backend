@@ -66,7 +66,7 @@ const loginUser = async (req, res) => {
             const userId = user._id;
             // Remove the password field
             delete userData.password;
-            const { token } = generateToken(userId);
+            const { token } = generateToken({userId});
             res.json({ success: true, data: userData, message: 'Authentication successful', token: token });
         } else {
             res.json({ success: false, message: 'Authentication failed' });
