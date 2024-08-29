@@ -10,12 +10,13 @@ const { generateToken } = require('../utils/jwtUtil');
 // Controller function to register a new user
 const registerUser = async (req, res) => {
     //   const { username, password, company, department } = req.body;
-    const { username, password, company, department, name, email, phone } = req.body;
+    const { username, password, company, department, role, email, phone } = req.body;
     // const { prefix, number } = phone;
     try {
         // Check if username or email already exists
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+        const existingUser = await User.findOne({ $or: [{ username }, { email: { $ne: null, $eq: email } }] });
         // const existingUser = await User.findOne({ $or: [{ username }, { email }, { phone }] });
+        console.log(existingUser);
         if (existingUser) {
             return res.json({ success: false, message: 'Username, email, or phone number already exists' });
         }
@@ -30,7 +31,7 @@ const registerUser = async (req, res) => {
             //   password: hashedPassword,
             company,
             department,
-            //   name,
+              role
             //   email,
             //   phone
         });
@@ -83,7 +84,7 @@ const updateUserDetails = async (req, res) => {
     const { prefix, number } = phone;
 
     if (!username) {
-        return res.status(400).json({ success: false, message: 'Username is required to update' });
+        return res.json({ success: false, message: 'Username is required to update' });
     }
 
     try {
@@ -99,6 +100,20 @@ const updateUserDetails = async (req, res) => {
             return res.json({ success: false, message: 'No changes detected. Please update at least one field.' });
         }
 
+        // Check for unique email or phone number if they are different from the current ones
+        if (email && email !== user.email) {
+            const emailExists = await User.findOne({ email });
+            if (emailExists) {
+                return res.json({ success: false, message: `Email ${email} is already in use` });
+            }
+        }
+
+        if (number && number !== user.phone.number) {
+            const phoneExists = await User.findOne({ 'phone.number': number });
+            if (phoneExists) {
+                return res.json({ success: false, message: `Phone number ${number} is already in use` });
+            }
+        }
         // Update user details in the database
         const updatedUser = await User.findOneAndUpdate(
             { username },

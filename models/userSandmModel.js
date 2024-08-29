@@ -65,7 +65,8 @@ const sandmUserSchema = new Schema({
   email: {
     type: String,
     // required: true,
-    unique: true,
+    unique: false,
+    sparse: true,
     validate: {
       validator: function(v) {
         return /\S+/.test(v); // Ensures it's not just whitespace
@@ -98,7 +99,8 @@ const sandmUserSchema = new Schema({
     number: {
       type: String,
     //   required: true,
-      unique: true,
+      unique: false,
+      sparse: true,
       validate: {
         validator: function(v) {
           return /\S+/.test(v); // Ensures it's not just whitespace
@@ -106,6 +108,12 @@ const sandmUserSchema = new Schema({
         message: 'Phone number cannot be empty'
       }
     }
+  },
+  role: {
+    type: String,
+    required: true,
+    enum: ['Admin', 'User', 'Manager'], 
+    default: 'User' // Default role
   }
 }, { timestamps: true });
 
@@ -123,6 +131,9 @@ sandmUserSchema.pre('save', async function(next) {
   }
 });
 
+// Creating a partial unique index for email and phone number
+sandmUserSchema.index({ email: 1 }, { unique: true, sparse: true });
+sandmUserSchema.index({ 'phone.number': 1 }, { unique: true, sparse: true });
 // Create a Mongoose model based on the schema
 const SandmUser = mongoose.model('Service-and-maintenance-user', sandmUserSchema);
 
