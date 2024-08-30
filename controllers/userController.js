@@ -243,7 +243,7 @@ const updateUser = async (req, res) => {
     if(req.phn && phoneNumber !== req.phn){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(!req.user || req.user === 'User'){
+    if(req.user && req.user === 'User'){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     // Check if restricted fields are in the request body
@@ -309,7 +309,7 @@ const deleteUser = async (req, res) => {
     if(req.phn && phoneNumber !== req.phn){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(!req.user || req.user === 'User'){
+    if(req.user && req.user === 'User'){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -363,7 +363,7 @@ const addUserVehicle = async (req, res) => {
     if(req.phn && phoneNumber !== req.phn){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(!req.user || req.user === 'User'){
+    if(req.user && req.user === 'User'){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -420,7 +420,7 @@ const getUserVehicles = async (req, res) => {
     if(req.phn && phoneNumber !== req.phn){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(!req.user || req.user === 'User'){
+    if(req.user && req.user === 'User'){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -446,7 +446,7 @@ const getUserVehicleById = async (req, res) => {
     if(req.phn && phoneNumber !== req.phn){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(!req.user || req.user === 'User'){
+    if(req.user && req.user === 'User'){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -478,7 +478,7 @@ const updateUserVehicle = async (req, res) => {
     if(req.phn && phoneNumber !== req.phn){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(!req.user || req.user === 'User'){
+    if(req.user && req.user === 'User'){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
 
@@ -535,7 +535,7 @@ const deleteUserVehicle = async (req, res) => {
     if(req.phn && phoneNumber !== req.phn){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(!req.user || req.user === 'User'){
+    if(req.user && req.user === 'User'){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -616,7 +616,7 @@ const addFavouriteLocation = async (req, res) => {
     if(req.phn && phoneNumber !== req.phn){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(!req.user || req.user === 'User'){
+    if(req.user && req.user === 'User'){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -654,7 +654,7 @@ const getUserFavouriteLocations = async (req, res) => {
     if(req.phn && phoneNumber !== req.phn){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(!req.user || req.user === 'User'){
+    if(req.user && req.user === 'User'){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -687,7 +687,7 @@ const removeFavouriteLocation = async (req, res) => {
     if(req.phn && phoneNumber !== req.phn){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(!req.user || req.user === 'User'){
+    if(req.user && req.user === 'User'){
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
