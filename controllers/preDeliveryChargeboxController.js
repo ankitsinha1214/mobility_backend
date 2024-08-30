@@ -5,6 +5,9 @@ const PreDeliveryQuestion = require('../models/preDeliveryQuestionModel');
 // Create a new PreDeliveryChargeboxResponse
 exports.createPreDeliveryChargeboxResponse = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { chargebox_id, responses, userServiceAndMaintenance } = req.body;
 
         // Validate user
@@ -48,6 +51,9 @@ exports.createPreDeliveryChargeboxResponse = async (req, res) => {
 // Get all PreDeliveryChargeboxResponses
 exports.getAllPreDeliveryChargeboxResponses = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const responses = await PreDeliveryChargeboxResponse.find()
         .populate('userServiceAndMaintenance', 'username email phone');  // Adjust fields as needed
         if (responses.length === 0) {
@@ -63,6 +69,9 @@ exports.getAllPreDeliveryChargeboxResponses = async (req, res) => {
 // Get PreDeliveryChargeboxResponse by ID
 exports.getPreDeliveryChargeboxResponseById = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const response = await PreDeliveryChargeboxResponse.findById(id);
         // const dataTosend = response;
@@ -93,6 +102,9 @@ exports.getPreDeliveryChargeboxResponseById = async (req, res) => {
 // Update PreDeliveryChargeboxResponse by ID
 exports.updatePreDeliveryChargeboxResponse = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const { chargebox_id, responses, userServiceAndMaintenance } = req.body;
 
@@ -130,6 +142,9 @@ exports.updatePreDeliveryChargeboxResponse = async (req, res) => {
 // Delete PreDeliveryChargeboxResponse by ID
 exports.deletePreDeliveryChargeboxResponse = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const deletedResponse = await PreDeliveryChargeboxResponse.findByIdAndDelete(id);
         if (!deletedResponse) {
@@ -145,6 +160,9 @@ exports.deletePreDeliveryChargeboxResponse = async (req, res) => {
 // Get PreDeliveryChargeboxResponses by User ID
 exports.getPreDeliveryChargeboxResponsesByUserId = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { userId } = req.params;
         const responses = await PreDeliveryChargeboxResponse.find({ userServiceAndMaintenance: userId });
 
@@ -162,6 +180,9 @@ exports.getPreDeliveryChargeboxResponsesByUserId = async (req, res) => {
 // Check if chargebox_id already exists
 exports.checkChargeboxIdExists = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { chargebox_id } = req.params;
 
         // Validate that chargebox_id is provided

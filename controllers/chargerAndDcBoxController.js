@@ -7,6 +7,9 @@ const SiteSurvey = require('../models/siteSurveyModel'); // Import the PreInstal
 // Create a new ChargerAndDcBox
 const createChargerAndDcBox = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { userId, locationId } = req.body;
 
         // Check if the user exists
@@ -34,6 +37,9 @@ const createChargerAndDcBox = async (req, res) => {
 // Get all ChargerAndDcBox entries
 const getAllChargerAndDcBox = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const chargerAndDcBoxes = await ChargerAndDcBox.find()
         .populate('userId', 'username email phone')  // Adjust fields as needed
         .populate('locationId', 'locationName address city state status'); // Adjust fields as needed;
@@ -49,6 +55,9 @@ const getAllChargerAndDcBox = async (req, res) => {
 // Get ChargerAndDcBox by ID
 const getChargerAndDcBoxById = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const chargerAndDcBox = await ChargerAndDcBox.findById(id);
         if (!chargerAndDcBox) {
@@ -63,6 +72,9 @@ const getChargerAndDcBoxById = async (req, res) => {
 // Delete ChargerAndDcBox by ID
 const deleteChargerAndDcBoxById = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const result = await ChargerAndDcBox.findByIdAndDelete(id);
         if (!result) {
@@ -78,6 +90,9 @@ const getFilteredLocationsWithApprovedPreInstallation = async (req, res) => {
     const { state, city, status } = req.body;
 
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Filter locations based on state, city, and status
         const filter = {};
         if (state) filter.state = state;
@@ -129,6 +144,9 @@ const updateStatusByType = async (req, res) => {
     const { id, status, reason, type } = req.body;
 
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Validate input
         if (!id || !status || !type) {
             return res.json({ success: false, message: 'ID, status, and type are required' });
@@ -200,6 +218,9 @@ const checkChargerAndDcBoxWaitingForApproval = async (req, res) => {
     const { locationId } = req.body;
 
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Check if there is already a Charger and DC Box entry with status 'Waiting for approval' for this location
         const existingEntry = await ChargerAndDcBox.findOne({ locationId, status: 'Waiting for approval' });
         if (existingEntry) {

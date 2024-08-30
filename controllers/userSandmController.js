@@ -13,6 +13,9 @@ const registerUser = async (req, res) => {
     const { username, password, company, department, role, email, phone } = req.body;
     // const { prefix, number } = phone;
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Check if username or email already exists
         const existingUser = await User.findOne({ $or: [{ username }, { email: { $ne: null, $eq: email } }] });
         // const existingUser = await User.findOne({ $or: [{ username }, { email }, { phone }] });
@@ -92,6 +95,9 @@ const updateUserDetails = async (req, res) => {
     }
 
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Fetch the current user details from the database
         const user = await User.findOne({ username });
 
@@ -149,6 +155,9 @@ const deleteUser = async (req, res) => {
     const { username } = req.params;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Delete user from the database
         const deletedUser = await User.findOneAndDelete({ username });
 
@@ -167,6 +176,9 @@ const getAllUserRecords = async (req, res) => {
     const { userId } = req.body;
 
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Check if the user exists
         const user = await User.findById(userId);
         if (!user) {
@@ -198,6 +210,9 @@ const getAllUserRecords = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Retrieve all users, excluding the password field
         const users = await User.find({}, '-password');
         res.json({ success: true, data: users, message: 'Users retrieved successfully' });
@@ -211,6 +226,9 @@ const updateUserStatus = async (req, res) => {
     const { userId, status } = req.body;
 
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Validate input
         if (!userId || !status) {
             return res.json({ success: false, message: 'User ID and status are required' });

@@ -7,12 +7,13 @@ const {
     updateQuestionById,
     deleteQuestionById
 } = require('../controllers/preDeliveryQuestionController'); // Adjust the path as necessary
+const fetchUser = require('../middleware/fetchuser');
 
 // Define routes
-router.post('/', createQuestion);
-router.get('/', getAllQuestions);
-router.get('/:id', getQuestionById);
-router.put('/:id', updateQuestionById);
-router.delete('/:id', deleteQuestionById);
+router.post('/',fetchUser, createQuestion);
+router.get('/',fetchUser, getAllQuestions);
+router.get('/:id',fetchUser, getQuestionById);
+router.put('/:id',fetchUser, updateQuestionById);
+router.delete('/:id',fetchUser, deleteQuestionById);
 
 module.exports = router;

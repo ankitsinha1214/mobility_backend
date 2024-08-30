@@ -3,6 +3,9 @@ const PredeliveryQuestion = require('../models/preDeliveryQuestionModel'); // Ad
 // Create a new predelivery question
 const createQuestion = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { question } = req.body;
         const newQuestion = new PredeliveryQuestion({ question });
         await newQuestion.save();
@@ -15,6 +18,9 @@ const createQuestion = async (req, res) => {
 // Get all predelivery questions
 const getAllQuestions = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const questions = await PredeliveryQuestion.find();
         if (questions.length === 0) {
             return res.json({ success: false, message: "No predelivery questions found" });
@@ -29,6 +35,9 @@ const getAllQuestions = async (req, res) => {
 // Get a single predelivery question by ID
 const getQuestionById = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const question = await PredeliveryQuestion.findById(id);
         if (!question) {
@@ -43,6 +52,9 @@ const getQuestionById = async (req, res) => {
 // Update a predelivery question by ID
 const updateQuestionById = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const { question } = req.body;
         const updatedQuestion = await PredeliveryQuestion.findByIdAndUpdate(id, { question }, { new: true, runValidators: true });
@@ -58,6 +70,9 @@ const updateQuestionById = async (req, res) => {
 // Delete a predelivery question by ID
 const deleteQuestionById = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const deletedQuestion = await PredeliveryQuestion.findByIdAndDelete(id);
         if (!deletedQuestion) {

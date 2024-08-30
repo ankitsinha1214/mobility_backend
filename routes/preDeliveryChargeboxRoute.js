@@ -17,21 +17,21 @@ const fetchUser = require('../middleware/fetchuser');
 router.post('/',fetchUser, createPreDeliveryChargeboxResponse);
 
 // Route to get all PreDeliveryChargeboxResponses
-router.get('/', getAllPreDeliveryChargeboxResponses);
+router.get('/',fetchUser, getAllPreDeliveryChargeboxResponses);
 
 // Route to get a PreDeliveryChargeboxResponse by ID
-router.get('/:id', getPreDeliveryChargeboxResponseById);
+router.get('/:id',fetchUser, getPreDeliveryChargeboxResponseById);
 
 // Route to update a PreDeliveryChargeboxResponse by ID
-router.put('/:id', updatePreDeliveryChargeboxResponse);
+router.put('/:id',fetchUser, updatePreDeliveryChargeboxResponse);
 
 // Route to delete a PreDeliveryChargeboxResponse by ID
-router.delete('/:id', deletePreDeliveryChargeboxResponse);
+router.delete('/:id',fetchUser, deletePreDeliveryChargeboxResponse);
 
 // Get PreDeliveryChargeboxResponses by User ID
-router.get('/user/:userId', getPreDeliveryChargeboxResponsesByUserId);
+router.get('/user/:userId',fetchUser, getPreDeliveryChargeboxResponsesByUserId);
 
 // Check if chargebox_id already exists
-router.get('/check/:chargebox_id', checkChargeboxIdExists);
+router.get('/check/:chargebox_id',fetchUser, checkChargeboxIdExists);
 
 module.exports = router;
