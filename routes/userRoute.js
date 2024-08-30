@@ -19,6 +19,7 @@ router.post(
 
 router.get(
   "/",
+  fetchUser,
   userController.getUser
 );
 
@@ -41,6 +42,7 @@ router.patch(
 
 router.delete(
   "/:phoneNumber",
+  fetchUser,
   userController.deleteUser
 );
 
@@ -62,27 +64,31 @@ router.post(
   userController.checkUserForResetPassword
 );
 // POST - Add a new user vehicle
-router.post('/:phoneNumber/vehicles', userController.addUserVehicle);
+router.post('/:phoneNumber/vehicles',
+  fetchUser, userController.addUserVehicle);
 
 // GET - Get all user vehicles
-router.get('/:phoneNumber/vehicles', userController.getUserVehicles);
+router.get('/:phoneNumber/vehicles',
+  fetchUser, userController.getUserVehicles);
 
 // GET - Get user vehicle by ID
-router.get('/:phoneNumber/vehicles/:vehicleId', userController.getUserVehicleById);
+router.get('/:phoneNumber/vehicles/:vehicleId',
+  fetchUser, userController.getUserVehicleById);
 
 // PUT - Update user vehicle by ID
-router.put('/:phoneNumber/vehicles/:vehicleId', userController.updateUserVehicle);
+router.put('/:phoneNumber/vehicles/:vehicleId', 
+  fetchUser, userController.updateUserVehicle);
 
 // DELETE - Delete user vehicle by ID
-router.delete('/:phoneNumber/vehicles/:vehicleId', userController.deleteUserVehicle);
+router.delete('/:phoneNumber/vehicles/:vehicleId',fetchUser, userController.deleteUserVehicle);
 
 // Add a location to favourite
-router.post('/:phoneNumber/add-favourite', userController.addFavouriteLocation);
+router.post('/:phoneNumber/add-favourite',fetchUser, userController.addFavouriteLocation);
 
 // Get all user favourite list
-router.get('/:phoneNumber/get-favourite', userController.getUserFavouriteLocations);
+router.get('/:phoneNumber/get-favourite',fetchUser, userController.getUserFavouriteLocations);
 
 // remove a location to favourite
-router.delete('/:phoneNumber/favourite', userController.removeFavouriteLocation);
+router.delete('/:phoneNumber/favourite',fetchUser, userController.removeFavouriteLocation);
 
 module.exports = router;

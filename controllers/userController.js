@@ -303,7 +303,15 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     const { phoneNumber } = req.params;
-
+    if (!phoneNumber) {
+        return res.json({ status: false, message: 'Phone Number is required' });
+    }
+    if(req.phn && phoneNumber !== req.phn){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+    if(!req.user || req.user === 'User'){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
     try {
         // Find the user by phoneNumber
         const user = await User.findOne({ phoneNumber });
@@ -349,7 +357,15 @@ const deleteUser = async (req, res) => {
 const addUserVehicle = async (req, res) => {
     const { phoneNumber } = req.params;
     const { make, model, variant, vehicle_reg, range, vehicle_img } = req.body;
-
+    if (!phoneNumber) {
+        return res.json({ status: false, message: 'Phone Number is required' });
+    }
+    if(req.phn && phoneNumber !== req.phn){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+    if(!req.user || req.user === 'User'){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
     try {
         // Check if the vehicle registration already exists
         //   const existingVehicle = await User.findOne({
@@ -398,7 +414,15 @@ const addUserVehicle = async (req, res) => {
 // get all vehicle of a user
 const getUserVehicles = async (req, res) => {
     const { phoneNumber } = req.params;
-
+    if (!phoneNumber) {
+        return res.json({ status: false, message: 'Phone Number is required' });
+    }
+    if(req.phn && phoneNumber !== req.phn){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+    if(!req.user || req.user === 'User'){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
     try {
         const user = await User.findOne({ phoneNumber });
 
@@ -416,7 +440,15 @@ const getUserVehicles = async (req, res) => {
 // get specific vehicle
 const getUserVehicleById = async (req, res) => {
     const { phoneNumber, vehicleId } = req.params;
-
+    if (!phoneNumber) {
+        return res.json({ status: false, message: 'Phone Number is required' });
+    }
+    if(req.phn && phoneNumber !== req.phn){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+    if(!req.user || req.user === 'User'){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
     try {
         const user = await User.findOne({ phoneNumber });
 
@@ -440,6 +472,15 @@ const getUserVehicleById = async (req, res) => {
 const updateUserVehicle = async (req, res) => {
     const { phoneNumber, vehicleId } = req.params;
     const { make, model, variant, vehicle_reg, range, vehicle_img } = req.body;
+    if (!phoneNumber) {
+        return res.json({ status: false, message: 'Phone Number is required' });
+    }
+    if(req.phn && phoneNumber !== req.phn){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+    if(!req.user || req.user === 'User'){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
 
     try {
         const user = await User.findOne({ phoneNumber });
@@ -488,7 +529,15 @@ const updateUserVehicle = async (req, res) => {
 // delete a vehicle 
 const deleteUserVehicle = async (req, res) => {
     const { phoneNumber, vehicleId } = req.params;
-
+    if (!phoneNumber) {
+        return res.json({ status: false, message: 'Phone Number is required' });
+    }
+    if(req.phn && phoneNumber !== req.phn){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+    if(!req.user || req.user === 'User'){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
     try {
         const user = await User.findOne({ phoneNumber });
 
@@ -560,11 +609,16 @@ const checkUserRegistration = async (req, res) => {
 const addFavouriteLocation = async (req, res) => {
     const { phoneNumber } = req.params;
     const { locationId } = req.body;
-
+    
     if (!phoneNumber || !locationId) {
         return res.json({ status: false, message: 'Phone Number and Location ID are required' });
     }
-
+    if(req.phn && phoneNumber !== req.phn){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+    if(!req.user || req.user === 'User'){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
     try {
         // Check if the location exists
         const location = await ChargerLocation.findById(locationId);
@@ -597,7 +651,12 @@ const getUserFavouriteLocations = async (req, res) => {
     if (!phoneNumber) {
         return res.json({ status: false, message: 'Phone Number is required' });
     }
-
+    if(req.phn && phoneNumber !== req.phn){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+    if(!req.user || req.user === 'User'){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
     try {
         // Find the user by phone number
         const user = await User.findOne({ phoneNumber });
@@ -625,7 +684,12 @@ const removeFavouriteLocation = async (req, res) => {
     if (!phoneNumber || !locationId) {
         return res.json({ status: false, message: 'Phone Number and Location ID are required' });
     }
-
+    if(req.phn && phoneNumber !== req.phn){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+    if(!req.user || req.user === 'User'){
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
     try {
         // Check if the location ID exists
         const locationExists = await ChargerLocation.findById(locationId);
