@@ -3,6 +3,7 @@ const SandmUser = require('../models/userSandmModel'); // Import the SandmUser m
 const ChargerLocation = require('../models/chargerLocationModel'); // Import the ChargerLocation model
 const PreInstallation = require('../models/preInstallationModel'); // Import the PreInstallation model
 const SiteSurvey = require('../models/siteSurveyModel'); // Import the PreInstallation model
+const NotificationServiceMaintenance = require('../models/notificationSandmModel');
 
 // Create a new ChargerAndDcBox
 const createChargerAndDcBox = async (req, res) => {
@@ -142,7 +143,6 @@ const getFilteredLocationsWithApprovedPreInstallation = async (req, res) => {
 
 const updateStatusByType = async (req, res) => {
     const { id, status, reason, type } = req.body;
-
     try {
         if (!req.user) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
@@ -158,21 +158,34 @@ const updateStatusByType = async (req, res) => {
         }
 
         let record;
+        let user;
+        let location;
+        let notification = { title: '', description: '' };
 
         // Update the record based on type
         if (type === 'site-survey') {
             record = await SiteSurvey.findById(id);
+            user = await SandmUser.findById(record.userId);
+            location = await ChargerLocation.findById(record.locationId);
             if (!record) {
                 return res.json({ success: false, message: 'Site survey not found' });
             }
             record.status = status;
             if (status === 'Rejected') {
                 record.Reason = reason;
+                notification.title = 'Site Survey Rejected';
+                notification.description = `Dear ${user.name}, your site survey request for 
+                ${location.locationName} has been rejected due to the following reason: ${reason}.
+                Please contact our support team for further assistance.`;
             }
             await record.save();
 
             // If the site survey is approved, update the corresponding location's status to "Pending"
             if (status === 'Approved') {
+                notification.title = 'Site Survey Approved';
+                notification.description = `Dear ${user.name}, your site survey request 
+                for ${location.locationName} has been approved. Please proceed with the next steps as per the guidelines. 
+                Thank you for your cooperation.`;
                 const location = await ChargerLocation.findById(record.locationId);
                 if (location) {
                     location.status = 'Pending';
@@ -181,27 +194,56 @@ const updateStatusByType = async (req, res) => {
             }
         } else if (type === 'pre-installation') {
             record = await PreInstallation.findById(id);
+            user = await SandmUser.findById(record.userId);
+            location = await ChargerLocation.findById(record.locationId);
             if (!record) {
                 return res.json({ success: false, message: 'Pre-installation not found' });
             }
             record.status = status;
             if (status === 'Rejected') {
                 record.Reason = reason;
+                notification.title = 'Pre-Installation Rejected';
+                notification.description = `Dear ${user.name}, your pre-installation request 
+                for ${location.locationName} has been rejected due to the following reason: 
+                ${reason}. Please contact our support team for further assistance.`;
+            } else if (status === 'Approved') {
+                notification.title = 'Pre-Installation Approved';
+                notification.description = `Dear ${user.name}, your pre-installation request 
+                for ${location.locationName} has been approved. Please proceed with the next steps
+                 as per the guidelines. Thank you for your cooperation.`;
             }
             await record.save();
         } else if (type === 'charger-dc-box') {
             record = await ChargerAndDcBox.findById(id);
+            user = await SandmUser.findById(record.userId);
+            location = await ChargerLocation.findById(record.locationId);
             if (!record) {
                 return res.json({ success: false, message: 'Charger and DC Box not found' });
             }
             record.status = status;
             if (status === 'Rejected') {
                 record.Reason = reason;
+                notification.title = 'Charger and DC Box Rejected';
+                notification.description = `Dear ${user.name}, your charger and DC box request 
+                for ${location.locationName} has been rejected due to the following reason: 
+                ${reason}. Please contact our support team for further assistance.`;
+            } else if (status === 'Approved') {
+                notification.title = 'Charger and DC Box Approved';
+                notification.description = `Dear ${user.name}, your charger and
+                 DC box request for ${location.locationName} has been approved. 
+                 Please proceed with the next steps as per the guidelines.
+                 Thank you for your cooperation.`;
             }
             await record.save();
         } else {
             return res.json({ success: false, message: 'Invalid type provided' });
         }
+        const title = notification.title;
+        const description = notification.description;
+        const userServiceAndMaintenance = record.userId;
+        const Notification = new NotificationServiceMaintenance({ title, description, userServiceAndMaintenance });
+        await Notification.save();
+
 
         return res.json({
             success: true,
