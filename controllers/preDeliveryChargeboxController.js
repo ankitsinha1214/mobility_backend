@@ -69,7 +69,7 @@ exports.getAllPreDeliveryChargeboxResponses = async (req, res) => {
 // Get PreDeliveryChargeboxResponse by ID
 exports.getPreDeliveryChargeboxResponseById = async (req, res) => {
     try {
-        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+        if (!req.user) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
         const { id } = req.params;
