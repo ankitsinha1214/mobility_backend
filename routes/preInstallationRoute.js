@@ -14,15 +14,15 @@ const fetchUser = require('../middleware/fetchuser');
 router.post('/', fetchUser, checkUserStatus, createPreInstallation);
 
 // Get all PreInstallations
-router.get('/', getAllPreInstallations);
+router.get('/', fetchUser, getAllPreInstallations);
 
 // Get PreInstallation by ID
-router.get('/:id', getPreInstallationById);
+router.get('/:id', fetchUser, getPreInstallationById);
 
 // Get all PreInstallations by userId
-router.get('/user/:userId', getPreInstallationsByUserId);
+router.get('/user/:userId', fetchUser, getPreInstallationsByUserId);
 
 // Delete PreInstallation by ID
-router.delete('/:id', deletePreInstallationById);
+router.delete('/:id', fetchUser, deletePreInstallationById);
 
 module.exports = router;

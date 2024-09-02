@@ -4,6 +4,9 @@ const ChargerLocation = require('../models/chargerLocationModel');
 
 const createSiteSurvey = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { userId, locationId } = req.body;
 
         // Check if the user exists
@@ -30,6 +33,9 @@ const createSiteSurvey = async (req, res) => {
 
 const getAllSiteSurveys = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const siteSurveys = await SiteSurvey.find()
             .populate('userId', 'username email phone')  // Adjust fields as needed
             .populate('locationId', 'locationName address city state status'); // Adjust fields as needed
@@ -45,6 +51,9 @@ const getAllSiteSurveys = async (req, res) => {
 
 const getSiteSurveyById = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const siteSurvey = await SiteSurvey.findById(id);
         if (!siteSurvey) {
@@ -58,6 +67,9 @@ const getSiteSurveyById = async (req, res) => {
 
 const getSiteSurveysByUserId = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { userId } = req.params;
         const siteSurveys = await SiteSurvey.find({ userId });
         if (!siteSurveys.length) {
@@ -71,6 +83,9 @@ const getSiteSurveysByUserId = async (req, res) => {
 
 const deleteSiteSurveyById = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const result = await SiteSurvey.findByIdAndDelete(id);
         if (!result) {
@@ -86,6 +101,9 @@ const getSiteSurveyByLocationId = async (req, res) => {
     const { locationId } = req.body;
 
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Find the site survey by locationId with status 'Approved'
         const siteSurvey = await SiteSurvey.findOne({ locationId, status: 'Approved' });
 

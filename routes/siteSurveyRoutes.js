@@ -16,18 +16,18 @@ const fetchUser = require('../middleware/fetchuser');
 router.post('/', fetchUser , checkUserStatus, createSiteSurvey);
 
 // Route to get all site surveys
-router.get('/', getAllSiteSurveys);
+router.get('/', fetchUser, getAllSiteSurveys);
 
 // Route to get a site survey by ID
-router.get('/:id', getSiteSurveyById);
+router.get('/:id', fetchUser, getSiteSurveyById);
 
 // Route to get all site surveys by user ID
-router.get('/user/:userId', getSiteSurveysByUserId);
+router.get('/user/:userId', fetchUser, getSiteSurveysByUserId);
 
 // Route to get all approved site surveys by Location ID
-router.post('/location', getSiteSurveyByLocationId);
+router.post('/location', fetchUser, getSiteSurveyByLocationId);
 
 // Route to delete a site survey by ID
-router.delete('/:id', deleteSiteSurveyById);
+router.delete('/:id', fetchUser, deleteSiteSurveyById);
 
 module.exports = router;

@@ -5,6 +5,9 @@ const ChargerLocation = require('../models/chargerLocationModel');
 // Create a new PreInstallation
 const createPreInstallation = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { userId, locationId } = req.body;
 
         // Check if the user exists
@@ -32,6 +35,9 @@ const createPreInstallation = async (req, res) => {
 // Get all PreInstallations
 const getAllPreInstallations = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const preInstallations = await PreInstallation.find() 
         .populate('userId', 'username email phone')  // Adjust fields as needed
         .populate('locationId', 'locationName address city state status'); // Adjust fields as needed;
@@ -47,6 +53,9 @@ const getAllPreInstallations = async (req, res) => {
 // Get PreInstallation by ID
 const getPreInstallationById = async (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const preInstallation = await PreInstallation.findById(id);
         if (!preInstallation) {
@@ -61,6 +70,9 @@ const getPreInstallationById = async (req, res) => {
 // Get all PreInstallations by userId
 const getPreInstallationsByUserId = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { userId } = req.params;
         const preInstallations = await PreInstallation.find({ userId });
         if (preInstallations.length === 0) {
@@ -75,6 +87,9 @@ const getPreInstallationsByUserId = async (req, res) => {
 // Delete PreInstallation by ID
 const deletePreInstallationById = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { id } = req.params;
         const result = await PreInstallation.findByIdAndDelete(id);
         if (!result) {
