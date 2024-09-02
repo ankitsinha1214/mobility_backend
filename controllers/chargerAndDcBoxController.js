@@ -42,8 +42,8 @@ const getAllChargerAndDcBox = async (req, res) => {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
         const chargerAndDcBoxes = await ChargerAndDcBox.find()
-        .populate('userId', 'username email phone')  // Adjust fields as needed
-        .populate('locationId', 'locationName address city state status'); // Adjust fields as needed;
+            .populate('userId', 'username email phone')  // Adjust fields as needed
+            .populate('locationId', 'locationName address city state status'); // Adjust fields as needed;
         if (chargerAndDcBoxes.length === 0) {
             return res.json({ status: false, message: 'No Charger and DC Box entries found' });
         }
@@ -125,7 +125,7 @@ const getFilteredLocationsWithApprovedPreInstallation = async (req, res) => {
         const approvedChargerAndDcBoxLocationIds = new Set(approvedChargerAndDcBox.map(cb => cb.locationId.toString()));
 
         // Filter locations to include only those with approved pre-installations and exclude those with approved charger and DC box
-        locations = locations.filter(loc => 
+        locations = locations.filter(loc =>
             approvedLocationIds.has(loc._id.toString()) &&
             !approvedChargerAndDcBoxLocationIds.has(loc._id.toString())
         );
@@ -174,18 +174,16 @@ const updateStatusByType = async (req, res) => {
             if (status === 'Rejected') {
                 record.Reason = reason;
                 notification.title = 'Site Survey Rejected';
-                notification.description = `Dear ${user.username}, your site survey request for 
-                ${location.locationName} has been rejected due to the following reason: ${reason}.
-                Please contact our support team for further assistance.`;
+                notification.description = `Dear ${user.username}, your site survey request for ${location.locationName} has been rejected due to the following reason: ${reason}.
+Please contact our support team for further assistance.`;
             }
             await record.save();
 
             // If the site survey is approved, update the corresponding location's status to "Pending"
             if (status === 'Approved') {
                 notification.title = 'Site Survey Approved';
-                notification.description = `Dear ${user.username}, your site survey request 
-                for ${location.locationName} has been approved. Please proceed with the next steps as per the guidelines. 
-                Thank you for your cooperation.`;
+                notification.description = `Dear ${user.username}, your site survey request for ${location.locationName} has been approved. Please proceed with the next steps as per the guidelines. 
+Thank you for your cooperation.`;
                 const location = await ChargerLocation.findById(record.locationId);
                 if (location) {
                     location.status = 'Pending';
@@ -203,14 +201,12 @@ const updateStatusByType = async (req, res) => {
             if (status === 'Rejected') {
                 record.Reason = reason;
                 notification.title = 'Pre-Installation Rejected';
-                notification.description = `Dear ${user.username}, your pre-installation request 
-                for ${location.locationName} has been rejected due to the following reason: 
-                ${reason}. Please contact our support team for further assistance.`;
+                notification.description = `Dear ${user.username}, your pre-installation request for ${location.locationName} has been rejected due to the following reason: ${reason}. 
+Please contact our support team for further assistance.`;
             } else if (status === 'Approved') {
                 notification.title = 'Pre-Installation Approved';
-                notification.description = `Dear ${user.username}, your pre-installation request 
-                for ${location.locationName} has been approved. Please proceed with the next steps
-                 as per the guidelines. Thank you for your cooperation.`;
+                notification.description = `Dear ${user.username}, your pre-installation request for ${location.locationName} has been approved. Please proceed with the next steps as per the guidelines. 
+Thank you for your cooperation.`;
             }
             await record.save();
         } else if (type === 'charger-dc-box') {
@@ -224,15 +220,12 @@ const updateStatusByType = async (req, res) => {
             if (status === 'Rejected') {
                 record.Reason = reason;
                 notification.title = 'Charger and DC Box Rejected';
-                notification.description = `Dear ${user.username}, your charger and DC box request 
-                for ${location.locationName} has been rejected due to the following reason: 
-                ${reason}. Please contact our support team for further assistance.`;
+                notification.description = `Dear ${user.username}, your charger and DC box request for ${location.locationName} has been rejected due to the following reason: ${reason}. 
+Please contact our support team for further assistance.`;
             } else if (status === 'Approved') {
                 notification.title = 'Charger and DC Box Approved';
-                notification.description = `Dear ${user.username}, your charger and
-                 DC box request for ${location.locationName} has been approved. 
-                 Please proceed with the next steps as per the guidelines.
-                 Thank you for your cooperation.`;
+                notification.description = `Dear ${user.username}, your charger and DC box request for ${location.locationName} has been approved. Please proceed with the next steps as per the guidelines.
+Thank you for your cooperation.`;
             }
             await record.save();
         } else {
