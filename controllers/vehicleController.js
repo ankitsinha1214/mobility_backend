@@ -56,6 +56,9 @@ const createVehicleModel = async (req, res) => {
     const { make, model, variant, ARAI_range, claimed_range, image } = req.body;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Check if the vehicle model already exists
         const existingModel = await VehicleModel.findOne({ make, model, variant });
         if (existingModel) {
@@ -86,6 +89,9 @@ const createVehicleModel = async (req, res) => {
 // Get all vehicle models
 const getAllVehicleModels = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const vehicleModels = await VehicleModel.find({});
         if (vehicleModels.length > 0) {
             return res.json({ success: true, data: vehicleModels });
@@ -103,6 +109,9 @@ const getVehicleModelById = async (req, res) => {
     const { id } = req.params;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const vehicleModel = await VehicleModel.findById(id);
 
         if (!vehicleModel) {
@@ -122,6 +131,9 @@ const updateVehicleModel = async (req, res) => {
     const { make, model, variant, ARAI_range, claimed_range, image } = req.body;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const vehicleModel = await VehicleModel.findById(id);
 
         if (!vehicleModel) {
@@ -149,6 +161,9 @@ const deleteVehicleModel = async (req, res) => {
     const { id } = req.params;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const vehicleModel = await VehicleModel.findByIdAndDelete(id);
 
         if (!vehicleModel) {

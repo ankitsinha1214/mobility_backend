@@ -14,6 +14,9 @@ const s3 = new S3Client({
 // Create a charger location
 const createChargerLocation = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { direction, freepaid, salesManager, dealer, facilities, chargerInfo } = req.body;
         const parsedDirection = JSON.parse(direction);
         const parsedFreepaid = JSON.parse(freepaid);
@@ -115,6 +118,9 @@ const getChargerLocationById = async (req, res) => {
 const updateChargerLocation = async (req, res) => {
     const { id } = req.params;
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const chargerLocation = await ChargerLocation.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
         if (!chargerLocation) {
             return res.json({ success: false, message: 'Charger location not found' });
@@ -130,6 +136,9 @@ const updateChargerLocation = async (req, res) => {
 const deleteChargerLocation = async (req, res) => {
     const { id } = req.params;
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const chargerLocation = await ChargerLocation.findByIdAndDelete(id);
         if (!chargerLocation) {
             return res.json({ success: false, message: 'Charger location not found' });
@@ -146,6 +155,9 @@ const changeChargerStatus = async (req, res) => {
     const { status } = req.body;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const chargerLocation = await ChargerLocation.findById(id);
         if (!chargerLocation) {
             return res.json({ success: false, message: 'Charger location not found' });

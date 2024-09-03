@@ -7,6 +7,9 @@ const createLocation = async (req, res) => {
     const { country, state, city } = req.body;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
       // Check if the combination of country, state, and city already exists
       const existingLocation = await Location.findOne({ country, state, city });
   
@@ -91,6 +94,9 @@ const updateLocation = async (req, res) => {
     const { country, state, city } = req.body;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const updatedLocation = await Location.findByIdAndUpdate(id, { country, state, city }, { new: true });
 
         if (!updatedLocation) {
@@ -109,6 +115,9 @@ const deleteLocation = async (req, res) => {
     const { id } = req.params;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const deletedLocation = await Location.findByIdAndDelete(id);
 
         if (!deletedLocation) {

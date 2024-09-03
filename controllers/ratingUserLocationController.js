@@ -98,6 +98,9 @@ exports.getReviewsByUser = async (req, res) => {
 // Get all reviews by location
 exports.getReviewsByLocation = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { locationId } = req.params;
 
         // Validate location

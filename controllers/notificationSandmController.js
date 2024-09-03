@@ -6,6 +6,9 @@ const createNotification = async (req, res) => {
     const { title, description, userServiceAndMaintenance } = req.body;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Validate the userServiceAndMaintenance ID
         const userExists = await UserSandmModel.findById(userServiceAndMaintenance);
         if (!userExists) {
@@ -24,6 +27,9 @@ const createNotification = async (req, res) => {
 // Get all notifications
 const getNotifications = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const notifications = await NotificationServiceMaintenance.find();
         return res.json({ success: true, data: notifications });
     } catch (error) {
@@ -80,6 +86,9 @@ const updateNotification = async (req, res) => {
     const { isRead } = req.body;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         // Validate the isRead field
         if (typeof isRead !== 'boolean') {
             return res.json({ success: false, message: 'Invalid isRead value' });
@@ -105,6 +114,9 @@ const updateNotification = async (req, res) => {
 const deleteNotification = async (req, res) => {
     const { id } = req.params;
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const notification = await NotificationServiceMaintenance.findByIdAndDelete(id);
         if (!notification) {
             return res.json({ success: false, message: 'Notification not found' });

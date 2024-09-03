@@ -25,6 +25,7 @@ router.get(
 
 router.get(
   "/:id",
+  fetchUser,
   userController.getUserById
 );
 

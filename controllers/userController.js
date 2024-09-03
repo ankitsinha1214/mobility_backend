@@ -205,6 +205,9 @@ const addUser = async (req, res) => {
 // Get all users
 const getUser = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const users = await User.find({}, { password: 0 });
 
         if (users.length > 0) {
@@ -223,6 +226,9 @@ const getUserById = async (req, res) => {
     const { id } = req.params;
 
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const user = await User.findById(id, { password: 0 });
 
         if (user) {

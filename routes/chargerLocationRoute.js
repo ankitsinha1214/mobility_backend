@@ -4,22 +4,24 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+const fetchUser = require('../middleware/fetchuser');
 // Routes
 router.post('/',
+    fetchUser,
     upload.fields([{
         name: 'locationImage', maxCount: 6
     }
     ]), chargerLocationController.createChargerLocation);
-router.get('/', chargerLocationController.getChargerLocations);
-router.get('/type', chargerLocationController.getLocationTypes);
-router.get('/all-location', chargerLocationController.getAllLocations);
-router.get('/:id', chargerLocationController.getChargerLocationById);
-router.put('/:id', chargerLocationController.updateChargerLocation);
-router.delete('/:id', chargerLocationController.deleteChargerLocation);
-router.post('/:id', chargerLocationController.changeChargerStatus);
-router.post('/location/filter', chargerLocationController.getLocationsByStateCityStatus);
-router.post('/location/filter/:checkType', chargerLocationController.getLocationsByStateCityStatusSitesurvey);
-router.post('/location/range', chargerLocationController.getChargerLocationsInRange);
-router.get('/location/search', chargerLocationController.searchChargerLocations);
+router.get('/', fetchUser, chargerLocationController.getChargerLocations);
+router.get('/type',fetchUser, chargerLocationController.getLocationTypes);
+router.get('/all-location',fetchUser, chargerLocationController.getAllLocations);
+router.get('/:id',fetchUser, chargerLocationController.getChargerLocationById);
+router.put('/:id',fetchUser, chargerLocationController.updateChargerLocation);
+router.delete('/:id',fetchUser, chargerLocationController.deleteChargerLocation);
+router.post('/:id',fetchUser, chargerLocationController.changeChargerStatus);
+router.post('/location/filter',fetchUser, chargerLocationController.getLocationsByStateCityStatus);
+router.post('/location/filter/:checkType', fetchUser, chargerLocationController.getLocationsByStateCityStatusSitesurvey);
+router.post('/location/range', fetchUser, chargerLocationController.getChargerLocationsInRange);
+router.get('/location/search', fetchUser, chargerLocationController.searchChargerLocations);
 
 module.exports = router;

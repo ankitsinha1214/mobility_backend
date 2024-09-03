@@ -1,26 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const faqController = require('../controllers/faqController');
+const fetchUser = require('../middleware/fetchuser');
 
 // Create an FAQ
-router.post('/', faqController.createFAQ);
+router.post('/',fetchUser, faqController.createFAQ);
 
 // Get all FAQs
-router.get('/', faqController.getFAQs);
+router.get('/',fetchUser, faqController.getFAQs);
 
 // Get all category of faq
-router.get('/all-faq-category', faqController.getCategoryFaq);
+router.get('/all-faq-category', fetchUser, faqController.getCategoryFaq);
 
 // Get all FAQs by category
-router.post('/faq-category', faqController.faqByCategory);
+router.post('/faq-category', fetchUser, faqController.faqByCategory);
 
 // Get a single FAQ by ID
-router.get('/:id', faqController.getFAQById);
+router.get('/:id', fetchUser, faqController.getFAQById);
 
 // Update an FAQ by ID
-router.put('/:id', faqController.updateFAQ);
+router.put('/:id', fetchUser, faqController.updateFAQ);
 
 // Delete an FAQ by ID
-router.delete('/:id', faqController.deleteFAQ);
+router.delete('/:id', fetchUser, faqController.deleteFAQ);
 
 module.exports = router;

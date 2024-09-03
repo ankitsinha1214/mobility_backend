@@ -3,6 +3,9 @@ const FAQ = require('../models/faqModel');
 // Create an FAQ
 const createFAQ = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const faq = new FAQ(req.body);
         await faq.save();
         return res.json({ success: true, data: faq, message: 'FAQ created successfully' });
@@ -75,6 +78,9 @@ const getFAQById = async (req, res) => {
 const updateFAQ = async (req, res) => {
     const { id } = req.params;
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const faq = await FAQ.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
         if (!faq) {
             return res.json({ success: false, message: 'FAQ not found' });
@@ -90,6 +96,9 @@ const updateFAQ = async (req, res) => {
 const deleteFAQ = async (req, res) => {
     const { id } = req.params;
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const faq = await FAQ.findByIdAndDelete(id);
         if (!faq) {
             return res.json({ success: false, message: 'FAQ not found' });

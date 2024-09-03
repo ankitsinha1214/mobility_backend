@@ -4,9 +4,10 @@ const vehicleModelController = require('../controllers/vehicleController');
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const fetchUser = require('../middleware/fetchuser');
 
 // Create a new vehicle model
-router.post('/',
+router.post('/',fetchUser, 
     upload.fields([{
         name: 'image', maxCount: 6
     }
@@ -14,17 +15,17 @@ router.post('/',
     vehicleModelController.createVehicleModel);
 
 // Get all vehicle models
-router.get('/', vehicleModelController.getAllVehicleModels);
+router.get('/',fetchUser,  vehicleModelController.getAllVehicleModels);
 
-router.get('/all', vehicleModelController.getVehicleHierarchy);
+router.get('/all', fetchUser, vehicleModelController.getVehicleHierarchy);
 
 // Get a vehicle model by ID
-router.get('/:id', vehicleModelController.getVehicleModelById);
+router.get('/:id', fetchUser, vehicleModelController.getVehicleModelById);
 
 // Update a vehicle model
-router.put('/:id', vehicleModelController.updateVehicleModel);
+router.put('/:id', fetchUser, vehicleModelController.updateVehicleModel);
 
 // Delete a vehicle model
-router.delete('/:id', vehicleModelController.deleteVehicleModel);
+router.delete('/:id', fetchUser, vehicleModelController.deleteVehicleModel);
 
 module.exports = router;
