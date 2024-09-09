@@ -30,7 +30,7 @@ const getNotifications = async (req, res) => {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
-        const notifications = await NotificationServiceMaintenance.find().populate('userId', 'username email phone');
+        const notifications = await NotificationServiceMaintenance.find().populate('userServiceAndMaintenance', 'username email phone');
         return res.json({ success: true, data: notifications });
     } catch (error) {
         console.error('Error:', error);
