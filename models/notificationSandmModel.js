@@ -18,7 +18,7 @@ const sandmNotificationSchema = new Schema({
     },
     userServiceAndMaintenance: {
         type: Schema.Types.ObjectId,
-        ref: 'userSandmModel', 
+        ref: 'Service-and-maintenance-user', 
         required: true
     }
 }, { timestamps: true });
