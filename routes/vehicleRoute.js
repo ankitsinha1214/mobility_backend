@@ -17,7 +17,7 @@ router.post('/',fetchUser,
 // Get all vehicle models
 router.get('/',fetchUser,  vehicleModelController.getAllVehicleModels);
 
-router.get('/all', fetchUser, vehicleModelController.getVehicleHierarchy);
+router.get('/all', vehicleModelController.getVehicleHierarchy);
 
 // Get a vehicle model by ID
 router.get('/:id', fetchUser, vehicleModelController.getVehicleModelById);
