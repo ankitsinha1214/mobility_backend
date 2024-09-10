@@ -86,9 +86,9 @@ const updateNotification = async (req, res) => {
     const { isRead } = req.body;
 
     try {
-        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
-            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
-        }
+        // if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+        //     return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        // }
         // Validate the isRead field
         if (typeof isRead !== 'boolean') {
             return res.json({ success: false, message: 'Invalid isRead value' });
@@ -108,7 +108,6 @@ const updateNotification = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
-
 
 // Delete a notification by ID
 const deleteNotification = async (req, res) => {
