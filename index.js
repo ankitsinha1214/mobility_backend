@@ -24,6 +24,7 @@ app.get('/', (_req, res) => {
   res.send({ message: 'Welcome to Backend of Esyasoft Mobility!!' });
 });
 
+app.use('/reports', require('./controllers/reportController')); // Adjust route paths as per your file structure
 app.use('/users', require('./routes/userRoute')); // Adjust route paths as per your file structure
 app.use('/user-service-and-maintenance', require('./routes/userSandmRoute')); // Adjust route paths as per your file structure
 app.use('/notification-service-and-maintenance', require('./routes/notificationSandmRoute')); // Adjust route paths as per your file structure

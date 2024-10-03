@@ -34,13 +34,13 @@ router.post('/signup', [
     //If there are errors return bad request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ success:success, errors: errors.array() });
+      return res.status(400).json({ success: success, errors: errors.array() });
     }
     //to check if user has same email or not
     try {
       let user = await User.findOne({ email: req.body.email })
       if (user) {
-        return res.status(400).json({ success:false,error: "Sorry user email already exist please try to login" })
+        return res.status(400).json({ success: false, error: "Sorry user email already exist please try to login" })
       }
       // Generate an OTP
       const otp = generateOTP();
@@ -52,19 +52,18 @@ router.post('/signup', [
         subject: 'OTP Verification',
         text: `Your OTP for signup is: ${otp}`
       };
-await transporter.sendMail(mailOptions);
-        const salt = await bcrypt.genSalt(10);
-        const secpass = await bcrypt.hash(req.body.password, salt);
+      await transporter.sendMail(mailOptions);
+      const salt = await bcrypt.genSalt(10);
+      const secpass = await bcrypt.hash(req.body.password, salt);
+      //creating a user
+      user = await User.create({
+        name: req.body.name,
+        email: req.body.email,
+        password: secpass,
+        otp: otp
+      })
 
-        //creating a user
-        user = await User.create({
-          name: req.body.name,
-          email: req.body.email,
-          password: secpass,
-          otp: otp
-        })
-
-        res.json({ success:true, message: "OTP sent Successfully" });
+      res.json({ success: true, message: "OTP sent Successfully" });
     } catch (error) {
       console.log(error.message);
       res.status(500).send("some error occured while sending OTP Please Try Again!");
@@ -76,32 +75,32 @@ router.post('/verifyotp', async (req, res) => {
   const { email, otp } = req.body;
 
   try {
-      // Find the OTP record for the user
-      const userRecord = await User.findOne({ email: email });
+    // Find the OTP record for the user
+    const userRecord = await User.findOne({ email: email });
 
-      if (!userRecord) {
-          return res.status(400).json({ success:false, error: "OTP not found for the user. Please Try SignUp Again" });
-      }
+    if (!userRecord) {
+      return res.status(400).json({ success: false, error: "OTP not found for the user. Please Try SignUp Again" });
+    }
 
-      // Check if the OTP matches
-      if (userRecord.otp === otp) {
-        userRecord.otp_verified = true;
-        await userRecord.save();
-          const data = {
-              user: {
-                  id: userRecord.id
-              }
-          };
+    // Check if the OTP matches
+    if (userRecord.otp === otp) {
+      userRecord.otp_verified = true;
+      await userRecord.save();
+      const data = {
+        user: {
+          id: userRecord.id
+        }
+      };
 
-          const authtoken = jwt.sign(data, JWT_SECRET);
+      const authtoken = jwt.sign(data, JWT_SECRET);
 
-          return res.json({ success:true, token:authtoken, id: userRecord.id });
-      } else {
-          return res.status(400).json({ success:false, error: "Invalid OTP" });
-      }
+      return res.json({ success: true, token: authtoken, id: userRecord.id });
+    } else {
+      return res.status(400).json({ success: false, error: "Invalid OTP" });
+    }
   } catch (error) {
-      console.error(error.message);
-      res.status(500).send("Some error occurred");
+    console.error(error.message);
+    res.status(500).send("Some error occurred");
   }
 });
 
@@ -109,38 +108,38 @@ router.post('/resendotp', async (req, res) => {
   const { email } = req.body;
 
   try {
-      // Find the user by email
-      const user = await User.findOne({ email });
+    // Find the user by email
+    const user = await User.findOne({ email });
 
-      if (!user) {
-          return res.status(400).json({ error: "User not found with this email!" });
-      }
+    if (!user) {
+      return res.status(400).json({ error: "User not found with this email!" });
+    }
 
-      // Generate a new OTP
-      const otp = generateOTP();
+    // Generate a new OTP
+    const otp = generateOTP();
 
-      // Update the user's OTP
-      user.otp = otp;
-      await user.save();
+    // Update the user's OTP
+    user.otp = otp;
+    await user.save();
 
-      // Send the OTP to the user
-      const mailOptions = {
-        from: 'geniacadmy@gmail.com',
-        to: req.body.email,
-        subject: 'OTP Verification',
-        text: `Your OTP for signup is: ${otp}`
-      };
+    // Send the OTP to the user
+    const mailOptions = {
+      from: 'geniacadmy@gmail.com',
+      to: req.body.email,
+      subject: 'OTP Verification',
+      text: `Your OTP for signup is: ${otp}`
+    };
 
-      const otpSent = await transporter.sendMail(mailOptions);
+    const otpSent = await transporter.sendMail(mailOptions);
 
-      if (!otpSent) {
-          return res.status(500).json({ error: "Failed to send OTP. Please try again later." });
-      }
+    if (!otpSent) {
+      return res.status(500).json({ error: "Failed to send OTP. Please try again later." });
+    }
 
-      return res.json({ success: true, message: "OTP has been resent successfully!" });
+    return res.json({ success: true, message: "OTP has been resent successfully!" });
   } catch (error) {
-      console.error(error.message);
-      res.status(500).send("Some error occurred");
+    console.error(error.message);
+    res.status(500).send("Some error occurred");
   }
 });
 // login 
@@ -161,16 +160,16 @@ router.post('/login', [
     let user = await User.findOne({ email });
     if (!user) {
       success = false;
-      return res.status(400).json({ success:false ,error: "Email doesnot Exist" });
+      return res.status(400).json({ success: false, error: "Email doesnot Exist" });
     }
 
     const passwordCompare = await bcrypt.compare(password, user.password);
     if (!passwordCompare) {
-      return res.status(400).json({ success:false , error: "Please try to login with correct credentials" });
+      return res.status(400).json({ success: false, error: "Please try to login with correct credentials" });
     }
 
-    if(!user.otp_verified){
-      return res.status(400).json({ success:false , error: "Your Account is not verified yet! Please Verify it" });
+    if (!user.otp_verified) {
+      return res.status(400).json({ success: false, error: "Your Account is not verified yet! Please Verify it" });
     }
 
     const data = {
@@ -179,7 +178,7 @@ router.post('/login', [
       }
     }
     const authtoken = jwt.sign(data, JWT_SECRET);
-    res.json({ success:true, token:authtoken, id: user.id })
+    res.json({ success: true, token: authtoken, id: user.id })
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Internal Server Error");
@@ -187,7 +186,7 @@ router.post('/login', [
 })
 
 //getall users
-router.get('/users', fetchuser,  async (req, res) => {
+router.get('/users', fetchuser, async (req, res) => {
   try {
     // Fetch all users, excluding the password field
     const users = await User.find().select("-password -otp_verified -otp");

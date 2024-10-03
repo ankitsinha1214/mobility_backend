@@ -4,7 +4,6 @@ const UserSandmModel = require('../models/userSandmModel'); // Ensure you have t
 // Create a new notification
 const createNotification = async (req, res) => {
     const { title, description, userServiceAndMaintenance } = req.body;
-
     try {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
@@ -14,7 +13,6 @@ const createNotification = async (req, res) => {
         if (!userExists) {
             return res.json({ success: false, message: 'Invalid userServiceAndMaintenance ID' });
         }
-
         const notification = new NotificationServiceMaintenance({ title, description, userServiceAndMaintenance });
         await notification.save();
         return res.json({ success: true, data: notification, message: 'Notification created successfully' });
@@ -130,7 +128,6 @@ const deleteNotification = async (req, res) => {
 // Get all notifications by userServiceAndMaintenance ID
 const getNotificationsByUserId = async (req, res) => {
     const { userId } = req.body;
-
     try {
         const notifications = await NotificationServiceMaintenance.find({ userServiceAndMaintenance: userId });
         if (notifications.length === 0) {
