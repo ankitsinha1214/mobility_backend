@@ -68,15 +68,15 @@ router.post('/generate-report', async (req, res) => {
                 worksheet.columns = [
                     { header: 'Charger ID', key: '_id', width: 30 },
                     { header: 'Charger Name', key: 'name', width: 30 },
-                    { header: 'Created Date', key: 'created_by', width: 30 },
+                    { header: 'Created Date', key: 'createdAt', width: 30 },
                 ];
                 break;
 
             case 'locations':
                 worksheet.columns = [
                     { header: 'Location ID', key: '_id', width: 30 },
-                    { header: 'Location Name', key: 'name', width: 30 },
-                    { header: 'Created Date', key: 'created_by', width: 30 },
+                    { header: 'Location Name', key: 'locationName', width: 30 },
+                    { header: 'Created Date', key: 'createdAt', width: 30 },
                 ];
                 break;
 
@@ -84,7 +84,7 @@ router.post('/generate-report', async (req, res) => {
                 worksheet.columns = [
                     { header: 'User ID', key: '_id', width: 30 },
                     { header: 'Username', key: 'username', width: 30 },
-                    { header: 'Created Date', key: 'created_by', width: 30 },
+                    { header: 'Created Date', key: 'createdAt', width: 30 },
                 ];
                 break;
         }
