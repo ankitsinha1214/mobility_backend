@@ -12,6 +12,7 @@ router.post('/',
         name: 'locationImage', maxCount: 6
     }
     ]), chargerLocationController.createChargerLocation);
+router.get('/chargers/all', fetchUser, chargerLocationController.getAllChargers);
 router.get('/', fetchUser, chargerLocationController.getChargerLocations);
 router.get('/type',fetchUser, chargerLocationController.getLocationTypes);
 router.get('/all-location',fetchUser, chargerLocationController.getAllLocations);

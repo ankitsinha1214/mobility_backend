@@ -71,6 +71,35 @@ const createChargerLocation = async (req, res) => {
     }
 };
 
+// Get all charger info only
+const getAllChargers = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+        // Find all ChargerLocation documents but only return the chargerInfo field
+        const chargers = await ChargerLocation.find({}, 'chargerInfo locationName city state');
+
+        if (chargers.length === 0) {
+            return res.json({
+                success: false,
+                message: 'No chargers found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: chargers
+        });
+    } catch (error) {
+        console.error('Error fetching charger info:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+};
+
 // Get all charger locations
 const getChargerLocations = async (req, res) => {
     try {
@@ -404,6 +433,7 @@ const searchChargerLocations = async (req, res) => {
 
 module.exports = {
     createChargerLocation,
+    getAllChargers,
     getChargerLocations,
     getLocationTypes,
     getChargerLocationById,
