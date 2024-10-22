@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { DATABASE } = require('./message.json'); // Adjust path as needed
+const logger = require('./logger');
+const logRequest = require('./middleware/loggerMiddleware'); 
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -12,6 +14,7 @@ const port = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(logRequest);
 
 // MongoDB Connection
 const dbConfig = require('./db'); // Assuming your MongoDB configuration is in db.js
@@ -23,6 +26,8 @@ mongoose.connect(dbConfig.mongoURI, dbConfig.options)
 app.get('/', (_req, res) => {
   res.send({ message: 'Welcome to Backend of Esyasoft Mobility!!' });
 });
+
+logger.info('Application has started');
 
 app.use('/reports', require('./controllers/reportController')); // Adjust route paths as per your file structure
 app.use('/users', require('./routes/userRoute')); // Adjust route paths as per your file structure
