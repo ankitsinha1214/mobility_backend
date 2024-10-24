@@ -13,6 +13,7 @@ router.post('/',
     }
     ]), chargerLocationController.createChargerLocation);
 router.get('/chargers/all', fetchUser, chargerLocationController.getAllChargers);
+router.post('/add-charger', fetchUser, chargerLocationController.addChargerToLocation);
 router.get('/', fetchUser, chargerLocationController.getChargerLocations);
 router.get('/type',fetchUser, chargerLocationController.getLocationTypes);
 router.get('/all-location',fetchUser, chargerLocationController.getAllLocations);

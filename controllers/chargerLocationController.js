@@ -71,6 +71,36 @@ const createChargerLocation = async (req, res) => {
     }
 };
 
+// Add a new charger to an existing charger location
+const addChargerToLocation = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+        const { location_id, newChargerInfo } = req.body; // Expecting the charger info to add in request body
+        console.log(newChargerInfo);
+        // const parsedChargerInfo = JSON.parse(newChargerInfo);
+        const parsedChargerInfo = (newChargerInfo);
+
+        // Find the location by location_id
+        const chargerLocation = await ChargerLocation.findById(location_id);
+        if (!chargerLocation) {
+            return res.json({ success: false, message: 'Location not found' });
+        }
+
+        // Append the new charger info to the existing chargerInfo array
+        chargerLocation.chargerInfo.push(parsedChargerInfo);
+
+        // Save the updated document
+        await chargerLocation.save();
+
+        return res.json({ success: true, message: 'New charger added successfully', data: chargerLocation });
+    } catch (error) {
+        console.error('Error adding charger:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 // Get all charger info only
 const getAllChargers = async (req, res) => {
     try {
@@ -433,6 +463,7 @@ const searchChargerLocations = async (req, res) => {
 
 module.exports = {
     createChargerLocation,
+    addChargerToLocation,
     getAllChargers,
     getChargerLocations,
     getLocationTypes,
