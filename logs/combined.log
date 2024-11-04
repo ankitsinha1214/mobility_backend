@@ -39,3 +39,19 @@
 2024-11-04T07:20:22.749Z [32minfo[39m: Application has started
 2024-11-04T07:31:47.989Z [32minfo[39m: Application has started
 2024-11-04T07:31:58.736Z [32minfo[39m: Application has started
+2024-11-04T07:44:35.767Z [32minfo[39m: Application has started
+2024-11-04T07:45:23.248Z [32minfo[39m: [POST] /reports/generate-report - 200 [72ms]
+2024-11-04T07:54:29.542Z [32minfo[39m: Application has started
+2024-11-04T07:54:44.807Z [32minfo[39m: [POST] /reports/generate-report - 200 [60ms]
+2024-11-04T07:56:17.198Z [32minfo[39m: Application has started
+2024-11-04T07:56:20.613Z [32minfo[39m: [POST] /reports/generate-report - 200 [90ms]
+2024-11-04T07:56:34.802Z [32minfo[39m: Application has started
+2024-11-04T07:56:54.730Z [32minfo[39m: Application has started
+2024-11-04T07:57:04.297Z [32minfo[39m: [POST] /reports/generate-report - 200 [55ms]
+2024-11-04T07:57:34.388Z [32minfo[39m: Application has started
+2024-11-04T07:57:36.109Z [32minfo[39m: [POST] /reports/generate-report - 200 [67ms]
+2024-11-04T08:00:31.243Z [32minfo[39m: Application has started
+2024-11-04T08:00:34.194Z [32minfo[39m: Application has started
+2024-11-04T08:00:38.672Z [32minfo[39m: [POST] /reports/generate-report - 200 [66ms]
+2024-11-04T08:01:13.086Z [32minfo[39m: Application has started
+2024-11-04T08:01:22.135Z [32minfo[39m: Application has started

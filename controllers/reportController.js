@@ -40,9 +40,13 @@ router.post('/generate-report', async (req, res) => {
                 // data = await Charger.find({
                 //     createdAt: { $gte: from, $lte: to }
                 // });
-                data = await Charger.find({
+                let data1 = [];
+                data1 = await Charger.find({
                     createdAt: { $gte: from, $lte: to }
                 }, 'chargerInfo');
+                data1.forEach(element => {
+                    data = data.concat(element.chargerInfo);
+                });
                 break;
 
             case 'locations':
