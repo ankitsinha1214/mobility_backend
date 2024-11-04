@@ -68,6 +68,11 @@ router.post('/generate-report', async (req, res) => {
                 worksheet.columns = [
                     { header: 'Charger ID', key: '_id', width: 30 },
                     { header: 'Charger Name', key: 'name', width: 30 },
+                    { header: 'Charger Status', key: 'status', width: 30 },
+                    { header: 'Charger Type', key: 'type', width: 30 },
+                    { header: 'Charger SubType', key: 'subtype', width: 30 },
+                    { header: 'Charger Power Output', key: 'powerOutput', width: 30 },
+                    { header: 'Charger Energy Consumptions', key: 'energyConsumptions', width: 30 },
                     { header: 'Created Date', key: 'createdAt', width: 30 },
                 ];
                 break;
@@ -76,6 +81,15 @@ router.post('/generate-report', async (req, res) => {
                 worksheet.columns = [
                     { header: 'Location ID', key: '_id', width: 30 },
                     { header: 'Location Name', key: 'locationName', width: 30 },
+                    { header: 'Location Status', key: 'status', width: 30 },
+                    { header: 'Location Type', key: 'locationType', width: 30 },
+                    { header: 'Address', key: 'address', width: 30 },
+                    { header: 'State', key: 'state', width: 30 },
+                    { header: 'City', key: 'city', width: 30 },
+                    { header: 'Working Hours', key: 'workingHours', width: 30 },
+                    { header: 'Working Days', key: 'workingDays', width: 30 },
+                    { header: 'Direction Latitude', key: 'direction.latitude', width: 30 },
+                    { header: 'Direction Longitude', key: 'direction.longitude', width: 30 },
                     { header: 'Created Date', key: 'createdAt', width: 30 },
                 ];
                 break;
@@ -83,7 +97,12 @@ router.post('/generate-report', async (req, res) => {
             case 'users':
                 worksheet.columns = [
                     { header: 'User ID', key: '_id', width: 30 },
-                    { header: 'Username', key: 'username', width: 30 },
+                    { header: 'First Name', key: 'firstName', width: 30 },
+                    { header: 'Last Name', key: 'lastName', width: 30 },
+                    { header: 'Status', key: 'status', width: 30 },
+                    { header: 'Phone Number', key: 'phoneNumber', width: 30 },
+                    { header: 'State', key: 'state', width: 30 },
+                    { header: 'City', key: 'city', width: 30 },
                     { header: 'Created Date', key: 'createdAt', width: 30 },
                 ];
                 break;
