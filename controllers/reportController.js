@@ -37,9 +37,12 @@ router.post('/generate-report', async (req, res) => {
         // Switch case for filtering data
         switch (filter) {
             case 'chargers':
+                // data = await Charger.find({
+                //     createdAt: { $gte: from, $lte: to }
+                // });
                 data = await Charger.find({
                     createdAt: { $gte: from, $lte: to }
-                });
+                }, 'chargerInfo');
                 break;
 
             case 'locations':
