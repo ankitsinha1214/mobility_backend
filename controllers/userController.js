@@ -221,6 +221,53 @@ const getUser = async (req, res) => {
     }
 };
 
+// get user based on pagination option for optimized rendering
+const getPaginatedUser = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are not authorized to view this data." });
+        }
+
+        // Extract pagination, sorting, and filtering parameters from the query
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const sortField = req.query.sortField || 'name';
+        const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
+        const search = req.query.search || '';
+
+        // Define the fields to return in the response
+        const userFields = 'firstName lastName phoneNumber email state city gender user_vehicle status';
+
+        // Build filter condition for searching
+        const filterCondition = search
+            ? { $or: [{ name: new RegExp(search, 'i') }, { email: new RegExp(search, 'i') }] }
+            : {};
+
+        // Fetch users with pagination, sorting, and filtering applied
+        const users = await User.find(filterCondition, userFields)
+            .sort({ [sortField]: sortOrder })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        // Fetch the total count for pagination metadata
+        const totalCount = await User.countDocuments(filterCondition);
+
+        // Return paginated results along with total count for frontend table management
+        return res.json({
+            success: true,
+            data: users,
+            pagination: {
+                totalRecords: totalCount,
+                currentPage: page,
+                totalPages: Math.ceil(totalCount / limit),
+            },
+        });
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
+    }
+};
+
 // Get user by ID
 const getUserById = async (req, res) => {
     const { id } = req.params;
@@ -728,6 +775,7 @@ const removeFavouriteLocation = async (req, res) => {
 module.exports = {
     addUser,
     getUser,
+    getPaginatedUser,
     getUserById,
     updateUser,
     deleteUser,

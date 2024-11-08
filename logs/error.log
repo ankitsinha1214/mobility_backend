@@ -4,3 +4,7 @@
 2024-10-24T07:06:21.871Z [31merror[39m: [POST] /charger-locations/add-charger - 500 [6ms]
 2024-10-24T07:08:16.169Z [31merror[39m: [POST] /charger-locations/add-charger - 500 [7ms]
 2024-10-24T07:09:01.914Z [31merror[39m: [POST] /charger-locations/add-charger - 500 [4ms]
+2024-11-06T07:52:55.940Z [31merror[39m: [GET] /get/pagination?page=1&limit=10 - 404 [4ms]
+2024-11-06T07:53:18.815Z [31merror[39m: [GET] /user/get/pagination?page=1&limit=10 - 404 [2ms]
+2024-11-06T07:53:22.253Z [31merror[39m: [GET] /users/get/pagination?page=1&limit=10 - 401 [4ms]
+2024-11-06T07:55:55.170Z [31merror[39m: [GET] /users/get/pagination?page=1&limit=10 - 401 [8ms]

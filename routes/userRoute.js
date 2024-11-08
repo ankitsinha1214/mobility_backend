@@ -22,6 +22,11 @@ router.get(
   fetchUser,
   userController.getUser
 );
+router.get(
+  "/get/pagination",
+  fetchUser,
+  userController.getPaginatedUser
+);
 
 router.get(
   "/:id",

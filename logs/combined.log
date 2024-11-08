@@ -55,3 +55,26 @@
 2024-11-04T08:00:38.672Z [32minfo[39m: [POST] /reports/generate-report - 200 [66ms]
 2024-11-04T08:01:13.086Z [32minfo[39m: Application has started
 2024-11-04T08:01:22.135Z [32minfo[39m: Application has started
+2024-11-06T07:42:05.093Z [32minfo[39m: Application has started
+2024-11-06T07:42:40.820Z [32minfo[39m: Application has started
+2024-11-06T07:52:55.940Z [31merror[39m: [GET] /get/pagination?page=1&limit=10 - 404 [4ms]
+2024-11-06T07:53:18.815Z [31merror[39m: [GET] /user/get/pagination?page=1&limit=10 - 404 [2ms]
+2024-11-06T07:53:22.253Z [31merror[39m: [GET] /users/get/pagination?page=1&limit=10 - 401 [4ms]
+2024-11-06T07:53:29.871Z [32minfo[39m: [GET] /users/get/pagination?page=1&limit=10 - 200 [106ms]
+2024-11-06T07:55:48.147Z [32minfo[39m: Application has started
+2024-11-06T07:55:55.170Z [31merror[39m: [GET] /users/get/pagination?page=1&limit=10 - 401 [8ms]
+2024-11-06T07:56:44.571Z [32minfo[39m: Application has started
+2024-11-06T07:56:49.680Z [32minfo[39m: [GET] /users/get/pagination?page=1&limit=10 - 200 [71ms]
+2024-11-06T07:57:06.672Z [32minfo[39m: Application has started
+2024-11-06T07:57:16.114Z [32minfo[39m: Application has started
+2024-11-06T08:05:04.517Z [32minfo[39m: Application has started
+2024-11-06T08:06:33.035Z [32minfo[39m: Application has started
+2024-11-06T08:06:52.134Z [32minfo[39m: Application has started
+2024-11-06T08:06:57.223Z [32minfo[39m: [GET] /users/get/pagination?page=1&limit=10 - 200 [89ms]
+2024-11-06T10:05:08.684Z [32minfo[39m: [GET] /users - 200 [352ms]
+2024-11-07T05:36:09.194Z [32minfo[39m: [GET] /users/get/pagination?page=1&limit=10 - 200 [493ms]
+2024-11-07T05:36:14.277Z [32minfo[39m: [GET] /users/get/pagination?page=2&limit=10 - 200 [86ms]
+2024-11-07T05:36:43.197Z [32minfo[39m: [GET] /users/get/pagination?page=2&limit=50 - 200 [76ms]
+2024-11-07T05:36:49.002Z [32minfo[39m: [GET] /users/get/pagination?page=1&limit=50 - 200 [63ms]
+2024-11-07T05:36:59.445Z [32minfo[39m: [GET] /users/get/pagination?page=1&limit=25 - 200 [84ms]
+2024-11-07T05:37:07.408Z [32minfo[39m: [GET] /users/get/pagination?page=1&limit=10 - 200 [235ms]
