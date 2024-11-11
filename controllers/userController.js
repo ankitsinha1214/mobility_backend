@@ -231,7 +231,7 @@ const getPaginatedUser = async (req, res) => {
         // Extract pagination, sorting, and filtering parameters from the query
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
-        const sortField = req.query.sortField || 'name';
+        const sortField = req.query.sortField || 'createdAt';
         const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
         const search = req.query.search || '';
 
