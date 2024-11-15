@@ -240,19 +240,22 @@ const getPaginatedUser = async (req, res) => {
 
         // Build filter condition for searching
          // Build filter condition for searching across multiple fields
-         const filterCondition = search
-         ? {
-             $or: [
-                 { firstName: new RegExp(search, 'i') },
-                 { lastName: new RegExp(search, 'i') },
-                 { email: new RegExp(search, 'i') },
-                 { gender: new RegExp(search, 'i') },
-                 { 'phoneNumber.number': new RegExp(search, 'i') }, // Adjust for nested fields if necessary
-                 { state: new RegExp(search, 'i') },
-                 { city: new RegExp(search, 'i') }
-             ]
+         let filterCondition = {};
+         if (search) {
+             filterCondition = {
+                 $or: [
+                     { firstName: { $regex: search, $options: 'i' } },
+                     { lastName: { $regex: search, $options: 'i' } },
+                     { email: { $regex: search, $options: 'i' } },
+                     { gender: { $regex: search, $options: 'i' } },
+                     { state: { $regex: search, $options: 'i' } },
+                     { city: { $regex: search, $options: 'i' } },
+                     { 'phoneNumber.number': { $regex: search, $options: 'i' } }, // Adjust for nested fields
+                 ],
+             };
          }
-         : {};
+         // Log the filter condition for debugging
+        console.log("Filter condition:", JSON.stringify(filterCondition));
 
         // Fetch users with pagination, sorting, and filtering applied
         const users = await User.find(filterCondition, userFields)
