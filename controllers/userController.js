@@ -266,12 +266,20 @@ const getPaginatedUser = async (req, res) => {
         // Fetch the total count for pagination metadata
         const totalCount = await User.countDocuments(filterCondition);
 
+        // Add an additional condition for counting active users with the same filter conditions
+        const activeFilterCondition = {
+            ...filterCondition,
+            status: 'active'
+        };
+        const totalActiveCount = await User.countDocuments(activeFilterCondition);
+
         // Return paginated results along with total count for frontend table management
         return res.json({
             success: true,
             data: users,
             pagination: {
                 totalRecords: totalCount,
+                totalActiveRecords: totalActiveCount,
                 currentPage: page,
                 totalPages: Math.ceil(totalCount / limit),
             },
