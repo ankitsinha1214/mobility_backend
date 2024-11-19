@@ -182,8 +182,8 @@ const addUser = async (req, res) => {
             updatedAt: newUser.updatedAt,
         };
         const userId = {
-            _id : newUser._id,
-            phoneNumber : newUser.phoneNumber
+            _id: newUser._id,
+            phoneNumber: newUser.phoneNumber
         };
         console.log(userId);
         const { token } = generateToken(userId);
@@ -239,22 +239,22 @@ const getPaginatedUser = async (req, res) => {
         const userFields = 'firstName lastName phoneNumber email state city gender user_vehicle status';
 
         // Build filter condition for searching
-         // Build filter condition for searching across multiple fields
-         let filterCondition = {};
-         if (search) {
-             filterCondition = {
-                 $or: [
-                     { firstName: { $regex: search, $options: 'i' } },
-                     { lastName: { $regex: search, $options: 'i' } },
-                     { email: { $regex: search, $options: 'i' } },
-                     { gender: { $regex: search, $options: 'i' } },
-                     { state: { $regex: search, $options: 'i' } },
-                     { city: { $regex: search, $options: 'i' } },
-                     { 'phoneNumber.number': { $regex: search, $options: 'i' } }, // Adjust for nested fields
-                 ],
-             };
-         }
-         // Log the filter condition for debugging
+        // Build filter condition for searching across multiple fields
+        let filterCondition = {};
+        if (search) {
+            filterCondition = {
+                $or: [
+                    { firstName: { $regex: search, $options: 'i' } },
+                    { lastName: { $regex: search, $options: 'i' } },
+                    // { email: { $regex: search, $options: 'i' } },
+                    { gender: { $regex: search, $options: 'i' } },
+                    { state: { $regex: search, $options: 'i' } },
+                    { city: { $regex: search, $options: 'i' } },
+                    // { 'phoneNumber.number': { $regex: search, $options: 'i' } }, // Adjust for nested fields
+                ],
+            };
+        }
+        // Log the filter condition for debugging
         console.log("Filter condition:", JSON.stringify(filterCondition));
 
         // Fetch users with pagination, sorting, and filtering applied
@@ -315,10 +315,10 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
     const { phoneNumber } = req.params;
     const { gender, email, date_of_birth, ...updateFields } = req.body;
-    if(req.phn && phoneNumber !== req.phn){
+    if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(req.user && req.user === 'User'){
+    if (req.user && req.user === 'User') {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     // Check if restricted fields are in the request body
@@ -381,10 +381,10 @@ const deleteUser = async (req, res) => {
     if (!phoneNumber) {
         return res.json({ status: false, message: 'Phone Number is required' });
     }
-    if(req.phn && phoneNumber !== req.phn){
+    if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(req.user && req.user === 'User'){
+    if (req.user && req.user === 'User') {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -435,10 +435,10 @@ const addUserVehicle = async (req, res) => {
     if (!phoneNumber) {
         return res.json({ status: false, message: 'Phone Number is required' });
     }
-    if(req.phn && phoneNumber !== req.phn){
+    if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(req.user && req.user === 'User'){
+    if (req.user && req.user === 'User') {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -492,10 +492,10 @@ const getUserVehicles = async (req, res) => {
     if (!phoneNumber) {
         return res.json({ status: false, message: 'Phone Number is required' });
     }
-    if(req.phn && phoneNumber !== req.phn){
+    if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(req.user && req.user === 'User'){
+    if (req.user && req.user === 'User') {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -518,10 +518,10 @@ const getUserVehicleById = async (req, res) => {
     if (!phoneNumber) {
         return res.json({ status: false, message: 'Phone Number is required' });
     }
-    if(req.phn && phoneNumber !== req.phn){
+    if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(req.user && req.user === 'User'){
+    if (req.user && req.user === 'User') {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -550,10 +550,10 @@ const updateUserVehicle = async (req, res) => {
     if (!phoneNumber) {
         return res.json({ status: false, message: 'Phone Number is required' });
     }
-    if(req.phn && phoneNumber !== req.phn){
+    if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(req.user && req.user === 'User'){
+    if (req.user && req.user === 'User') {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
 
@@ -607,10 +607,10 @@ const deleteUserVehicle = async (req, res) => {
     if (!phoneNumber) {
         return res.json({ status: false, message: 'Phone Number is required' });
     }
-    if(req.phn && phoneNumber !== req.phn){
+    if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(req.user && req.user === 'User'){
+    if (req.user && req.user === 'User') {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -664,9 +664,9 @@ const checkUserRegistration = async (req, res) => {
 
         if (user) {
             const userId = {
-                _id : user._id,
+                _id: user._id,
                 // _id : user._id.toString(),
-                phoneNumber : user.phoneNumber
+                phoneNumber: user.phoneNumber
             };
             console.log(userId);
             const { token } = generateToken(userId);
@@ -684,14 +684,14 @@ const checkUserRegistration = async (req, res) => {
 const addFavouriteLocation = async (req, res) => {
     const { phoneNumber } = req.params;
     const { locationId } = req.body;
-    
+
     if (!phoneNumber || !locationId) {
         return res.json({ status: false, message: 'Phone Number and Location ID are required' });
     }
-    if(req.phn && phoneNumber !== req.phn){
+    if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(req.user && req.user === 'User'){
+    if (req.user && req.user === 'User') {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -726,10 +726,10 @@ const getUserFavouriteLocations = async (req, res) => {
     if (!phoneNumber) {
         return res.json({ status: false, message: 'Phone Number is required' });
     }
-    if(req.phn && phoneNumber !== req.phn){
+    if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(req.user && req.user === 'User'){
+    if (req.user && req.user === 'User') {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
@@ -759,10 +759,10 @@ const removeFavouriteLocation = async (req, res) => {
     if (!phoneNumber || !locationId) {
         return res.json({ status: false, message: 'Phone Number and Location ID are required' });
     }
-    if(req.phn && phoneNumber !== req.phn){
+    if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
-    if(req.user && req.user === 'User'){
+    if (req.user && req.user === 'User') {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
