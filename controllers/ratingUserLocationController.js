@@ -111,7 +111,7 @@ exports.getReviewsByLocation = async (req, res) => {
 
         // Get reviews
         const reviews = await Review.find({ location: locationId })
-                        .populate('user', 'firstName lastName') ;
+                        .populate('user', 'firstName lastName status') ;
         if (reviews.length === 0) {
             return res.json({ success: false, message: 'No reviews found for this location' });
         }
