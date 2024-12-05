@@ -158,6 +158,45 @@ const getLocationTypes = async (req, res) => {
     }
 };
 
+// get location type with count and percentage 
+const getLocationTypesCountPercentage = async (req, res) => {
+    try {
+      const totalLocations = await ChargerLocation.countDocuments(); // Total count of all locations
+  
+      const locationTypes = await ChargerLocation.aggregate([
+        {
+          $group: {
+            _id: '$locationType', // Group by locationType
+            count: { $sum: 1 }, // Count occurrences
+          },
+        },
+        {
+            $project: {
+              _id: 0,
+              locationType: '$_id',
+              count: 1,
+              percentage: {
+                $round: [
+                  { $multiply: [{ $divide: ['$count', totalLocations] }, 100] },
+                  2, // Round to 2 decimal places
+                ],
+              },
+            },
+          },
+        ]);    
+  
+      if (locationTypes.length === 0) {
+        return res.json({ success: false, message: 'No location types found' });
+      }
+  
+      return res.json({ success: true, data: locationTypes });
+    } catch (error) {
+      console.error('Error:', error);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  };
+  
+
 // Get a single charger location by ID
 const getChargerLocationById = async (req, res) => {
     const { id } = req.params;
@@ -467,6 +506,7 @@ module.exports = {
     getAllChargers,
     getChargerLocations,
     getLocationTypes,
+    getLocationTypesCountPercentage,
     getChargerLocationById,
     updateChargerLocation,
     deleteChargerLocation,
