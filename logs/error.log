@@ -8,3 +8,5 @@
 2024-11-06T07:53:18.815Z [31merror[39m: [GET] /user/get/pagination?page=1&limit=10 - 404 [2ms]
 2024-11-06T07:53:22.253Z [31merror[39m: [GET] /users/get/pagination?page=1&limit=10 - 401 [4ms]
 2024-11-06T07:55:55.170Z [31merror[39m: [GET] /users/get/pagination?page=1&limit=10 - 401 [8ms]
+2024-12-05T10:54:09.951Z [31merror[39m: [POST] /charger-locations/location/filter/site-survey - 401 [3ms]
+2024-12-05T10:54:45.360Z [31merror[39m: [GET] /charger-locations/type - 401 [2ms]

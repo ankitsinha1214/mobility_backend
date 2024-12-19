@@ -255,6 +255,57 @@ const updateUserStatus = async (req, res) => {
     }
 };
 
+// Controller function to create a manager
+const createManager = async (req, res) => {
+    const { username, password, serviceID, email, phone, company, department } = req.body;
+
+    try {
+        // Validate user permissions
+        if (!req.user || req.user !== 'Admin') {
+            return res.json({ success: false, message: "You are not authorized to create a manager." });
+        }
+
+        // Validate required fields
+        if (!username || !password || !serviceID || !email) {
+            return res.json({ success: false, message: "Missing required fields." });
+        }
+
+        // Check for duplicate username, email, or phone
+        const existingManager = await User.findOne({
+            $or: [{ username }, { email }]
+        });
+        if (existingManager) {
+            return res.json({ success: false, message: "Username or email already exists." });
+        }
+
+        // Hash the password
+        // const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create a new manager object
+        const newManager = new User({
+            username,
+            password,
+            serviceID,
+            email,
+            phone,
+            company,
+            department,
+            role: 'Manager'
+        });
+
+        // Save the manager to the database
+        await newManager.save();
+
+        res.json({
+            success: true,
+            message: "Manager created successfully.",
+            data: { username, email, phone, serviceID, role: 'Manager' }
+        });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
+    }
+};
 
 module.exports = {
     registerUser,
@@ -263,5 +314,6 @@ module.exports = {
     deleteUser,
     getAllUserRecords,
     getAllUsers,
+    createManager,
     updateUserStatus
 };
