@@ -157,3 +157,10 @@
 2024-12-19T21:42:52.376Z [32minfo[39m: [POST] /user-service-and-maintenance/create-manager - 200 [5ms]
 2024-12-19T21:43:40.374Z [32minfo[39m: Application has started
 2024-12-19T21:43:49.177Z [32minfo[39m: [POST] /user-service-and-maintenance/create-manager - 200 [191ms]
+2024-12-19T21:49:09.636Z [32minfo[39m: [GET] /user-service-and-maintenance - 200 [71ms]
+2024-12-19T21:52:10.914Z [32minfo[39m: Application has started
+2024-12-19T21:52:16.841Z [32minfo[39m: Application has started
+2024-12-19T21:53:32.459Z [32minfo[39m: Application has started
+2024-12-19T21:54:09.700Z [31merror[39m: [GET] /user-service-and-maintenance//admins-managers - 401 [4ms]
+2024-12-19T21:54:14.579Z [32minfo[39m: [GET] /user-service-and-maintenance//admins-managers - 200 [73ms]
+2024-12-19T21:54:59.453Z [32minfo[39m: [GET] /user-service-and-maintenance/admins-managers - 200 [70ms]

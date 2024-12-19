@@ -307,6 +307,34 @@ const createManager = async (req, res) => {
     }
 };
 
+// Controller function to get all Admins and Managers
+const getAdminsAndManagers = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin')) {
+            return res.json({ success: false, message: "You are Not a Valid User." });
+        }
+        // Retrieve users with the role 'Admin' or 'Manager', excluding the password field
+        const adminsAndManagers = await User.find(
+            { role: { $in: ['Admin', 'Manager'] } },
+            '-password'
+        );
+
+        res.json({
+            success: true,
+            data: adminsAndManagers,
+            message: 'Admins and Managers retrieved successfully'
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error',
+            error: error.message
+        });
+    }
+};
+
+
 module.exports = {
     registerUser,
     loginUser,
@@ -315,5 +343,6 @@ module.exports = {
     getAllUserRecords,
     getAllUsers,
     createManager,
-    updateUserStatus
+    updateUserStatus,
+    getAdminsAndManagers
 };
