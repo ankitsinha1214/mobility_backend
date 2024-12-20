@@ -114,6 +114,10 @@ const sandmUserSchema = new Schema({
     required: true,
     enum: ['Admin', 'User', 'Manager'], 
     default: 'User' // Default role
+  },
+  serviceID: {
+    type: [String],
+    default: []
   }
 }, { timestamps: true });
 
