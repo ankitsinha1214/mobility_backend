@@ -14,6 +14,8 @@ router.post('/',
     ]), chargerLocationController.createChargerLocation);
 router.get('/chargers/all', fetchUser, chargerLocationController.getAllChargers);
 router.post('/add-charger', fetchUser, chargerLocationController.addChargerToLocation);
+router.post('/update-charger', fetchUser, chargerLocationController.updateChargerInLocation);
+router.delete('/delete-charger', fetchUser, chargerLocationController.deleteChargerFromLocation);
 router.get('/', fetchUser, chargerLocationController.getChargerLocations);
 router.get('/type',fetchUser, chargerLocationController.getLocationTypes);
 router.get('/location-type-count',fetchUser, chargerLocationController.getLocationTypesCountPercentage);

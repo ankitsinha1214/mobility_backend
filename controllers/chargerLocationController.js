@@ -101,6 +101,83 @@ const addChargerToLocation = async (req, res) => {
     }
 };
 
+// Update an existing charger in a charger location
+const updateChargerInLocation = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+
+        const { location_id, charger_id, updatedChargerInfo } = req.body; // Expecting the charger info to update in request body
+
+        // Find the location by location_id
+        const chargerLocation = await ChargerLocation.findById(location_id);
+        if (!chargerLocation) {
+            return res.json({ success: false, message: 'Location not found' });
+        }
+
+        // Find the index of the charger to be updated
+        const chargerIndex = chargerLocation.chargerInfo.findIndex(
+            (charger) => charger._id.toString() === charger_id
+        );
+
+        if (chargerIndex === -1) {
+            return res.json({ success: false, message: 'Charger not found' });
+        }
+
+        // Update the charger info at the specific index
+        chargerLocation.chargerInfo[chargerIndex] = {
+            ...chargerLocation.chargerInfo[chargerIndex],
+            ...updatedChargerInfo,
+        };
+
+        // Save the updated document
+        await chargerLocation.save();
+
+        return res.json({ success: true, message: 'Charger updated successfully', data: chargerLocation });
+    } catch (error) {
+        console.error('Error updating charger:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+// Delete a charger from a charger location
+const deleteChargerFromLocation = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+
+        const { location_id, charger_id } = req.body; // Expecting the charger ID to delete in request body
+
+        // Find the location by location_id
+        const chargerLocation = await ChargerLocation.findById(location_id);
+        if (!chargerLocation) {
+            return res.json({ success: false, message: 'Location not found' });
+        }
+
+        // Filter out the charger with the given ID
+        const updatedChargerInfo = chargerLocation.chargerInfo.filter(
+            (charger) => charger._id.toString() !== charger_id
+        );
+
+        if (updatedChargerInfo.length === chargerLocation.chargerInfo.length) {
+            return res.json({ success: false, message: 'Charger not found' });
+        }
+
+        // Update the chargerInfo array and save the document
+        chargerLocation.chargerInfo = updatedChargerInfo;
+        await chargerLocation.save();
+
+        return res.json({ success: true, message: 'Charger deleted successfully', data: chargerLocation });
+    } catch (error) {
+        console.error('Error deleting charger:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+
+
 // Get all charger info only
 const getAllChargers = async (req, res) => {
     try {
@@ -503,6 +580,8 @@ const searchChargerLocations = async (req, res) => {
 module.exports = {
     createChargerLocation,
     addChargerToLocation,
+    updateChargerInLocation,
+    deleteChargerFromLocation,
     getAllChargers,
     getChargerLocations,
     getLocationTypes,
