@@ -9,6 +9,48 @@ const s3 = new S3Client({
 })
 
 // Get vehicle make, model, and variant hierarchy
+// const getVehicleHierarchy = async (req, res) => {
+//     try {
+//         const vehicleModels = await VehicleModel.find({});
+
+//         const hierarchy = {};
+
+//         vehicleModels.forEach(vehicle => {
+//             const { make, model, variant, ARAI_range, claimed_range, image } = vehicle;
+
+//             if (!hierarchy[make]) {
+//                 hierarchy[make] = {};
+//             }
+
+//             if (!hierarchy[make][model]) {
+//                 hierarchy[make][model] = [];
+//             }
+
+//             // Check if variant already exists in the hierarchy
+//             const existingVariant = hierarchy[make][model].find(v => v.variant === variant);
+//             if (existingVariant) {
+//                 // Update existing variant with additional data
+//                 existingVariant.ARAI_range = ARAI_range;
+//                 existingVariant.claimed_range = claimed_range;
+//                 existingVariant.image = image;
+//             } else {
+//                 // Add new variant with additional data
+//                 hierarchy[make][model].push({
+//                     variant,
+//                     ARAI_range,
+//                     claimed_range,
+//                     image
+//                 });
+//             }
+//         });
+
+//         return res.json({ success: true, data: [hierarchy] });
+//     } catch (error) {
+//         console.error('Error:', error);
+//         return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
+//     }
+// };
+
 const getVehicleHierarchy = async (req, res) => {
     try {
         const vehicleModels = await VehicleModel.find({});
@@ -16,18 +58,25 @@ const getVehicleHierarchy = async (req, res) => {
         const hierarchy = {};
 
         vehicleModels.forEach(vehicle => {
-            const { make, model, variant, ARAI_range, claimed_range, image } = vehicle;
+            const { make, model, variant, type, ARAI_range, claimed_range, image } = vehicle;
 
-            if (!hierarchy[make]) {
-                hierarchy[make] = {};
+            // Ensure `type` exists in the hierarchy
+            if (!hierarchy[type]) {
+                hierarchy[type] = {};
             }
 
-            if (!hierarchy[make][model]) {
-                hierarchy[make][model] = [];
+            // Ensure `make` exists under `type`
+            if (!hierarchy[type][make]) {
+                hierarchy[type][make] = {};
             }
 
-            // Check if variant already exists in the hierarchy
-            const existingVariant = hierarchy[make][model].find(v => v.variant === variant);
+            // Ensure `model` exists under `make`
+            if (!hierarchy[type][make][model]) {
+                hierarchy[type][make][model] = [];
+            }
+
+            // Check if the variant already exists under model
+            const existingVariant = hierarchy[type][make][model].find(v => v.variant === variant);
             if (existingVariant) {
                 // Update existing variant with additional data
                 existingVariant.ARAI_range = ARAI_range;
@@ -35,7 +84,7 @@ const getVehicleHierarchy = async (req, res) => {
                 existingVariant.image = image;
             } else {
                 // Add new variant with additional data
-                hierarchy[make][model].push({
+                hierarchy[type][make][model].push({
                     variant,
                     ARAI_range,
                     claimed_range,
@@ -53,16 +102,16 @@ const getVehicleHierarchy = async (req, res) => {
 
 // Create a new vehicle model
 const createVehicleModel = async (req, res) => {
-    const { make, model, variant, ARAI_range, claimed_range, image } = req.body;
+    const { make, model, variant, type, ARAI_range, claimed_range, image } = req.body;
 
     try {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
         // Check if the vehicle model already exists
-        const existingModel = await VehicleModel.findOne({ make, model, variant });
+        const existingModel = await VehicleModel.findOne({ make, model, variant }); // type need to be check if required
         if (existingModel) {
-            return res.status(400).json({ success: false, message: 'Vehicle model already exists' });
+            return res.json({ success: false, message: 'Vehicle model already exists' });
         }
         const arr1 = req.files.image[0].mimetype.split("/")
 
@@ -76,7 +125,7 @@ const createVehicleModel = async (req, res) => {
         }
         const command4 = new PutObjectCommand(params4);
         await s3.send(command4);
-        const newVehicleModel = new VehicleModel({ make, model, variant, ARAI_range, claimed_range, image : awsImgKey });
+        const newVehicleModel = new VehicleModel({ make, model, variant, type, ARAI_range, claimed_range, image: awsImgKey });
         await newVehicleModel.save();
 
         return res.json({ success: true, data: newVehicleModel, message: "Vehicle model created successfully" });
@@ -128,7 +177,7 @@ const getVehicleModelById = async (req, res) => {
 // Update a vehicle model
 const updateVehicleModel = async (req, res) => {
     const { id } = req.params;
-    const { make, model, variant, ARAI_range, claimed_range, image } = req.body;
+    const { make, model, variant, type, ARAI_range, claimed_range, image } = req.body;
 
     try {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
@@ -143,6 +192,7 @@ const updateVehicleModel = async (req, res) => {
         vehicleModel.make = make;
         vehicleModel.model = model;
         vehicleModel.variant = variant;
+        vehicleModel.type = type;
         vehicleModel.ARAI_range = ARAI_range;
         vehicleModel.claimed_range = claimed_range;
         vehicleModel.image = image;

@@ -71,6 +71,66 @@ const createChargerLocation = async (req, res) => {
     }
 };
 
+// update new location images
+const updateChargerLocationImage = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are not a valid user." });
+        }
+
+        const { locationId } = req.body; // Assume the location ID is passed in the URL
+        console.log(locationId)
+        const chargerLocation = await ChargerLocation.findById(locationId);
+
+        if (!chargerLocation) {
+            return res.json({ success: false, message: 'Charger location not found' });
+        }
+
+        // Ensure new images are uploaded
+        if (!req.files || !req.files.locationImage || req.files.locationImage.length === 0) {
+            return res.json({ success: false, message: 'No image file uploaded' });
+        }
+
+        const imageKeys = [];
+        for (const file of req.files.locationImage) {
+            const arr1 = file.mimetype.split("/");
+            const awsImgKey = `locationImg/locationImg-${Date.now()}.${arr1[1]}`;
+            const params4 = {
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Key: awsImgKey,
+                Body: file.buffer,
+                ContentType: file.mimetype
+            };
+
+            // Upload new image to S3
+            const command4 = new PutObjectCommand(params4);
+            await s3.send(command4);
+            imageKeys.push(awsImgKey);
+        }
+
+        // If there are existing images, delete the previous ones from S3
+        if (chargerLocation.locationImage && chargerLocation.locationImage.length > 0) {
+            for (const oldImageKey of chargerLocation.locationImage) {
+                const deleteParams = {
+                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Key: oldImageKey
+                };
+                const deleteCommand = new DeleteObjectCommand(deleteParams);
+                await s3.send(deleteCommand);
+            }
+        }
+
+        // Update the charger location with the new image(s)
+        chargerLocation.locationImage = imageKeys;
+        await chargerLocation.save();
+
+        return res.json({ success: true, data: chargerLocation, message: 'Charger location image updated successfully' });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
+    }
+};
+
 // Add a new charger to an existing charger location
 const addChargerToLocation = async (req, res) => {
     try {
@@ -579,6 +639,7 @@ const searchChargerLocations = async (req, res) => {
 
 module.exports = {
     createChargerLocation,
+    updateChargerLocationImage,
     addChargerToLocation,
     updateChargerInLocation,
     deleteChargerFromLocation,

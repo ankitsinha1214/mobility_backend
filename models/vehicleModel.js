@@ -32,16 +32,16 @@ const vehicleModelSchema = new Schema({
       message: 'Variant cannot be empty'
     }
   },
-  // type: {
-  //   type: String,
-  //   required: true,
-  //   validate: {
-  //     validator: function(v) {
-  //       return /\S+/.test(v); // Ensures it's not just whitespace
-  //     },
-  //     message: 'Vehicle type cannot be empty'
-  //   }
-  // },
+  type: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function(v) {
+        return /\S+/.test(v); // Ensures it's not just whitespace
+      },
+      message: 'Vehicle type cannot be empty'
+    }
+  },
   ARAI_range: {
     type: String,
     required: true,

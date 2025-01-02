@@ -12,6 +12,12 @@ router.post('/',
         name: 'locationImage', maxCount: 6
     }
     ]), chargerLocationController.createChargerLocation);
+router.put('/update-image',
+    fetchUser,
+    upload.fields([{
+        name: 'locationImage', maxCount: 6
+    }
+    ]), chargerLocationController.updateChargerLocationImage);
 router.get('/chargers/all', fetchUser, chargerLocationController.getAllChargers);
 router.post('/add-charger', fetchUser, chargerLocationController.addChargerToLocation);
 router.post('/update-charger', fetchUser, chargerLocationController.updateChargerInLocation);
