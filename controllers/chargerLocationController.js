@@ -72,56 +72,125 @@ const createChargerLocation = async (req, res) => {
 };
 
 // update new location images
+// const updateChargerLocationImage = async (req, res) => {
+//     try {
+//         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+//             return res.status(401).json({ success: false, message: "You are not a valid user." });
+//         }
+
+//         const { locationId } = req.body; // Assume the location ID is passed in the URL
+//         console.log(locationId)
+//         const chargerLocation = await ChargerLocation.findById(locationId);
+
+//         if (!chargerLocation) {
+//             return res.json({ success: false, message: 'Charger location not found' });
+//         }
+
+//         // Ensure new images are uploaded
+//         if (!req.files || !req.files.locationImage || req.files.locationImage.length === 0) {
+//             return res.json({ success: false, message: 'No image file uploaded' });
+//         }
+
+//         const imageKeys = [];
+//         for (const file of req.files.locationImage) {
+//             const arr1 = file.mimetype.split("/");
+//             const awsImgKey = `locationImg/locationImg-${Date.now()}.${arr1[1]}`;
+//             const params4 = {
+//                 Bucket: process.env.AWS_BUCKET_NAME,
+//                 Key: awsImgKey,
+//                 Body: file.buffer,
+//                 ContentType: file.mimetype
+//             };
+
+//             // Upload new image to S3
+//             const command4 = new PutObjectCommand(params4);
+//             await s3.send(command4);
+//             imageKeys.push(awsImgKey);
+//         }
+
+//         // If there are existing images, delete the previous ones from S3
+//         if (chargerLocation.locationImage && chargerLocation.locationImage.length > 0) {
+//             for (const oldImageKey of chargerLocation.locationImage) {
+//                 const deleteParams = {
+//                     Bucket: process.env.AWS_BUCKET_NAME,
+//                     Key: oldImageKey
+//                 };
+//                 const deleteCommand = new DeleteObjectCommand(deleteParams);
+//                 await s3.send(deleteCommand);
+//             }
+//         }
+
+//         // Update the charger location with the new image(s)
+//         chargerLocation.locationImage = imageKeys;
+//         await chargerLocation.save();
+
+//         return res.json({ success: true, data: chargerLocation, message: 'Charger location image updated successfully' });
+//     } catch (error) {
+//         console.error('Error:', error);
+//         return res.status(500).json({ success: false, message: 'Internal server error', error: error.message });
+//     }
+// };
 const updateChargerLocationImage = async (req, res) => {
     try {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are not a valid user." });
         }
 
-        const { locationId } = req.body; // Assume the location ID is passed in the URL
-        console.log(locationId)
+        const { locationId } = req.body; // `locationImageUrl` from the request body
+        let locationImageUrl = req.body.locationImageUrl;
+        if (!Array.isArray(locationImageUrl)) {
+            locationImageUrl = [];
+        }
         const chargerLocation = await ChargerLocation.findById(locationId);
 
         if (!chargerLocation) {
             return res.json({ success: false, message: 'Charger location not found' });
         }
 
-        // Ensure new images are uploaded
-        if (!req.files || !req.files.locationImage || req.files.locationImage.length === 0) {
+        if ((!req.files || !req.files.locationImage || req.files.locationImage.length === 0) && (!locationImageUrl || locationImageUrl?.length === 0)) {
             return res.json({ success: false, message: 'No image file uploaded' });
         }
 
-        const imageKeys = [];
-        for (const file of req.files.locationImage) {
-            const arr1 = file.mimetype.split("/");
-            const awsImgKey = `locationImg/locationImg-${Date.now()}.${arr1[1]}`;
-            const params4 = {
-                Bucket: process.env.AWS_BUCKET_NAME,
-                Key: awsImgKey,
-                Body: file.buffer,
-                ContentType: file.mimetype
-            };
-
-            // Upload new image to S3
-            const command4 = new PutObjectCommand(params4);
-            await s3.send(command4);
-            imageKeys.push(awsImgKey);
-        }
-
-        // If there are existing images, delete the previous ones from S3
-        if (chargerLocation.locationImage && chargerLocation.locationImage.length > 0) {
-            for (const oldImageKey of chargerLocation.locationImage) {
-                const deleteParams = {
+        // Upload new images to S3
+        const newImageKeys = [];
+        if (!(!req.files || !req.files.locationImage || req.files.locationImage.length === 0)) {
+            for (const file of req.files.locationImage) {
+                const arr1 = file.mimetype.split("/");
+                const awsImgKey = `locationImg/locationImg-${Date.now()}.${arr1[1]}`;
+                const params4 = {
                     Bucket: process.env.AWS_BUCKET_NAME,
-                    Key: oldImageKey
+                    Key: awsImgKey,
+                    Body: file.buffer,
+                    ContentType: file.mimetype
                 };
-                const deleteCommand = new DeleteObjectCommand(deleteParams);
-                await s3.send(deleteCommand);
+
+                const command4 = new PutObjectCommand(params4);
+                await s3.send(command4);
+                newImageKeys.push(awsImgKey);
             }
         }
 
-        // Update the charger location with the new image(s)
-        chargerLocation.locationImage = imageKeys;
+        // Filter out existing images not present in the new request body
+        const imagesToKeep = chargerLocation.locationImage.filter(imageKey =>
+            locationImageUrl.some(url => url.includes(imageKey))
+        );
+
+        // Identify images to delete
+        const imagesToDelete = chargerLocation.locationImage.filter(imageKey =>
+            !locationImageUrl.some(url => url.includes(imageKey))
+        );
+        // Delete unwanted images from S3
+        for (const oldImageKey of imagesToDelete) {
+            const deleteParams = {
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Key: oldImageKey
+            };
+            const deleteCommand = new DeleteObjectCommand(deleteParams);
+            await s3.send(deleteCommand);
+        }
+
+        // Update charger location with the combined array of kept and new images
+        chargerLocation.locationImage = [...imagesToKeep, ...newImageKeys];
         await chargerLocation.save();
 
         return res.json({ success: true, data: chargerLocation, message: 'Charger location image updated successfully' });
@@ -298,41 +367,41 @@ const getLocationTypes = async (req, res) => {
 // get location type with count and percentage 
 const getLocationTypesCountPercentage = async (req, res) => {
     try {
-      const totalLocations = await ChargerLocation.countDocuments(); // Total count of all locations
-  
-      const locationTypes = await ChargerLocation.aggregate([
-        {
-          $group: {
-            _id: '$locationType', // Group by locationType
-            count: { $sum: 1 }, // Count occurrences
-          },
-        },
-        {
-            $project: {
-              _id: 0,
-              locationType: '$_id',
-              count: 1,
-              percentage: {
-                $round: [
-                  { $multiply: [{ $divide: ['$count', totalLocations] }, 100] },
-                  2, // Round to 2 decimal places
-                ],
-              },
+        const totalLocations = await ChargerLocation.countDocuments(); // Total count of all locations
+
+        const locationTypes = await ChargerLocation.aggregate([
+            {
+                $group: {
+                    _id: '$locationType', // Group by locationType
+                    count: { $sum: 1 }, // Count occurrences
+                },
             },
-          },
-        ]);    
-  
-      if (locationTypes.length === 0) {
-        return res.json({ success: false, message: 'No location types found' });
-      }
-  
-      return res.json({ success: true, data: locationTypes });
+            {
+                $project: {
+                    _id: 0,
+                    locationType: '$_id',
+                    count: 1,
+                    percentage: {
+                        $round: [
+                            { $multiply: [{ $divide: ['$count', totalLocations] }, 100] },
+                            2, // Round to 2 decimal places
+                        ],
+                    },
+                },
+            },
+        ]);
+
+        if (locationTypes.length === 0) {
+            return res.json({ success: false, message: 'No location types found' });
+        }
+
+        return res.json({ success: true, data: locationTypes });
     } catch (error) {
-      console.error('Error:', error);
-      return res.status(500).json({ success: false, message: 'Internal server error' });
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-  };
-  
+};
+
 
 // Get a single charger location by ID
 const getChargerLocationById = async (req, res) => {
