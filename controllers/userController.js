@@ -431,7 +431,7 @@ const deleteUser = async (req, res) => {
 // add a new vehicle for user
 const addUserVehicle = async (req, res) => {
     const { phoneNumber } = req.params;
-    const { make, model, variant, vehicle_reg, range, vehicle_img } = req.body;
+    const { type, make, model, variant, vehicle_reg, range, vehicle_img } = req.body;
     if (!phoneNumber) {
         return res.json({ status: false, message: 'Phone Number is required' });
     }
@@ -464,7 +464,7 @@ const addUserVehicle = async (req, res) => {
         }
 
         // Create a new vehicle object
-        const newVehicle = { make, model, variant, vehicle_reg, range, vehicle_img };
+        const newVehicle = { type, make, model, variant, vehicle_reg, range, vehicle_img };
 
         // Push the new vehicle object to the user's user_vehicle array
         const user = await User.findOneAndUpdate(
@@ -546,7 +546,7 @@ const getUserVehicleById = async (req, res) => {
 // update a vehicle
 const updateUserVehicle = async (req, res) => {
     const { phoneNumber, vehicleId } = req.params;
-    const { make, model, variant, vehicle_reg, range, vehicle_img } = req.body;
+    const { type, make, model, variant, vehicle_reg, range, vehicle_img } = req.body;
     if (!phoneNumber) {
         return res.json({ status: false, message: 'Phone Number is required' });
     }
@@ -571,6 +571,7 @@ const updateUserVehicle = async (req, res) => {
 
         // Check if any of the fields are being updated
         const isUpdated = (
+            vehicle.type !== type ||
             vehicle.make !== make ||
             vehicle.model !== model ||
             vehicle.variant !== variant ||
@@ -584,6 +585,7 @@ const updateUserVehicle = async (req, res) => {
         }
 
         // Update the vehicle fields
+        vehicle.type = type;
         vehicle.make = make;
         vehicle.model = model;
         vehicle.variant = variant;
