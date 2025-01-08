@@ -3752,3 +3752,4 @@ HEAD
 2025-01-08T10:27:38.727Z [32minfo[39m: [GET] / - 200 [1ms]
 2025-01-08T10:55:26.551Z [32minfo[39m: [GET] /charger-locations - 304 [28ms]
 2025-01-08T11:05:55.586Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-08T11:39:46.159Z [32minfo[39m: Application has started
