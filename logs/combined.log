@@ -3753,3 +3753,8 @@ HEAD
 2025-01-08T10:55:26.551Z [32minfo[39m: [GET] /charger-locations - 304 [28ms]
 2025-01-08T11:05:55.586Z [32minfo[39m: [GET] / - 200 [1ms]
 2025-01-08T11:39:46.159Z [32minfo[39m: Application has started
+2025-01-08T12:10:19.693Z [32minfo[39m: Application has started
+2025-01-08T12:10:46.215Z [32minfo[39m: [GET] /charger-locations - 304 [117ms]
+2025-01-08T12:10:48.418Z [32minfo[39m: [GET] /charger-locations - 304 [56ms]
+2025-01-08T12:10:51.186Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-08T12:10:51.232Z [31merror[39m: [GET] /favicon.ico - 404 [2ms]

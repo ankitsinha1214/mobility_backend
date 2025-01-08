@@ -499,3 +499,4 @@
 2025-01-08T04:42:43.829Z [31merror[39m: [GET] /nmaplowercheck1736311363 - 404 [1ms]
 2025-01-08T04:42:44.248Z [31merror[39m: [GET] /HNAP1 - 404 [1ms]
 2025-01-08T04:42:44.298Z [31merror[39m: [GET] /evox/about - 404 [0ms]
+2025-01-08T12:10:51.232Z [31merror[39m: [GET] /favicon.ico - 404 [2ms]
