@@ -13,7 +13,7 @@ const port = process.env.PORT || 8080;
 
 // const ws = new WebSocket('ws://localhost:8000');
 // const ws = new WebSocket.Server({ port: 8000, host: '0.0.0.0' });
-const wss = new WebSocketServer({ port: 8000 });
+const wss = new WebSocketServer({ port: 8006 });
 wss.on("connection",function connection(ws){
   console.log("Client Connected");
   ws.on('message', (message) => {
