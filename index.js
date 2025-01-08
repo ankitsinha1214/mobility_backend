@@ -6,10 +6,51 @@ const bodyParser = require('body-parser');
 const { DATABASE } = require('./message.json'); // Adjust path as needed
 const logger = require('./logger');
 const logRequest = require('./middleware/loggerMiddleware'); 
-
+const WebSocket = require('ws');
 const app = express();
 const port = process.env.PORT || 8080;
 
+// const ws = new WebSocket('ws://localhost:8000');
+const ws = new WebSocket.Server({ port: 8000, host: '0.0.0.0' });
+ws.on('open', () => {
+  console.log('Connected to the WebSocket server');
+  ws.send('Hello Server!');
+});
+
+ws.on('message', (message) => {
+  console.log('Received from server:', message);
+});
+
+ws.on('close', () => {
+  console.log('Disconnected from the server');
+});
+
+ws.on('error', (error) => {
+  console.error('WebSocket error:', error);
+});
+// const wss = new WebSocket.Server({ port: 8000, host: '0.0.0.0' });
+
+// wss.on('connection', (socket) => {
+//   console.log('New WebSocket client connected');
+
+//   // Listen for messages from clients
+//   socket.on('message', (message) => {
+//     console.log('Received:', message);
+
+//     // Send a response back to the client
+//     socket.send(`Server Echo: ${message}`);
+//   });
+
+//   // Handle client disconnection
+//   socket.on('close', () => {
+//     console.log('WebSocket client disconnected');
+//   });
+
+//   // Handle errors
+//   socket.on('error', (error) => {
+//     console.error('WebSocket error:', error);
+//   });
+// });
 // Middleware
 app.use(cors());
 app.use(express.json());
