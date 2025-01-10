@@ -5,7 +5,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const { DATABASE } = require('./message.json'); // Adjust path as needed
 const logger = require('./logger');
-const logRequest = require('./middleware/loggerMiddleware'); 
+const logRequest = require('./middleware/loggerMiddleware');
 const { WebSocketServer } = require('ws');
 const WebSocket = require('ws');
 const { v4: uuidv4 } = require("uuid");
@@ -14,14 +14,19 @@ const port = process.env.PORT || 8080;
 
 let wsConnection;
 const wss = new WebSocketServer({ port: 8006 });
-wss.on("connection",function connection(ws){
+wss.on("connection", function connection(ws) {
   console.log("Client Connected");
-  wsConnection = ws; 
+  wsConnection = ws;
+
+  setInterval(() => {
+    sendHeartbeat();
+  }, 10000);
+
   ws.on('message', (message) => {
     console.log('Received from server: %s', message);
     try {
       const parsedMessage = JSON.parse(message);
-      console.log("Message in Array",parsedMessage);
+      console.log("Message in Array", parsedMessage);
       handleOcppMessage(ws, parsedMessage);
     } catch (error) {
       console.error("Invalid message format:", error);
@@ -69,6 +74,24 @@ function handleOcppMessage(ws, message) {
     console.log("Unsupported message type:", messageType);
   }
 }
+
+function sendHeartbeat() {
+  if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
+    const messageId = generateUniqueId();
+    const heartbeatMessage = [
+      2, // MessageTypeId for Call
+      messageId,
+      "Heartbeat", // OCPP action for heartbeat
+      {}
+    ];
+
+    wsConnection.send(JSON.stringify(heartbeatMessage));
+    console.log("Sent Heartbeat message:", heartbeatMessage);
+  } else {
+    console.log("WebSocket connection not open. Unable to send heartbeat.");
+  }
+}
+
 
 function handleReboot(ws, messageId, payload) {
   console.log("Reboot payload:", payload);
