@@ -133,7 +133,8 @@ app.post('/api/transaction', (req, res) => {
   const ocppMessage = [
     2, // MessageTypeId for Call
     messageId,
-    action === 'start' ? 'StartTransaction' : 'StopTransaction',
+    action === 'start' ? 'RemoteStartTransaction' : 'RemoteStopTransaction',
+    // action === 'start' ? 'StartTransaction' : 'StopTransaction',
     payload || { idTag: chargerId }
   ];
 
