@@ -8,14 +8,15 @@ const logger = require('./logger');
 const logRequest = require('./middleware/loggerMiddleware'); 
 const { WebSocketServer } = require('ws');
 // const WebSocket = require('ws');
+const { v4: uuidv4 } = require("uuid");
 const app = express();
 const port = process.env.PORT || 8080;
 
-// const ws = new WebSocket('ws://localhost:8000');
-// const ws = new WebSocket.Server({ port: 8000, host: '0.0.0.0' });
+let wsConnection;
 const wss = new WebSocketServer({ port: 8006 });
 wss.on("connection",function connection(ws){
   console.log("Client Connected");
+  wsConnection = ws; 
   ws.on('message', (message) => {
     console.log('Received from server: %s', message);
     try {
@@ -115,6 +116,40 @@ mongoose.connect(dbConfig.mongoURI, dbConfig.options)
   .catch(err => console.error({ msg: DATABASE.ERROR_CONNECTING, err }));
 
 // Routes
+// Handle API for Start/Stop Transactions
+app.post('/api/transaction', (req, res) => {
+  const { action, chargerId, payload } = req.body;
+
+  if (!action || !['start', 'stop'].includes(action)) {
+    return res.status(400).json({ status: false, message: 'Invalid action specified' });
+  }
+
+  if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+    return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
+  }
+
+  const messageId = generateUniqueId(); // Generate a unique ID for the message
+  const ocppMessage = [
+    2, // MessageTypeId for Call
+    messageId,
+    action === 'start' ? 'StartTransaction' : 'StopTransaction',
+    payload || { idTag: chargerId }
+  ];
+
+  try {
+    wsConnection.send(JSON.stringify(ocppMessage));
+    return res.json({ status: true, message: `${action} transaction initiated`, messageId });
+  } catch (error) {
+    console.error('Error sending WebSocket message:', error);
+    return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
+  }
+});
+// Generate a unique ID
+function generateUniqueId() {
+  return uuidv4();
+}
+
+
 app.get('/', (_req, res) => {
   res.send({ message: 'Welcome to Backend of Esyasoft Mobility!!' });
 });
