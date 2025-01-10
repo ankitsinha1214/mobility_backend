@@ -55,10 +55,7 @@ function handleOcppMessage(ws, message) {
       case "BootNotification":
         console.log('Boot Notification:', payload);
         handleBootNotification(ws, messageId, payload);
-
         // handleStartTransaction(ws, messageId, payload);
-
-
         break;
       default:
         console.log("Unknown action:", action);
