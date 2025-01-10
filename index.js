@@ -7,7 +7,7 @@ const { DATABASE } = require('./message.json'); // Adjust path as needed
 const logger = require('./logger');
 const logRequest = require('./middleware/loggerMiddleware'); 
 const { WebSocketServer } = require('ws');
-// const WebSocket = require('ws');
+const WebSocket = require('ws');
 const { v4: uuidv4 } = require("uuid");
 const app = express();
 const port = process.env.PORT || 8080;
@@ -124,6 +124,7 @@ app.post('/api/transaction', (req, res) => {
     return res.status(400).json({ status: false, message: 'Invalid action specified' });
   }
 
+  // if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
   if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
     return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
   }
