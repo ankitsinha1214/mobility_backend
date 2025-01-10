@@ -3941,3 +3941,9 @@ HEAD
 2025-01-10T10:53:04.993Z [32minfo[39m: [POST] /api/transaction - 200 [0ms]
 2025-01-10T10:54:02.805Z [32minfo[39m: [POST] /api/transaction - 200 [1ms]
 2025-01-10T10:56:50.559Z [32minfo[39m: [POST] /api/transaction - 200 [0ms]
+2025-01-10T11:16:58.552Z [32minfo[39m: Application has started
+2025-01-10T11:20:43.109Z [32minfo[39m: [GET] / - 200 [10ms]
+2025-01-10T11:20:43.506Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [3ms]
+2025-01-10T11:23:16.840Z [32minfo[39m: [POST] /api/transaction - 200 [2ms]
+2025-01-10T11:24:59.640Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-10T11:25:42.468Z [32minfo[39m: [POST] /api/charger/reboot - 200 [1ms]
