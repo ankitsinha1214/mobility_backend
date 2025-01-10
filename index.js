@@ -47,6 +47,9 @@ function handleOcppMessage(ws, message) {
 
   if (messageType === 2) { // Call message
     switch (action) {
+      case "Reboot":
+        handleReboot(ws, messageId, payload);
+        break;
       case "StartTransaction":
         handleStartTransaction(ws, messageId, payload);
         break;
@@ -66,6 +69,21 @@ function handleOcppMessage(ws, message) {
     console.log("Unsupported message type:", messageType);
   }
 }
+
+function handleReboot(ws, messageId, payload) {
+  console.log("Reboot payload:", payload);
+
+  // Response indicating the reboot command is accepted
+  const response = [3, messageId, { status: "Accepted" }];
+  ws.send(JSON.stringify(response));
+  console.log("Sent Reboot response:", response);
+
+  // Simulate a reboot action (you can add actual reboot logic if needed)
+  setTimeout(() => {
+    console.log("Simulating charger reboot...");
+  }, 3000);
+}
+
 
 function handleBootNotification(ws, messageId, payload) {
   const response = [
@@ -116,6 +134,30 @@ mongoose.connect(dbConfig.mongoURI, dbConfig.options)
   .catch(err => console.error({ msg: DATABASE.ERROR_CONNECTING, err }));
 
 // Routes
+app.post('/api/charger/reboot', (req, res) => {
+  const { chargerId } = req.body;
+
+  if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+    return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
+  }
+
+  const messageId = generateUniqueId(); // Generate a unique ID for the message
+  const ocppMessage = [
+    2, // MessageTypeId for Call
+    messageId,
+    "Reboot",
+    { chargerId }
+  ];
+
+  try {
+    wsConnection.send(JSON.stringify(ocppMessage));
+    return res.status(200).json({ status: true, message: "Reboot command sent", messageId });
+  } catch (error) {
+    console.error('Error sending WebSocket message:', error);
+    return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
+  }
+});
+
 // Handle API for Start/Stop Transactions
 app.post('/api/transaction', (req, res) => {
   const { action, chargerId, payload } = req.body;
