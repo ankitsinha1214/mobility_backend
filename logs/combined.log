@@ -3887,3 +3887,13 @@ HEAD
 2025-01-10T07:11:39.026Z [32minfo[39m: [GET] / - 200 [9ms]
 2025-01-10T07:20:52.934Z [32minfo[39m: [GET] / - 200 [1ms]
 2025-01-10T07:37:02.930Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-10T08:06:32.681Z [32minfo[39m: Application has started
+2025-01-10T08:07:00.242Z [32minfo[39m: [GET] /charger-locations - 304 [122ms]
+2025-01-10T08:07:07.709Z [31merror[39m: [POST] /api/transaction - 500 [2ms]
+2025-01-10T08:10:11.675Z [31merror[39m: [POST] /api/transaction - 500 [2ms]
+2025-01-10T08:11:35.876Z [32minfo[39m: Application has started
+2025-01-10T08:11:52.659Z [31merror[39m: [POST] /api/transaction - 500 [9ms]
+2025-01-10T08:13:50.356Z [31merror[39m: [POST] /api/transaction - 500 [2ms]
+2025-01-10T08:14:36.232Z [31merror[39m: [POST] /api/transaction - 500 [1ms]
+2025-01-10T08:15:00.670Z [31merror[39m: [POST] /api/transaction - 500 [0ms]
+2025-01-10T08:15:04.746Z [31merror[39m: [POST] /api/transaction - 500 [1ms]
