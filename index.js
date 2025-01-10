@@ -18,9 +18,16 @@ wss.on("connection",function connection(ws){
   console.log("Client Connected");
   ws.on('message', (message) => {
     console.log('Received from server: %s', message);
+    try {
+      const parsedMessage = JSON.parse(message);
+      console.log("Message in Array",parsedMessage);
+      handleOcppMessage(ws, parsedMessage);
+    } catch (error) {
+      console.error("Invalid message format:", error);
+    }
   });
   ws.on('open', () => {
-    console.log('Connected to the WebSocket server');
+    console.log('Connected to OCPP server');
     ws.send('Hello Server!');
   });
   ws.on('close', () => {
@@ -34,31 +41,67 @@ wss.on("connection",function connection(ws){
   // });
 })
 
+function handleOcppMessage(ws, message) {
+  const [messageType, messageId, action, payload] = message;
 
+  if (messageType === 2) { // Call message
+    switch (action) {
+      case "StartTransaction":
+        handleStartTransaction(ws, messageId, payload);
+        break;
+      case "StopTransaction":
+        handleStopTransaction(ws, messageId, payload);
+        break;
+      case "BootNotification":
+        console.log('Boot Notification:', payload);
+        handleBootNotification(ws, messageId, payload);
+        handleStartTransaction(ws, messageId, payload);
+        break;
+      default:
+        console.log("Unknown action:", action);
+        sendError(ws, messageId, "NotImplemented", "Unknown action");
+    }
+  } else {
+    console.log("Unsupported message type:", messageType);
+  }
+}
 
-// const wss = new WebSocket.Server({ port: 8000, host: '0.0.0.0' });
+function handleBootNotification(ws, messageId, payload) {
+  const response = [
+    3, // MessageTypeId for CallResult
+    messageId,
+    {
+      status: 'Accepted',
+      currentTime: new Date().toISOString(),
+      interval: 300 // Heartbeat interval in seconds
+    }
+  ];
 
-// wss.on('connection', (socket) => {
-//   console.log('New WebSocket client connected');
+  ws.send(JSON.stringify(response));
+  console.log('Sent BootNotification Response');
+}
 
-//   // Listen for messages from clients
-//   socket.on('message', (message) => {
-//     console.log('Received:', message);
+function handleStartTransaction(ws, messageId, payload) {
+  console.log("StartTransaction payload:", payload);
 
-//     // Send a response back to the client
-//     socket.send(`Server Echo: ${message}`);
-//   });
+  const response = [3, messageId, { transactionId: 123 }];
+  ws.send(JSON.stringify(response));
+  console.log("Sent StartTransaction response:", response);
+}
 
-//   // Handle client disconnection
-//   socket.on('close', () => {
-//     console.log('WebSocket client disconnected');
-//   });
+function handleStopTransaction(ws, messageId, payload) {
+  console.log("StopTransaction payload:", payload);
 
-//   // Handle errors
-//   socket.on('error', (error) => {
-//     console.error('WebSocket error:', error);
-//   });
-// });
+  const response = [3, messageId, {}];
+  ws.send(JSON.stringify(response));
+  console.log("Sent StopTransaction response:", response);
+}
+
+function sendError(ws, messageId, errorCode, errorDescription) {
+  const response = [4, messageId, errorCode, errorDescription];
+  ws.send(JSON.stringify(response));
+  console.log("Sent error response:", response);
+}
 // Middleware
 app.use(cors());
 app.use(express.json());
