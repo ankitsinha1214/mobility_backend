@@ -89,7 +89,8 @@
 
 // module.exports = { handleOcppMessage };
 
-
+const logger = require('./logger');
+const { v4: uuidv4 } = require("uuid");
 
 function handleOcppMessage(ws, message) {
     const [messageType, messageId, action, payload] = message;
