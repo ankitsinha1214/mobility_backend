@@ -12,15 +12,29 @@ const { v4: uuidv4 } = require("uuid");
 const app = express();
 const port = process.env.PORT || 8080;
 
+const allClients = new Map();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(bodyParser.json());
+app.use(logRequest);
+
+// MongoDB Connection
+const dbConfig = require('./db'); // Assuming your MongoDB configuration is in db.js
+mongoose.connect(dbConfig.mongoURI, dbConfig.options)
+  .then(() => console.log(DATABASE.CONNECTED))
+  .catch(err => console.error({ msg: DATABASE.ERROR_CONNECTING, err }));
+
 let wsConnection;
 const wss = new WebSocketServer({ port: 8006 });
 wss.on("connection", function connection(ws) {
   console.log("Client Connected");
   wsConnection = ws;
 
-  setInterval(() => {
-    sendHeartbeat();
-  }, 10000);
+  // setInterval(() => {
+  //   sendHeartbeat();
+  // }, 10000);
 
   ws.on('message', (message) => {
     console.log('Received from server: %s', message);
@@ -46,6 +60,7 @@ wss.on("connection", function connection(ws) {
   //   console.log('Received from server:', message);
   // });
 })
+// const ws = require('./ocppConnect.js');
 
 function handleOcppMessage(ws, message) {
   const [messageType, messageId, action, payload] = message;
@@ -58,6 +73,15 @@ function handleOcppMessage(ws, message) {
       case "StartTransaction":
         handleStartTransaction(ws, messageId, payload);
         break;
+      case "Authorize":
+        handleAuthorize(ws, messageId, payload);
+        break;
+      case "StatusNotification":
+        handleStatus(ws, messageId, payload);
+        break;
+      case "Reset":
+        handleReset(ws, messageId, payload);
+        break;
       case "StopTransaction":
         handleStopTransaction(ws, messageId, payload);
         break;
@@ -66,6 +90,14 @@ function handleOcppMessage(ws, message) {
         handleBootNotification(ws, messageId, payload);
         // handleStartTransaction(ws, messageId, payload);
         break;
+        case "Heartbeat": // Handle Heartbeat action
+        console.log('Heartbeat received:', payload);
+        sendHeartbeatAcknowledgment(ws, messageId);
+        break;
+        case "MeterValues":
+          console.log("Meter Values:", payload);
+          handleMeterValues(ws, messageId, payload);
+          break;
       default:
         console.log("Unknown action:", action);
         sendError(ws, messageId, "NotImplemented", "Unknown action");
@@ -107,6 +139,19 @@ function handleReboot(ws, messageId, payload) {
   }, 3000);
 }
 
+function handleReset(ws, messageId, payload) {
+  console.log("Reset payload:", payload);
+
+  // Response indicating the reboot command is accepted
+  const response = [3, messageId, { status: "Accepted" }];
+  ws.send(JSON.stringify(response));
+  console.log("Sent Reset response:", response);
+
+  // Simulate a reboot action (you can add actual reboot logic if needed)
+  setTimeout(() => {
+    console.log("Simulating charger reseting...");
+  }, 3000);
+}
 
 function handleBootNotification(ws, messageId, payload) {
   const response = [
@@ -126,9 +171,104 @@ function handleBootNotification(ws, messageId, payload) {
 function handleStartTransaction(ws, messageId, payload) {
   console.log("StartTransaction payload:", payload);
 
-  const response = [3, messageId, { transactionId: 123 }];
+  const transactionId = uuidv4(); // Generate a unique transaction ID
+  const response = [
+    3, // CallResult message type
+    messageId, // Echo the message ID
+    {
+      transactionId,
+      idTagInfo: {
+        status: "Accepted", // Indicating the transaction has started
+        expiryDate: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(), // Example expiry
+      },
+    },
+  ];
   ws.send(JSON.stringify(response));
-  console.log("Sent StartTransaction response:", response);
+  console.log("StartTransaction response sent:", response);
+}
+
+function sendHeartbeatAcknowledgment(ws, messageId) {
+  const response = [
+    3, // CallResult message type
+    messageId, // Corresponding message ID
+    { currentTime: new Date().toISOString() } // Payload
+  ];
+  ws.send(JSON.stringify(response));
+  console.log("Heartbeat acknowledgment sent:", response);
+}
+
+// Function to handle MeterValues action
+function handleMeterValues(ws, messageId, payload) {
+  console.log("Received MeterValues:", payload);
+
+  // Process the meter values
+  // Example: Save to the database or log the meter readings
+  // Here, assume payload contains information like connectorId, meterValue, and timestamp
+  const { connectorId, meterValue, timestamp } = payload;
+
+  console.log(`MeterValues Details:
+    Connector ID: ${connectorId}
+    Meter Value: ${meterValue}
+    Timestamp: ${timestamp}`);
+
+  // Respond to the client to acknowledge MeterValues
+  const response = [
+    3, // CallResult
+    messageId,
+    {} // Empty object for CallResult response payload
+  ];
+  ws.send(JSON.stringify(response));
+}
+
+function handleAuthorize(ws, messageId, payload) {
+  console.log("Authorize payload:", payload);
+
+  // const messageId = generateUniqueId(); // Generate a unique ID for the message
+  const ocppMessage = [
+    2, // MessageTypeId for Call
+    messageId,
+    "Authorize",
+    { "idTag": "deadbeef" }
+  ];
+
+  wsConnection.send(JSON.stringify(ocppMessage));
+
+  // const response = [3, messageId, { transactionId: 123 }];
+  // ws.send(JSON.stringify(response));
+  // console.log("Sent StartTransaction response:", response);
+}
+
+function handleStatus(ws, messageId, payload) {
+  console.log("Received StatusNotification:", payload);
+
+  // Example payload structure for StatusNotification
+  // {
+  //   connectorId: 1,
+  //   errorCode: "NoError",
+  //   status: "Available",
+  //   timestamp: "2025-01-13T12:34:56Z",
+  // }
+
+  const { connectorId, errorCode, status, timestamp } = payload;
+  // if (status !== 'Preparing') {
+  //   return;
+  // }
+
+  // Log status notification details
+  logger.info(`StatusNotification - Connector: ${connectorId}, Status: ${status}, ErrorCode: ${errorCode}, Timestamp: ${timestamp}`);
+
+  // Respond back to acknowledge receipt
+  // const response = [{}]; // Response messageType: 3 (CallResult)
+  const response = [3, messageId, {}]; // Response messageType: 3 (CallResult)
+  ws.send(JSON.stringify(response), (err) => {
+    if (err) {
+      console.error("Error sending StatusNotification response:", err);
+    } else {
+      console.log("StatusNotification response sent successfully.");
+    }
+  });
+
+  // You can perform additional operations, such as updating a database or triggering further actions based on status
 }
 
 function handleStopTransaction(ws, messageId, payload) {
@@ -144,17 +284,6 @@ function sendError(ws, messageId, errorCode, errorDescription) {
   ws.send(JSON.stringify(response));
   console.log("Sent error response:", response);
 }
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(bodyParser.json());
-app.use(logRequest);
-
-// MongoDB Connection
-const dbConfig = require('./db'); // Assuming your MongoDB configuration is in db.js
-mongoose.connect(dbConfig.mongoURI, dbConfig.options)
-  .then(() => console.log(DATABASE.CONNECTED))
-  .catch(err => console.error({ msg: DATABASE.ERROR_CONNECTING, err }));
 
 // Routes
 app.post('/api/charger/reboot', (req, res) => {
@@ -180,9 +309,81 @@ app.post('/api/charger/reboot', (req, res) => {
     return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
   }
 });
+app.post('/api/charger/reset', (req, res) => {
+  const { chargerId } = req.body;
+
+  if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+    return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
+  }
+
+  const messageId = generateUniqueId(); // Generate a unique ID for the message
+  const ocppMessage = [
+    2, // MessageTypeId for Call
+    messageId,
+    "Reset",
+    { "type": "Soft" }
+  ];
+
+  try {
+    wsConnection.send(JSON.stringify(ocppMessage));
+    return res.status(200).json({ status: true, message: "Reboot command sent", messageId });
+  } catch (error) {
+    console.error('Error sending WebSocket message:', error);
+    return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
+  }
+});
+
+app.post('/api/charger/authorize', (req, res) => {
+  const { chargerId } = req.body;
+
+  // if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+  //   return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
+  // }
+
+  const messageId = generateUniqueId(); // Generate a unique ID for the message
+  const ocppMessage = [
+    2, // MessageTypeId for Call
+    messageId,
+    "Authorize",
+    { "idTag": "6299459950" }
+  ];
+
+  try {
+    wsConnection.send(JSON.stringify(ocppMessage));
+    return res.status(200).json({ status: true, message: "Authorize command sent", messageId });
+  } catch (error) {
+    console.error('Error sending WebSocket message:', error);
+    return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
+  }
+});
+
+app.post('/charging-station/:identity/start-transaction', async (req, res, next) => {
+  try {
+
+    const client = allClients.get(req.params.identity);
+
+    if (!client) {
+      throw Error("Client not found");
+    }
+
+    const response = await client.call('RemoteStartTransaction', {
+      connectorId: 1, // start on connector 1
+      idTag: 'XXXXXXXX', // using an idTag with identity 'XXXXXXXX'
+    });
+
+    if (response.status === 'Accepted') {
+      console.log('Remote start worked!');
+    } else {
+      console.log('Remote start rejected.');
+    }
+
+  } catch (err) {
+    next(err);
+  }
+});
 
 // Handle API for Start/Stop Transactions
-app.post('/api/transaction', (req, res) => {
+app.post('/charger/transaction', async(req, res) => {
   const { action, chargerId, payload } = req.body;
 
   if (!action || !['start', 'stop'].includes(action)) {
@@ -204,11 +405,19 @@ app.post('/api/transaction', (req, res) => {
   ];
 
   try {
-    wsConnection.send(JSON.stringify(ocppMessage));
+    const response = await wsConnection.send(JSON.stringify(ocppMessage));
+    // console.log("response",response);
+    // if (response.status === 'Accepted') {
+    //   console.log('Remote start worked!');
+    //   return res.json({ status: true, message: `${action} transaction initiated`, messageId });
+    // } else {
+    //   console.log('Remote start rejected.');
+    //   return res.json({ status: false, message: `${action} transaction failed`, messageId });
+    // }
     return res.json({ status: true, message: `${action} transaction initiated`, messageId });
   } catch (error) {
     console.error('Error sending WebSocket message:', error);
-    return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
+    return res.status(500).json({ status: false, message: 'Error sending start transaction!!!' });
   }
 });
 // Generate a unique ID
@@ -238,8 +447,6 @@ app.use('/site-surveys', require('./routes/siteSurveyRoutes'));
 app.use('/pre-delivery-chargebox-response', require('./routes/preDeliveryChargeboxRoute'));
 app.use('/pre-installations', require('./routes/preInstallationRoute'));
 app.use('/charger-dc-box', require('./routes/chargerAndDcBoxRoute'));
-
-// app.use('/subservice', require('./routes/subServiceRoute'));
 
 // Start the server
 app.listen(port, () => {

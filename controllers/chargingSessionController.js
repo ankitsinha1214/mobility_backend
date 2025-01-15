@@ -24,6 +24,44 @@ const startChargingSession = async (req, res) => {
     }
 };
 
+const startStopChargingSession = async (req, res) => {
+    const { action, chargerId, payload } = req.body;
+
+    if (!action || !['start', 'stop'].includes(action)) {
+        return res.status(400).json({ status: false, message: 'Invalid action specified' });
+    }
+
+    // if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+    if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+        return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
+    }
+
+    const messageId = generateUniqueId(); // Generate a unique ID for the message
+    const ocppMessage = [
+        2, // MessageTypeId for Call
+        messageId,
+        action === 'start' ? 'RemoteStartTransaction' : 'RemoteStopTransaction',
+        // action === 'start' ? 'StartTransaction' : 'StopTransaction',
+        payload || { idTag: chargerId }
+    ];
+
+    try {
+        const response = await wsConnection.send(JSON.stringify(ocppMessage));
+        // console.log("response",response);
+        // if (response.status === 'Accepted') {
+        //   console.log('Remote start worked!');
+        //   return res.json({ status: true, message: `${action} transaction initiated`, messageId });
+        // } else {
+        //   console.log('Remote start rejected.');
+        //   return res.json({ status: false, message: `${action} transaction failed`, messageId });
+        // }
+        return res.json({ status: true, message: `${action} transaction initiated`, messageId });
+    } catch (error) {
+        console.error('Error sending WebSocket message:', error);
+        return res.status(500).json({ status: false, message: 'Error sending start transaction!!!' });
+    }
+};
+
 const stopChargingSession = async (req, res) => {
     try {
         const { transactionId, reason } = req.body;
@@ -47,5 +85,8 @@ const stopChargingSession = async (req, res) => {
 const generateTransactionId = () => {
     return 'tx-' + Math.random().toString(36).substring(2, 15); // Example transaction ID generator
 };
+function generateUniqueId() {
+    return uuidv4();
+  }
 
-module.exports = { startChargingSession, stopChargingSession };
+module.exports = { startChargingSession, stopChargingSession, startStopChargingSession };
