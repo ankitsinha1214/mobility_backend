@@ -600,3 +600,4 @@
 2025-01-15T07:22:13.808Z [31merror[39m: [GET] /config.json - 404 [0ms]
 2025-01-15T07:50:20.724Z [31merror[39m: [POST] /charger/transaction - 404 [0ms]
 2025-01-15T07:50:58.056Z [31merror[39m: [POST] /charger/transaction - 404 [0ms]
+2025-01-15T10:06:02.804Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [3ms]

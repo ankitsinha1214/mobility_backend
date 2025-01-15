@@ -4623,3 +4623,19 @@ HEAD
 2025-01-15T07:49:36.904Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [16ms]
 2025-01-15T07:50:20.724Z [31merror[39m: [POST] /charger/transaction - 404 [0ms]
 2025-01-15T07:50:58.056Z [31merror[39m: [POST] /charger/transaction - 404 [0ms]
+2025-01-15T07:55:17.081Z [32minfo[39m: Application has started
+2025-01-15T07:58:26.255Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-15T07:58:24Z
+2025-01-15T07:58:27.284Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-15T07:58:25Z
+2025-01-15T07:58:33.627Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-15T07:58:32Z
+2025-01-15T07:58:45.145Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [32ms]
+2025-01-15T07:58:45.522Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [4ms]
+2025-01-15T07:58:45.564Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [40ms]
+2025-01-15T07:58:46.122Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [54ms]
+2025-01-15T07:58:51.284Z [32minfo[39m: [POST] /charger/transaction - 200 [1ms]
+2025-01-15T07:58:57.327Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-15T07:58:54Z
+2025-01-15T08:02:18.917Z [32minfo[39m: [POST] /charger/transaction - 200 [1ms]
+2025-01-15T08:02:22.380Z [32minfo[39m: StatusNotification - Connector: 1, Status: Finishing, ErrorCode: NoError, Timestamp: 2025-01-15T08:02:20Z
+2025-01-15T08:40:57.608Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T09:31:23.349Z [32minfo[39m: [HEAD] http://112.124.42.80:63435/ - 200 [1ms]
+2025-01-15T10:00:57.675Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T10:06:02.804Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [3ms]
