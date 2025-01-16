@@ -96,7 +96,7 @@ wss.on("connection", (ws) => {
         try {
             const parsedMessage = JSON.parse(message);
             console.log("Message in Array", parsedMessage);
-            handleOcppMessage(ws, parsedMessage);
+            handleOcppMessage(ws, parsedMessage, chargerId);
         } catch (error) {
             console.error("Invalid message format:", error);
         }

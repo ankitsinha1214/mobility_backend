@@ -91,8 +91,9 @@
 
 const logger = require('./logger');
 const { v4: uuidv4 } = require("uuid");
+const ChargingSession = require('./models/chargerSessionModel.js');
 
-function handleOcppMessage(ws, message) {
+function handleOcppMessage(ws, message, chargerId) {
     const [messageType, messageId, action, payload] = message;
 
     if (messageType === 2) { // Call message
@@ -101,7 +102,7 @@ function handleOcppMessage(ws, message) {
                 handleReboot(ws, messageId, payload);
                 break;
             case "StartTransaction":
-                handleStartTransaction(ws, messageId, payload);
+                handleStartTransaction(ws, messageId, payload, chargerId);
                 break;
             case "Authorize":
                 handleAuthorize(ws, messageId, payload);
@@ -113,7 +114,7 @@ function handleOcppMessage(ws, message) {
                 handleReset(ws, messageId, payload);
                 break;
             case "StopTransaction":
-                handleStopTransaction(ws, messageId, payload);
+                handleStopTransaction(ws, messageId, payload, chargerId);
                 break;
             case "BootNotification":
                 console.log('Boot Notification:', payload);
@@ -126,7 +127,7 @@ function handleOcppMessage(ws, message) {
                 break;
             case "MeterValues":
                 console.log("Meter Values:", payload);
-                handleMeterValues(ws, messageId, payload);
+                handleMeterValues(ws, messageId, payload, chargerId);
                 break;
             default:
                 console.log("Unknown action:", action);
@@ -198,10 +199,15 @@ function handleBootNotification(ws, messageId, payload) {
     console.log('Sent BootNotification Response');
 }
 
-function handleStartTransaction(ws, messageId, payload) {
+async function handleStartTransaction(ws, messageId, payload, chargerId) {
     console.log("StartTransaction payload:", payload);
-
-    const transactionId = uuidv4(); // Generate a unique transaction ID
+    // Save transaction to the database
+    const session = await ChargingSession.findOneAndUpdate(
+        { chargerId, status: 'Started' },
+        { $set: { startMeterValue: payload.meterStart } }, // Update the latest meter value
+        { new: true }
+    );
+    const transactionId = session.transactionId; // Generate a unique transaction ID
     const response = [
         3, // CallResult message type
         messageId, // Echo the message ID
@@ -213,6 +219,13 @@ function handleStartTransaction(ws, messageId, payload) {
             },
         },
     ];
+
+    try {
+        // await Transaction.create(transactionData);
+        console.log("Session updated:", session._id);
+    } catch (error) {
+        console.error("Error saving transaction:", error);
+    }
     ws.send(JSON.stringify(response));
     console.log("StartTransaction response sent:", response);
 }
@@ -228,17 +241,19 @@ function sendHeartbeatAcknowledgment(ws, messageId) {
 }
 
 // Function to handle MeterValues action
-function handleMeterValues(ws, messageId, payload) {
+async function handleMeterValues(ws, messageId, payload, chargerId) {
     console.log("Received MeterValues:", payload);
 
     // Process the meter values
     // Example: Save to the database or log the meter readings
     // Here, assume payload contains information like connectorId, meterValue, and timestamp
-    const { connectorId, meterValue, timestamp } = payload;
+    const { connectorId, transactionId, meterValue } = payload;
+    const { timestamp, sampledValue } = meterValue[0];
 
     console.log(`MeterValues Details:
       Connector ID: ${connectorId}
-      Meter Value: ${meterValue}
+      Transaction ID: ${transactionId}
+      Meter Value: ${sampledValue}
       Timestamp: ${timestamp}`);
 
     // Respond to the client to acknowledge MeterValues
@@ -248,6 +263,18 @@ function handleMeterValues(ws, messageId, payload) {
         {} // Empty object for CallResult response payload
     ];
     ws.send(JSON.stringify(response));
+    const session = await ChargingSession.findOneAndUpdate(
+        { chargerId, status: 'Started' },
+        { $set: { metadata: sampledValue } }, // Update the latest meter value
+        { new: true }
+    );
+
+    if (!session) {
+        console.log(`No active session found for charger ID ${session.chargerId}`);
+        return;
+    }
+
+    console.log(`Meter value updated for session ${session._id}: ${meterValue}`);
 }
 
 function handleAuthorize(ws, messageId, payload) {
@@ -301,12 +328,39 @@ function handleStatus(ws, messageId, payload) {
     // You can perform additional operations, such as updating a database or triggering further actions based on status
 }
 
-function handleStopTransaction(ws, messageId, payload) {
+async function handleStopTransaction(ws, messageId, payload, chargerId) {
     console.log("StopTransaction payload:", payload);
+     // Save transaction to the database
+     // Retrieve the session dynamically based on transactionId
+     const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
+    //  const session = await ChargingSession.findOneAndUpdate(
+    //     { chargerId, status: 'Started' },
+    //     { $set: { endMeterValue: payload.meterStop } }, // Update the latest meter value
+    //     { new: true }
+    // );
+    // Update session details
 
-    const response = [3, messageId, {}];
-    ws.send(JSON.stringify(response));
-    console.log("Sent StopTransaction response:", response);
+
+    // session.endTime = (payload?.timestamp);
+    session.status = "Stopped";
+    session.reason = payload.reason;
+    session.endMeterValue = payload.meterStop;
+    
+    // const response = [3, messageId, {}];
+    // ws.send(JSON.stringify(response));
+    // console.log("Sent StopTransaction response:", response);
+    try {
+        // Save updated session to the database
+        await session.save();
+
+        const response = [3, messageId, {}];
+        ws.send(JSON.stringify(response));
+        console.log("Sent StopTransaction response:", response);
+    } catch (error) {
+        console.error('Failed to update session:', error);
+        const errorResponse = [3, messageId, { error: 'Failed to update session' }];
+        ws.send(JSON.stringify(errorResponse));
+    }
 }
 
 function sendError(ws, messageId, errorCode, errorDescription) {
