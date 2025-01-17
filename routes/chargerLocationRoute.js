@@ -19,6 +19,7 @@ router.put('/update-image',
     }
     ]), chargerLocationController.updateChargerLocationImage);
 router.get('/chargers/all', fetchUser, chargerLocationController.getAllChargers);
+router.post('/get-charger-info-by-name', fetchUser, chargerLocationController.getChargerLocationsInfoByName);
 router.post('/add-charger', fetchUser, chargerLocationController.addChargerToLocation);
 router.post('/update-charger', fetchUser, chargerLocationController.updateChargerInLocation);
 router.delete('/delete-charger', fetchUser, chargerLocationController.deleteChargerFromLocation);

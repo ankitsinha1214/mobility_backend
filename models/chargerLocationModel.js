@@ -84,14 +84,24 @@ const chargerInfoSchema = new Schema({
     },
     energyConsumptions: {
         type: String,
-        required: true,
-        trim: true,
+        // required: true,
+        // trim: true,
+    },
+    costPerUnit: {
+        amount: {
+            type: Number, // Amount of the cost
+            required: true
+        },
+        currency: {
+            type: String, // Currency code (e.g., USD, EUR)
+            required: true
+        }
     },
     maxCurrent: {
-        type: Number, // Max current in amps
+        type: String, // Max current in amps
     },
     maxVoltage: {
-        type: Number, // Max voltage in volts
+        type: String, // Max voltage in volts
     }
 });
 

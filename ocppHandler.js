@@ -270,7 +270,7 @@ async function handleMeterValues(ws, messageId, payload, chargerId) {
     );
 
     if (!session) {
-        console.log(`No active session found for charger ID ${session.chargerId}`);
+        console.log(`No active session found for charger ID ${session}`);
         return;
     }
 
@@ -341,10 +341,10 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
     // Update session details
 
 
-    // session.endTime = (payload?.timestamp);
+    session.endTime = (payload?.timestamp);
     session.status = "Stopped";
-    session.reason = payload.reason;
-    session.endMeterValue = payload.meterStop;
+    session.reason = payload?.reason;
+    session.endMeterValue = payload?.meterStop;
     
     // const response = [3, messageId, {}];
     // ws.send(JSON.stringify(response));
