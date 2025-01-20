@@ -306,7 +306,7 @@ const getSessionData = async (req, res) => {
         const unit = firstMeterValueParts[1] || 'Wh';
 
         // Calculate the difference
-        const meterValueDifference = `${lastMeterValue - firstMeterValue} ${unit}`;
+        const meterValueDifference = `${(lastMeterValue - firstMeterValue).toFixed(4)} ${unit}`;
         // const meterValueDifference = lastMeterValue - firstMeterValue;
         // Response
         return res.json({
