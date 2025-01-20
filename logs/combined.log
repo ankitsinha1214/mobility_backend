@@ -5363,3 +5363,17 @@ HEAD
 2025-01-20T06:07:21.590Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-20T06:07:20Z
 2025-01-20T06:11:45.827Z [32minfo[39m: [GET] / - 200 [1ms]
 2025-01-20T06:36:28.579Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-20T06:43:25.518Z [32minfo[39m: Application has started
+2025-01-20T06:43:30.024Z [32minfo[39m: Application has started
+2025-01-20T06:45:41.376Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-20T06:45:39Z
+2025-01-20T06:45:42.285Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-20T06:45:40Z
+2025-01-20T06:47:14.211Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-20T06:47:12Z
+2025-01-20T06:50:08.278Z [32minfo[39m: [POST] /session/transaction - 200 [42ms]
+2025-01-20T06:50:12.272Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-20T06:50:10Z
+2025-01-20T06:51:37.392Z [32minfo[39m: [POST] /session/get-session-info - 200 [14ms]
+2025-01-20T06:52:07.942Z [32minfo[39m: [POST] /session/get-session-info - 200 [11ms]
+2025-01-20T06:53:55.230Z [32minfo[39m: [POST] /session/get-session-info - 200 [11ms]
+2025-01-20T06:55:10.721Z [32minfo[39m: [POST] /session/transaction - 200 [5ms]
+2025-01-20T06:55:14.468Z [32minfo[39m: StatusNotification - Connector: 1, Status: Finishing, ErrorCode: NoError, Timestamp: 2025-01-20T06:55:11Z
+2025-01-20T06:55:42.687Z [32minfo[39m: [POST] /session/get-session-info - 200 [9ms]
+2025-01-20T07:02:36.458Z [32minfo[39m: [POST] /session/get-session-info - 200 [9ms]
