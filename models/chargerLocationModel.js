@@ -84,6 +84,7 @@ const chargerInfoSchema = new Schema({
     },
     energyConsumptions: {
         type: String,
+        default: '0 kWh'
         // required: true,
         // trim: true,
     },

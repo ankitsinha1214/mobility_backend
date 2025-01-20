@@ -263,18 +263,40 @@ async function handleMeterValues(ws, messageId, payload, chargerId) {
         {} // Empty object for CallResult response payload
     ];
     ws.send(JSON.stringify(response));
-    const session = await ChargingSession.findOneAndUpdate(
-        { chargerId, status: 'Started' },
-        { $set: { metadata: sampledValue } }, // Update the latest meter value
-        { new: true }
-    );
 
+    const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
+    // const session = await ChargingSession.findOneAndUpdate(
+    //     { chargerId, status: 'Started' },
+    //     { $set: { metadata: sampledValue } }, // Update the latest meter value
+    //     { new: true }
+    // );
     if (!session) {
         console.log(`No active session found for charger ID ${session}`);
         return;
     }
+    const metadata = session?.metadata || [];
+    // var m_data = {};
+    const m_data = {};
+    sampledValue.forEach((element) => {
+        const key = element?.measurand || "Unknown"; // Use measurand as the key
+        const valueWithUnit = `${element?.value} ${element?.unit || ''}`.trim(); // Combine value and unit
+        m_data[key] = valueWithUnit; // Store in m_data
+    });
+    // Add the object (with all key-value pairs) to metadata
+    metadata.push({
+        timestamp, // Add the timestamp for this batch of sampled values
+        values: m_data // Add the processed key-value pairs
+    });
 
-    console.log(`Meter value updated for session ${session._id}: ${meterValue}`);
+    // Update the session with the new metadata
+    session.metadata = metadata;
+    try {
+        await session.save();
+        console.log(`Meter value updated for session ${session._id}: ${meterValue}`);
+    } catch (error) {
+        // console.error('Error updating metadata:', error.message);
+        console.error('Failed to update metadata:', error);
+    }
 }
 
 function handleAuthorize(ws, messageId, payload) {
@@ -330,9 +352,9 @@ function handleStatus(ws, messageId, payload) {
 
 async function handleStopTransaction(ws, messageId, payload, chargerId) {
     console.log("StopTransaction payload:", payload);
-     // Save transaction to the database
-     // Retrieve the session dynamically based on transactionId
-     const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
+    // Save transaction to the database
+    // Retrieve the session dynamically based on transactionId
+    const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
     //  const session = await ChargingSession.findOneAndUpdate(
     //     { chargerId, status: 'Started' },
     //     { $set: { endMeterValue: payload.meterStop } }, // Update the latest meter value
@@ -345,16 +367,25 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
     session.status = "Stopped";
     session.reason = payload?.reason;
     session.endMeterValue = payload?.meterStop;
-    
+
     // const response = [3, messageId, {}];
     // ws.send(JSON.stringify(response));
     // console.log("Sent StopTransaction response:", response);
     try {
-        // Save updated session to the database
-        await session.save();
-
         const response = [3, messageId, {}];
         ws.send(JSON.stringify(response));
+        // Save updated session to the database
+        // await session.save();
+        // Save the session after 5 seconds
+        setTimeout(async () => {
+            try {
+                await session.save();
+                console.log(`Session saved successfully after 5 seconds for session ID: ${session._id}`);
+            } catch (error) {
+                console.error('Failed to save session after 5 seconds:', error);
+            }
+        }, 5000); // 5 seconds delay
+
         console.log("Sent StopTransaction response:", response);
     } catch (error) {
         console.error('Failed to update session:', error);

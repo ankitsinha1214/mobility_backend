@@ -704,11 +704,58 @@ const searchChargerLocations = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 };
+
 const getChargerLocationsInfoByName = async (req, res) => {
     const { chargerName } = req.body;
 
     if (!chargerName) {
         return res.json({ status: false, message: 'chargerId is required' });
+    }
+
+    try {
+        const chargerLocation = await ChargerLocation.findOne({
+            'chargerInfo.name': chargerName
+        }).select('locationName locationType freepaid chargerInfo');
+        // }).select('locationName locationType state city address direction chargerInfo');
+
+        if (!chargerLocation) {
+            return res.json({ status: false, message: 'Charger not found' });
+        }
+
+        // Find the specific chargerInfo within the location
+        const chargerInfo = chargerLocation.chargerInfo.find(charger => charger.name === chargerName);
+
+        if (!chargerInfo) {
+            return res.json({ status: false, message: 'Charger details not found in the location' });
+        }
+
+        return res.json({
+            status: true,
+            message: 'Charger info retrieved successfully',
+            data: {
+                location: {
+                    locationName: chargerLocation.locationName,
+                    locationType: chargerLocation.locationType,
+                    // state: chargerLocation.state,
+                    // city: chargerLocation.city,
+                    // address: chargerLocation.address,
+                    freepaid: chargerLocation.freepaid,
+                },
+                chargerInfo
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+};
+
+// SESSION DETAILS 
+const getChargerSessionsDetails = async (req, res) => {
+    const { sessionId } = req.body;
+
+    if (!sessionId) {
+        return res.json({ status: false, message: 'sessionId is required' });
     }
 
     try {
@@ -769,5 +816,6 @@ module.exports = {
     getLocationsByStateCityStatusSitesurvey,
     getChargerLocationsInRange,
     searchChargerLocations,
-    getChargerLocationsInfoByName
+    getChargerLocationsInfoByName,
+    getChargerSessionsDetails
 };

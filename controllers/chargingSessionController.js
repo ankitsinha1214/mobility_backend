@@ -90,6 +90,7 @@
 // module.exports = { startChargingSession, stopChargingSession, startStopChargingSession };
 const { getClient } = require('../ocppConnect.js');
 const ChargingSession = require('../models/chargerSessionModel.js');
+const ChargerLocation = require('../models/chargerLocationModel');
 
 const startStopChargingSession = async (req, res) => {
     const { action, chargerId, payload } = req.body;
@@ -104,7 +105,7 @@ const startStopChargingSession = async (req, res) => {
     }
 
     const messageId = generateUniqueId(); // Generate a unique ID for the message
-    
+
     try {
         // return res.json({ status: true, message: `${action} transaction initiated for charger ID ${chargerId}`, messageId });
         if (action === 'start') {
@@ -163,7 +164,7 @@ const startStopChargingSession = async (req, res) => {
                 action === 'start' ? 'RemoteStartTransaction' : 'RemoteStopTransaction',
                 { transactionId: sessionDetails?.transactionId },
             ];
-            
+
             client.send(JSON.stringify(ocppMessage1)); // Send the message to the specific charger
             // const session = await ChargingSession.findOneAndUpdate(
             //     { chargerId, transactionId: payload.transactionId, status: 'Started' },
@@ -239,8 +240,97 @@ const resetChargingSession = async (req, res) => {
     }
 };
 
+const getSessionData = async (req, res) => {
+    const { sessionId } = req.body;
+
+    // Validate input
+    if (!sessionId) {
+        return res.json({
+            status: false,
+            message: 'Session ID is required',
+        });
+    }
+
+    try {
+        // Find the session by sessionId
+        const session = await ChargingSession.findById(sessionId);
+        if (!session) {
+            return res.json({
+                status: false,
+                message: 'Session not found',
+            });
+        }
+        const chargerName = session?.chargerId;
+        if (!chargerName) {
+            return res.json({ status: false, message: 'chargerId is not found in the session.' });
+        }
+        const chargerLocation = await ChargerLocation.findOne({
+            'chargerInfo.name': chargerName
+        }).select('locationName locationType freepaid chargerInfo');
+        // }).select('locationName locationType state city address direction chargerInfo');
+
+        if (!chargerLocation) {
+            return res.json({ status: false, message: 'Charger not found in the location.' });
+        }
+
+        // Find the specific chargerInfo within the location
+        const chargerInfo = chargerLocation.chargerInfo.find(charger => charger.name === chargerName);
+
+        if (!chargerInfo) {
+            return res.json({ status: false, message: 'Charger details not found in the location' });
+        }
+
+        if (!chargerInfo.costPerUnit) {
+            return res.json({ status: false, message: 'Cost Per Unit is not assigned to this Charger' });
+        }
+        const costPerUnit = chargerInfo.costPerUnit;
+        // Check if metadata exists and has values
+        const metadata = session.metadata || [];
+        if (metadata.length < 1) {
+            return res.json({
+                status: false,
+                message: 'Insufficient metadata to calculate meter value changes',
+            });
+        }
+        // Get the 0th index and the highest index
+        const firstEntry = metadata[0]?.values;
+        const lastEntry = metadata[metadata.length - 1]?.values;
+        // Extract meter values and units
+        const firstMeterValueParts = firstEntry['Energy.Active.Import.Register']?.split(' ') || [];
+
+        // Extract meter values
+        const firstMeterValue = parseFloat(firstEntry['Energy.Active.Import.Register']?.split(' ')[0] || 0);
+        const lastMeterValue = parseFloat(lastEntry['Energy.Active.Import.Register']?.split(' ')[0] || 0);
+
+        // Extract the unit (assuming both entries have the same unit)
+        const unit = firstMeterValueParts[1] || 'Wh';
+
+        // Calculate the difference
+        const meterValueDifference = `${lastMeterValue - firstMeterValue} ${unit}`;
+        // const meterValueDifference = lastMeterValue - firstMeterValue;
+        // Response
+        return res.json({
+            status: true,
+            message: 'Meter value retrieved successfully',
+            data: {
+                firstMeterValue,
+                lastMeterValue,
+                meterValueDifference,
+                costPerUnit
+            },
+        });
+    } catch (error) {
+        console.error('Error fetching session data:', error);
+        res.status(500).json({
+            status: false,
+            message: 'Internal Server Error',
+            error: error?.message,
+        });
+    }
+};
+
 const generateUniqueId = () => {
     return 'uuid-' + Math.random().toString(36).substring(2, 15); // Example UUID generator
 };
 
-module.exports = { startStopChargingSession, resetChargingSession };
+module.exports = { startStopChargingSession, resetChargingSession, getSessionData };
