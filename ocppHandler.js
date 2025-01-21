@@ -207,7 +207,7 @@ async function handleStartTransaction(ws, messageId, payload, chargerId) {
         { $set: { startMeterValue: payload.meterStart } }, // Update the latest meter value
         { new: true }
     );
-    const transactionId = session.transactionId; // Generate a unique transaction ID
+    const transactionId = session?.transactionId; // Generate a unique transaction ID
     const response = [
         3, // CallResult message type
         messageId, // Echo the message ID
@@ -264,6 +264,7 @@ async function handleMeterValues(ws, messageId, payload, chargerId) {
     ];
     ws.send(JSON.stringify(response));
 
+    // const session = await ChargingSession.findOne({ transactionId });
     const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
     // const session = await ChargingSession.findOneAndUpdate(
     //     { chargerId, status: 'Started' },
@@ -354,7 +355,12 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
     console.log("StopTransaction payload:", payload);
     // Save transaction to the database
     // Retrieve the session dynamically based on transactionId
+
+    // const transactionId = payload?.transactionId;
+    // const session = await ChargingSession.findOne({ transactionId, status: 'Started' });
+
     const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
+
     //  const session = await ChargingSession.findOneAndUpdate(
     //     { chargerId, status: 'Started' },
     //     { $set: { endMeterValue: payload.meterStop } }, // Update the latest meter value
@@ -362,11 +368,12 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
     // );
     // Update session details
 
-
-    session.endTime = (payload?.timestamp);
-    session.status = "Stopped";
-    session.reason = payload?.reason;
-    session.endMeterValue = payload?.meterStop;
+    if(session){
+        session.endTime = (payload?.timestamp);
+        session.status = "Stopped";
+        session.reason = payload?.reason;
+        session.endMeterValue = payload?.meterStop;
+    }
 
     // const response = [3, messageId, {}];
     // ws.send(JSON.stringify(response));
@@ -379,8 +386,10 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
         // Save the session after 5 seconds
         setTimeout(async () => {
             try {
+                if(session){
                 await session.save();
                 console.log(`Session saved successfully after 5 seconds for session ID: ${session._id}`);
+                }
             } catch (error) {
                 console.error('Failed to save session after 5 seconds:', error);
             }
