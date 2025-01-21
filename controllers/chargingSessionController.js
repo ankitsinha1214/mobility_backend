@@ -91,6 +91,7 @@
 const { getClient } = require('../ocppConnect.js');
 const ChargingSession = require('../models/chargerSessionModel.js');
 const ChargerLocation = require('../models/chargerLocationModel');
+const moment = require('moment-timezone');
 
 const startStopChargingSession = async (req, res) => {
     const { action, chargerId, payload } = req.body;
@@ -107,6 +108,20 @@ const startStopChargingSession = async (req, res) => {
     const messageId = generateUniqueId(); // Generate a unique ID for the message
 
     try {
+        const activeSession = await ChargingSession.findOne({ chargerId, status: 'Started' });
+        const activeSession1 = await ChargingSession.findOne({ chargerId, status: 'Stopped' });
+        if (action === 'start' && activeSession) {
+            return res.json({
+                status: false,
+                message: 'A previous transaction is still in progress. Please wait for it to complete before starting a new one.',
+            });
+        }
+        if (action === 'stop' && activeSession1) {
+            return res.json({
+                status: false,
+                message: 'No Active Session Found to stop the Charger.',
+            });
+        }
         // return res.json({ status: true, message: `${action} transaction initiated for charger ID ${chargerId}`, messageId });
         if (action === 'start') {
             const ocppMessage = [
@@ -196,8 +211,11 @@ const startStopChargingSession = async (req, res) => {
 };
 
 const resetChargingSession = async (req, res) => {
-    const { chargerId, type } = req.body;
+    if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
 
+    const { chargerId, type } = req.body;
     // Validate inputs
     if (!chargerId || !type || !['Soft', 'Hard'].includes(type)) {
         return res.status(400).json({
@@ -241,13 +259,19 @@ const resetChargingSession = async (req, res) => {
 };
 
 const getSessionData = async (req, res) => {
-    const { sessionId } = req.body;
+    const { sessionId, timezone } = req.body;
 
     // Validate input
     if (!sessionId) {
         return res.json({
             status: false,
             message: 'Session ID is required',
+        });
+    }
+    if(!timezone){
+        return res.json({
+            status: false,
+            message: 'TimeZone is required',
         });
     }
 
@@ -309,6 +333,10 @@ const getSessionData = async (req, res) => {
         const meterValueDifference = `${(lastMeterValue - firstMeterValue).toFixed(4)} ${unit}`;
         // const meterValueDifference = lastMeterValue - firstMeterValue;
         // Response
+        const status = session?.status;
+        // const startTime = session?.startTime;
+        // Format startTime as per timezone
+        const startTimeIST = moment(session?.startTime).tz(timezone).format('YYYY-MM-DD HH:mm:ss');
         return res.json({
             status: true,
             message: 'Meter value retrieved successfully',
@@ -316,7 +344,9 @@ const getSessionData = async (req, res) => {
                 firstMeterValue,
                 lastMeterValue,
                 meterValueDifference,
-                costPerUnit
+                costPerUnit,
+                status,
+                startTimeIST
             },
         });
     } catch (error) {
