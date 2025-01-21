@@ -109,14 +109,13 @@ const startStopChargingSession = async (req, res) => {
 
     try {
         const activeSession = await ChargingSession.findOne({ chargerId, status: 'Started' });
-        const activeSession1 = await ChargingSession.findOne({ chargerId, status: 'Stopped' });
         if (action === 'start' && activeSession) {
             return res.json({
                 status: false,
                 message: 'A previous transaction is still in progress. Please wait for it to complete before starting a new one.',
             });
         }
-        if (action === 'stop' && activeSession1) {
+        if (action === 'stop' && !activeSession) {
             return res.json({
                 status: false,
                 message: 'No Active Session Found to stop the Charger.',
