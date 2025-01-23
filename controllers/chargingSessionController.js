@@ -4,6 +4,10 @@ const ChargingSession = require('../models/chargerSessionModel.js');
 const ChargerLocation = require('../models/chargerLocationModel');
 const moment = require('moment-timezone');
 
+// Helper function to calculate energy consumed
+const calculateEnergyConsumed = (startMeterValue, endMeterValue) => {
+    return (endMeterValue - startMeterValue); // energy consumed in kWh
+};
 // const startStopChargingSession = async (req, res) => {
 //     const { action, chargerId, payload } = req.body;
 
@@ -189,7 +193,7 @@ const startStopChargingSession = async (req, res) => {
                 message: 'No Active Session Found to stop the Charger.',
             });
         }
-        if(action === 'start'){
+        if (action === 'start') {
             // Send WebSocket message
             const ocppMessage = [
                 2, // MessageTypeId for Call
@@ -199,7 +203,7 @@ const startStopChargingSession = async (req, res) => {
             ];
             client.send(JSON.stringify(ocppMessage)); // Send the message to the specific charger
         }
-        else if(action === 'stop'){
+        else if (action === 'stop') {
             const sessionId = payload?.sessionId;
             if (!sessionId) {
                 return res.json({
@@ -435,8 +439,108 @@ const getSessionData = async (req, res) => {
     }
 };
 
+// View Session Receipt API
+const getSessionReceipt = async (req, res) => {
+    try {
+        const { sessionId } = req.body;
+
+        // Fetch the charging session data by sessionId
+        const session = await ChargingSession.findById(sessionId);
+        if (!session) {
+            return res.json({ status: false, message: 'Session not found' });
+        }
+
+        // Fetch charger location details based on chargerId
+        const chargerLocation = await ChargerLocation.findOne({ "chargerInfo.name": session.chargerId });
+        if (!chargerLocation) {
+            return res.json({ status: false, message: 'Charger location not found' });
+        }
+
+        // Find the charger info corresponding to the chargerId in the session
+        const chargerInfo = chargerLocation.chargerInfo.find(charger => charger.name === session.chargerId);
+        if (!chargerInfo) {
+            return res.json({ status: false, message: 'Charger info not found' });
+        }
+        const metadata = session.metadata || [];
+
+        // Get the 0th index and the highest index
+        const firstEntry = metadata[0].values;
+        const lastEntry = metadata[metadata.length - 1]?.values;
+
+        // Extract meter values
+        const firstMeterValue = parseFloat(firstEntry['Energy.Active.Import.Register']?.split(' ')[0] || 0);
+        const lastMeterValue = parseFloat(lastEntry['Energy.Active.Import.Register']?.split(' ')[0] || 0);
+        // Get the last metadata object from the array
+
+        // Calculate energy consumed
+        const energyConsumed = lastMeterValue && firstMeterValue
+            ? (lastMeterValue - firstMeterValue).toFixed(4)
+            : 0;
+        // const energyConsumed = calculateEnergyConsumed(session.metadata[0]?.values.Energy.Active.Import.Register, session.metadata[0]?.values.Energy.Active.Import.Register);
+
+        // Calculate the session cost
+        const costPerUnit = chargerInfo.costPerUnit.amount;
+        const totalEnergyCost = energyConsumed * costPerUnit;
+
+        // Dummy values for now
+        const parkingTariff = chargerLocation.freepaid.parking ? 'FREE' : 'PAID';
+        const platformFee = "FREE";
+        const idleFee = "FREE"; // Example; can be based on idle time
+
+        // Calculate tax (GST 10%)
+        const gst = 0.10;
+        const gstAmount = totalEnergyCost * gst;
+
+        // Calculate grand total
+        const grandTotal = totalEnergyCost + gstAmount;
+
+        // Format the charger duration in HH:MM:SS
+        const durationInMs = session.endTime - session.startTime;
+        const durationInSeconds = Math.floor(durationInMs / 1000);
+        const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
+        const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
+        const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
+        const formattedDuration = `${hours}:${minutes}:${seconds}`;
+
+        // Format the response
+        const receipt = [
+            {
+                "charger-details": [
+                    { "Charger location": chargerLocation.locationName },
+                    { "Charger ID": session.chargerId },
+                    { "Charger duration": formattedDuration },  // Convert to minutes
+                    { "Energy consumed": `${energyConsumed} Wh` },
+                    { "Cost per Unit": `${costPerUnit} ${chargerInfo.costPerUnit.currency}` },
+                    { "Idle rate": "FREE" }  // Dummy value
+                ]
+            },
+            {
+                "session details": [
+                    { "Total energy cost": `₹ ${totalEnergyCost.toFixed(2)}` },
+                    { "Parking tariff": parkingTariff },
+                    { "Platform fee": platformFee },
+                    { "Idle fee": idleFee }
+                ]
+            },
+            {
+                "tax details": [
+                    { "GST 10%": `₹ ${gstAmount.toFixed(2)}` }
+                ]
+            },
+            {
+                "Grand Total": `₹ ${grandTotal.toFixed(2)}`
+            }
+        ];
+
+        res.json({ status: true, data: receipt, message: 'Receipt Details Generated Successfully!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: false, message: 'Internal Server error' });
+    }
+}
+
 const generateUniqueId = () => {
     return 'uuid-' + Math.random().toString(36).substring(2, 15); // Example UUID generator
 };
 
-module.exports = { startStopChargingSession, resetChargingSession, getSessionData };
+module.exports = { startStopChargingSession, resetChargingSession, getSessionData, getSessionReceipt };
