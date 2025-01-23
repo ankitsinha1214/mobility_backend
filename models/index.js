@@ -14,6 +14,7 @@ const ChargerAndDcBox = require('./chargerAndDcboxModel'); // Update the path as
 const preDeliveryChargebox = require('./preDeliveryChargeboxResponseModel'); // Update the path as necessary for other models
 const sandmNotification = require('./notificationSandmModel'); // Update the path as necessary for other models
 const chargingSession = require('./chargerSessionModel'); // Update the path as necessary for other models
+const payment = require('./paymentModel'); // Update the path as necessary for other models
 
 const { DATABASE } = require('../message.json');
 
@@ -39,5 +40,6 @@ module.exports = {
   predeliveryQuestion,
   preDeliveryChargebox,
   chargingSession,
-  ChargerAndDcBox
+  ChargerAndDcBox,
+  payment
 };

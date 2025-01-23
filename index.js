@@ -6,13 +6,13 @@ const bodyParser = require('body-parser');
 const { DATABASE } = require('./message.json'); // Adjust path as needed
 const logger = require('./logger');
 const logRequest = require('./middleware/loggerMiddleware');
-const { WebSocketServer } = require('ws');
-const WebSocket = require('ws');
-const { v4: uuidv4 } = require("uuid");
+// const { WebSocketServer } = require('ws');
+// const WebSocket = require('ws');
+// const { v4: uuidv4 } = require("uuid");
 const app = express();
 const port = process.env.PORT || 8080;
 
-const allClients = new Map();
+// const allClients = new Map();
 
 // Middleware
 app.use(cors());
@@ -27,7 +27,7 @@ mongoose.connect(dbConfig.mongoURI, dbConfig.options)
   .catch(err => console.error({ msg: DATABASE.ERROR_CONNECTING, err }));
 
   
-const ws = require('./ocppConnect.js');
+// const ws = require('./ocppConnect.js');
 // let wsConnection;
 // const wss = new WebSocketServer({ port: 8006 });
 // wss.on("connection", function connection(ws) {
@@ -287,144 +287,144 @@ const ws = require('./ocppConnect.js');
 // }
 
 // Routes
-app.post('/api/charger/reboot', (req, res) => {
-  const { chargerId } = req.body;
+// app.post('/api/charger/reboot', (req, res) => {
+//   const { chargerId } = req.body;
 
-  if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
-    return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
-  }
+//   if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+//     return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
+//   }
 
-  const messageId = generateUniqueId(); // Generate a unique ID for the message
-  const ocppMessage = [
-    2, // MessageTypeId for Call
-    messageId,
-    "Reboot",
-    { chargerId }
-  ];
+//   const messageId = generateUniqueId(); // Generate a unique ID for the message
+//   const ocppMessage = [
+//     2, // MessageTypeId for Call
+//     messageId,
+//     "Reboot",
+//     { chargerId }
+//   ];
 
-  try {
-    wsConnection.send(JSON.stringify(ocppMessage));
-    return res.status(200).json({ status: true, message: "Reboot command sent", messageId });
-  } catch (error) {
-    console.error('Error sending WebSocket message:', error);
-    return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
-  }
-});
-app.post('/api/charger/reset', (req, res) => {
-  const { chargerId } = req.body;
+//   try {
+//     wsConnection.send(JSON.stringify(ocppMessage));
+//     return res.status(200).json({ status: true, message: "Reboot command sent", messageId });
+//   } catch (error) {
+//     console.error('Error sending WebSocket message:', error);
+//     return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
+//   }
+// });
+// app.post('/api/charger/reset', (req, res) => {
+//   const { chargerId } = req.body;
 
-  if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
-    return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
-  }
+//   if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+//     return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
+//   }
 
-  const messageId = generateUniqueId(); // Generate a unique ID for the message
-  const ocppMessage = [
-    2, // MessageTypeId for Call
-    messageId,
-    "Reset",
-    { "type": "Soft" }
-  ];
+//   const messageId = generateUniqueId(); // Generate a unique ID for the message
+//   const ocppMessage = [
+//     2, // MessageTypeId for Call
+//     messageId,
+//     "Reset",
+//     { "type": "Soft" }
+//   ];
 
-  try {
-    wsConnection.send(JSON.stringify(ocppMessage));
-    return res.status(200).json({ status: true, message: "Reboot command sent", messageId });
-  } catch (error) {
-    console.error('Error sending WebSocket message:', error);
-    return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
-  }
-});
+//   try {
+//     wsConnection.send(JSON.stringify(ocppMessage));
+//     return res.status(200).json({ status: true, message: "Reboot command sent", messageId });
+//   } catch (error) {
+//     console.error('Error sending WebSocket message:', error);
+//     return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
+//   }
+// });
 
-app.post('/api/charger/authorize', (req, res) => {
-  const { chargerId } = req.body;
+// app.post('/api/charger/authorize', (req, res) => {
+//   const { chargerId } = req.body;
 
-  // if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
-  //   return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
-  // }
+//   // if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+//   //   return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
+//   // }
 
-  const messageId = generateUniqueId(); // Generate a unique ID for the message
-  const ocppMessage = [
-    2, // MessageTypeId for Call
-    messageId,
-    "Authorize",
-    { "idTag": "6299459950" }
-  ];
+//   const messageId = generateUniqueId(); // Generate a unique ID for the message
+//   const ocppMessage = [
+//     2, // MessageTypeId for Call
+//     messageId,
+//     "Authorize",
+//     { "idTag": "6299459950" }
+//   ];
 
-  try {
-    wsConnection.send(JSON.stringify(ocppMessage));
-    return res.status(200).json({ status: true, message: "Authorize command sent", messageId });
-  } catch (error) {
-    console.error('Error sending WebSocket message:', error);
-    return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
-  }
-});
+//   try {
+//     wsConnection.send(JSON.stringify(ocppMessage));
+//     return res.status(200).json({ status: true, message: "Authorize command sent", messageId });
+//   } catch (error) {
+//     console.error('Error sending WebSocket message:', error);
+//     return res.status(500).json({ status: false, message: 'Error sending WebSocket message' });
+//   }
+// });
 
-app.post('/charging-station/:identity/start-transaction', async (req, res, next) => {
-  try {
+// app.post('/charging-station/:identity/start-transaction', async (req, res, next) => {
+//   try {
 
-    const client = allClients.get(req.params.identity);
+//     const client = allClients.get(req.params.identity);
 
-    if (!client) {
-      throw Error("Client not found");
-    }
+//     if (!client) {
+//       throw Error("Client not found");
+//     }
 
-    const response = await client.call('RemoteStartTransaction', {
-      connectorId: 1, // start on connector 1
-      idTag: 'XXXXXXXX', // using an idTag with identity 'XXXXXXXX'
-    });
+//     const response = await client.call('RemoteStartTransaction', {
+//       connectorId: 1, // start on connector 1
+//       idTag: 'XXXXXXXX', // using an idTag with identity 'XXXXXXXX'
+//     });
 
-    if (response.status === 'Accepted') {
-      console.log('Remote start worked!');
-    } else {
-      console.log('Remote start rejected.');
-    }
+//     if (response.status === 'Accepted') {
+//       console.log('Remote start worked!');
+//     } else {
+//       console.log('Remote start rejected.');
+//     }
 
-  } catch (err) {
-    next(err);
-  }
-});
+//   } catch (err) {
+//     next(err);
+//   }
+// });
 
 // Handle API for Start/Stop Transactions
-app.post('/charger/transaction', async(req, res) => {
-  const { action, chargerId, payload } = req.body;
+// app.post('/charger/transaction', async(req, res) => {
+//   const { action, chargerId, payload } = req.body;
 
-  if (!action || !['start', 'stop'].includes(action)) {
-    return res.status(400).json({ status: false, message: 'Invalid action specified' });
-  }
+//   if (!action || !['start', 'stop'].includes(action)) {
+//     return res.status(400).json({ status: false, message: 'Invalid action specified' });
+//   }
 
-  // if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
-  if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
-    return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
-  }
+//   // if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+//   if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+//     return res.status(500).json({ status: false, message: 'WebSocket connection not established' });
+//   }
 
-  const messageId = generateUniqueId(); // Generate a unique ID for the message
-  const ocppMessage = [
-    2, // MessageTypeId for Call
-    messageId,
-    action === 'start' ? 'RemoteStartTransaction' : 'RemoteStopTransaction',
-    // action === 'start' ? 'StartTransaction' : 'StopTransaction',
-    payload || { idTag: chargerId }
-  ];
+//   const messageId = generateUniqueId(); // Generate a unique ID for the message
+//   const ocppMessage = [
+//     2, // MessageTypeId for Call
+//     messageId,
+//     action === 'start' ? 'RemoteStartTransaction' : 'RemoteStopTransaction',
+//     // action === 'start' ? 'StartTransaction' : 'StopTransaction',
+//     payload || { idTag: chargerId }
+//   ];
 
-  try {
-    const response = await wsConnection.send(JSON.stringify(ocppMessage));
-    // console.log("response",response);
-    // if (response.status === 'Accepted') {
-    //   console.log('Remote start worked!');
-    //   return res.json({ status: true, message: `${action} transaction initiated`, messageId });
-    // } else {
-    //   console.log('Remote start rejected.');
-    //   return res.json({ status: false, message: `${action} transaction failed`, messageId });
-    // }
-    return res.json({ status: true, message: `${action} transaction initiated`, messageId });
-  } catch (error) {
-    console.error('Error sending WebSocket message:', error);
-    return res.status(500).json({ status: false, message: 'Error sending start transaction!!!' });
-  }
-});
+//   try {
+//     const response = await wsConnection.send(JSON.stringify(ocppMessage));
+//     // console.log("response",response);
+//     // if (response.status === 'Accepted') {
+//     //   console.log('Remote start worked!');
+//     //   return res.json({ status: true, message: `${action} transaction initiated`, messageId });
+//     // } else {
+//     //   console.log('Remote start rejected.');
+//     //   return res.json({ status: false, message: `${action} transaction failed`, messageId });
+//     // }
+//     return res.json({ status: true, message: `${action} transaction initiated`, messageId });
+//   } catch (error) {
+//     console.error('Error sending WebSocket message:', error);
+//     return res.status(500).json({ status: false, message: 'Error sending start transaction!!!' });
+//   }
+// });
 // Generate a unique ID
-function generateUniqueId() {
-  return uuidv4();
-}
+// function generateUniqueId() {
+//   return uuidv4();
+// }
 
 
 app.get('/', (_req, res) => {
@@ -443,6 +443,7 @@ app.use('/charger-locations', require('./routes/chargerLocationRoute'));
 app.use('/faq', require('./routes/faqRoute'));
 app.use('/reviews', require('./routes/ratingUserLocationRoute'));
 app.use('/session', require('./routes/chargingSessionRoute'));
+app.use('/payment', require('./routes/paymentRoute'));
 app.use('/pre-delivery-question', require('./routes/preDeliveryQuestionRoute'));
 app.use('/site-surveys', require('./routes/siteSurveyRoutes'));
 app.use('/pre-delivery-chargebox-response', require('./routes/preDeliveryChargeboxRoute'));

@@ -249,7 +249,7 @@ const startStopChargingSession = async (req, res) => {
                 const sessionData = {
                     chargerId,
                     userPhone: payload?.idTag,
-                    transactionId: Math.floor(100000 + Math.random() * 900000), // Random transaction ID
+                    transactionId: Math.floor(10000000 + Math.random() * 90000000), // Random transaction ID
                     startMeterValue: payload?.startMeterValue || 0,
                 };
 
@@ -511,7 +511,7 @@ const getSessionReceipt = async (req, res) => {
                     { "Charger duration": formattedDuration },  // Convert to minutes
                     { "Energy consumed": `${energyConsumed} Wh` },
                     { "Cost per Unit": `${costPerUnit} ${chargerInfo.costPerUnit.currency}` },
-                    { "Idle rate": "FREE" }  // Dummy value
+                    // { "Idle rate": "FREE" }  // Dummy value
                 ]
             },
             {
