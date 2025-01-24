@@ -264,15 +264,16 @@ async function handleMeterValues(ws, messageId, payload, chargerId) {
     ];
     ws.send(JSON.stringify(response));
 
-    // const session = await ChargingSession.findOne({ transactionId });
-    const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
+    const session = await ChargingSession.findOne({ "transactionId": String(transactionId) });
+    console.log('meter value session',session);
+    // const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
     // const session = await ChargingSession.findOneAndUpdate(
     //     { chargerId, status: 'Started' },
     //     { $set: { metadata: sampledValue } }, // Update the latest meter value
     //     { new: true }
     // );
     if (!session) {
-        console.log(`No active session found for charger ID ${session}`);
+        console.log(`No active session found for charger ID ${chargerId}`);
         return;
     }
     const metadata = session?.metadata || [];
