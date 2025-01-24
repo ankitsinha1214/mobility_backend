@@ -357,10 +357,11 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
     // Save transaction to the database
     // Retrieve the session dynamically based on transactionId
 
-    // const transactionId = payload?.transactionId;
+    const transactionId = payload?.transactionId;
     // const session = await ChargingSession.findOne({ transactionId, status: 'Started' });
 
-    const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
+    const session = await ChargingSession.findOne({ "transactionId": String(transactionId) });
+    // const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
 
     //  const session = await ChargingSession.findOneAndUpdate(
     //     { chargerId, status: 'Started' },
@@ -375,6 +376,9 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
         session.reason = payload?.reason;
         session.endMeterValue = payload?.meterStop;
     }
+    else{
+        console.log(`Session stop value not updated for charger ID ${chargerId}`);
+    }
 
     // const response = [3, messageId, {}];
     // ws.send(JSON.stringify(response));
@@ -385,16 +389,16 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
         // Save updated session to the database
         // await session.save();
         // Save the session after 5 seconds
-        setTimeout(async () => {
+        // setTimeout(async () => {
             try {
                 if(session){
                 await session.save();
-                console.log(`Session saved successfully after 5 seconds for session ID: ${session._id}`);
+                console.log(`Session saved successfully for session ID: ${session._id}`);
                 }
             } catch (error) {
                 console.error('Failed to save session after 5 seconds:', error);
             }
-        }, 5000); // 5 seconds delay
+        // }, 5000); // 5 seconds delay
 
         console.log("Sent StopTransaction response:", response);
     } catch (error) {
