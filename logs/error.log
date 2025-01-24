@@ -777,3 +777,8 @@
 2025-01-22T15:57:49.365Z [31merror[39m: [GET] /favicon.ico - 404 [1ms]
 2025-01-23T02:44:15.304Z [31merror[39m: [GET] /favicon.ico - 404 [1ms]
 2025-01-23T07:08:06.889Z [31merror[39m: [GET] /manager/text/list - 404 [1ms]
+2025-01-23T13:40:42.726Z [31merror[39m: [POST] /session/transaction - 401 [1ms]
+2025-01-23T18:17:16.732Z [31merror[39m: [GET] /manager/html - 404 [3ms]
+2025-01-23T19:44:22.793Z [31merror[39m: [GET] http://txt.go.sohu.com/ip/soip?0.19710037223580078481746331328712 - 404 [1ms]
+2025-01-23T23:02:58.065Z [31merror[39m: [GET] /.git/config - 404 [1ms]
+2025-01-24T00:12:42.558Z [31merror[39m: [GET] http://apiv4.9hits.com/test - 404 [0ms]
