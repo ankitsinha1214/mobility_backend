@@ -14,6 +14,10 @@ exports.createPayment = async (req, res) => {
             });
         }
         const payment = new Payment(paymentData);
+        if (paymentData.status === 'captured') {
+            sessionExists.status = 'Completed';
+            await sessionExists.save();
+        }
         await payment.save();
         return res.json({
             status: true,

@@ -264,7 +264,7 @@ async function handleMeterValues(ws, messageId, payload, chargerId) {
     ];
     ws.send(JSON.stringify(response));
 
-    const session = await ChargingSession.findOne({ "transactionId": String(transactionId) });
+    const session = await ChargingSession.findOne({ chargerId, "transactionId": String(transactionId) });
     console.log('meter value session',session);
     // const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
     // const session = await ChargingSession.findOneAndUpdate(
@@ -360,7 +360,7 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
     const transactionId = payload?.transactionId;
     // const session = await ChargingSession.findOne({ transactionId, status: 'Started' });
 
-    const session = await ChargingSession.findOne({ "transactionId": String(transactionId) });
+    const session = await ChargingSession.findOne({ chargerId , "transactionId": String(transactionId) });
     // const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
 
     //  const session = await ChargingSession.findOneAndUpdate(

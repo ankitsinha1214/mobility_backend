@@ -60,6 +60,14 @@ const chargingSessionSchema = new Schema({
     // },
 }, { timestamps: true });
 
+// Middleware to remove transactionId when status is updated to 'Completed'
+chargingSessionSchema.pre('save', function (next) {
+    if (this.isModified('status') && this.status === 'Completed') {
+        this.transactionId = undefined; // Remove transactionId
+    }
+    next();
+});
+
 const ChargingSession = mongoose.model('ChargingSession', chargingSessionSchema);
 
 module.exports = ChargingSession;
