@@ -42,16 +42,16 @@ const chargingSessionSchema = new Schema({
     endMeterValue: {
         type: Number, // in kWh 
     },
-    cost: {
-        amount: {
-            type: Number, // Amount of the cost
-            // required: true
-        },
-        currency: {
-            type: String, // Currency code (e.g., USD, EUR)
-            // required: true
-        }
-    },
+    // cost: {
+    //     amount: {
+    //         type: Number, // Amount of the cost
+    //         // required: true
+    //     },
+    //     currency: {
+    //         type: String, // Currency code (e.g., USD, EUR)
+    //         // required: true
+    //     }
+    // },
     reason: {
         type: String, // reason for stoppage 
     },

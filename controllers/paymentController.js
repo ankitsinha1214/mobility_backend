@@ -74,3 +74,40 @@ exports.getPaymentById = async (req, res) => {
         });
     }
 };
+
+// CHECK PAYMENT BY SESSION ID 
+exports.checkPaymentBySessionId = async (req, res) => {
+    try {
+        const { sessionId } = req.body;
+        // Find the payment by sessionId
+        const payment = await Payment.findOne({ sessionId });
+
+        if (!payment) {
+            return res.json({
+                status: false,
+                message: 'Payment not found for the given session ID'
+            });
+        }
+
+        // Check if the status is 'captured'
+        if (payment.status === 'captured') {
+            return res.json({
+                status: true,
+                message: 'Payment status is captured',
+                // data: payment
+            });
+        } else {
+            return res.json({
+                status: false,
+                message: 'Payment status is not captured',
+                currentStatus: payment.status
+            });
+        }
+    } catch (error) {
+        console.error('Error checking payment status by session ID:', error);
+        res.status(500).json({
+            status: false,
+            message: 'An error occurred while checking the payment status'
+        });
+    }
+};

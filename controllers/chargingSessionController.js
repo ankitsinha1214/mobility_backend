@@ -485,6 +485,16 @@ const getSessionReceipt = async (req, res) => {
         // Dummy values for now
         const parkingTariff = chargerLocation.freepaid.parking ? 'FREE' : 'PAID';
         const platformFee = "FREE";
+        // var convenienceFee = "FREE";
+        let convenienceFee = "FREE";
+        let convenienceFeeValue = 0;
+        if (totalEnergyCost < 1) {
+            convenienceFee = "₹ 1";
+            convenienceFeeValue = parseInt(convenienceFee.replace(/[^\d]/g, '')) || 0;
+        }
+        // else{
+        //     platformFee = "FREE";
+        // }
         const idleFee = "FREE"; // Example; can be based on idle time
 
         // Calculate tax (GST 10%)
@@ -492,7 +502,11 @@ const getSessionReceipt = async (req, res) => {
         const gstAmount = totalEnergyCost * gst;
 
         // Calculate grand total
-        const grandTotal = totalEnergyCost + gstAmount;
+        let grandTotal = totalEnergyCost + gstAmount + convenienceFeeValue;
+        // var grandTotal = totalEnergyCost + gstAmount;
+        // if (totalEnergyCost < 1) {
+        //     grandTotal += 1;
+        // }
 
         // Format the charger duration in HH:MM:SS
         const durationInMs = session.endTime - session.startTime;
@@ -519,6 +533,7 @@ const getSessionReceipt = async (req, res) => {
                     { "Total energy cost": `₹ ${totalEnergyCost.toFixed(2)}` },
                     { "Parking tariff": parkingTariff },
                     { "Platform fee": platformFee },
+                    { "Convenience fee": convenienceFee },
                     { "Idle fee": idleFee }
                 ]
             },
