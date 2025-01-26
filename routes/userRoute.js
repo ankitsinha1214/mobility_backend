@@ -73,6 +73,10 @@ router.post(
 router.post('/:phoneNumber/vehicles',
   fetchUser, userController.addUserVehicle);
 
+// POST - Add History details for user
+router.get('/:phoneNumber/history',
+  fetchUser, userController.getHistory);
+
 // GET - Get all user vehicles
 router.get('/:phoneNumber/vehicles',
   fetchUser, userController.getUserVehicles);

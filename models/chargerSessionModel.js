@@ -11,9 +11,8 @@ const chargingSessionSchema = new Schema({
         type: String,
         required: true
     },
-    // user: {
+    // vehicleId: {
     //     type: Schema.Types.ObjectId,
-    //     ref: 'User',
     //     required: true
     // },
     transactionId: {

@@ -165,14 +165,20 @@ const calculateEnergyConsumed = (startMeterValue, endMeterValue) => {
 
 const startStopChargingSession = async (req, res) => {
     const { action, chargerId, payload } = req.body;
-
+    // console.log(req.phoneNumber === payload.idTag);
+    // console.log((req.phoneNumber && req.phoneNumber !== payload.idTag));
+    // if ((req.phoneNumber && req.phoneNumber !== payload.idTag) || (req.user && req.user !== 'Admin' && req.user !== 'Manager')) {
+    //     return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    // }
+    // console.log('entered');
+    // return;
     if (!action || !['start', 'stop'].includes(action)) {
         return res.status(400).json({ status: false, message: 'Invalid action specified' });
     }
 
     const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
     if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
-        return res.status(500).json({ status: false, message: `WebSocket connection not established for charger ID ${chargerId}` });
+        return res.json({ status: false, message: `WebSocket connection not established for charger ID ${chargerId}` });
     }
 
     const messageId = generateUniqueId(); // Generate a unique ID for the message

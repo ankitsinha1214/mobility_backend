@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const ChargerLocation = require('../models/chargerLocationModel');
 const { USER } = require("../message.json");
 const { generateToken } = require('../utils/jwtUtil');
+const ChargingSession = require('../models/chargerSessionModel.js');
 
 // Update user password
 const updatepassword = async (req, res) => {
@@ -657,6 +658,128 @@ const deleteUserVehicle = async (req, res) => {
     }
 };
 
+// GET History of session of user by phone number 
+const getHistory = async (req, res) => {
+    try {
+        const { phoneNumber } = req.params;
+
+        // Validate phoneNumber input
+        if (!phoneNumber) {
+            return res.json({
+                status: false,
+                message: 'Phone number is required',
+            });
+        }
+        // Find all sessions associated with the phoneNumber
+        const sessions = await ChargingSession.find({ userPhone: phoneNumber })
+            .sort({ startTime: -1 }) // Sort by most recent sessions
+            .select('-__v'); // Exclude the __v field if not needed
+
+        if (!sessions || sessions.length === 0) {
+            return res.json({
+                status: false,
+                message: 'No charging sessions found for this phone number',
+            });
+        }
+        console.log(sessions);
+        const chargerLocations = await Promise.all(
+            sessions.map(async (session) => {
+                return ChargerLocation.findOne({
+                    'chargerInfo.name': session.chargerId,
+                }).select('locationName locationType freepaid chargerInfo address');
+            })
+        );
+        // Filter out null results
+        const validLocations = chargerLocations.filter(location => location !== null);
+
+        if (validLocations.length === 0) {
+            return res.json({ status: false, message: 'Charger locations not found.' });
+        }
+
+        const results = validLocations.map((location, index) => {
+            const chargerInfo = location.chargerInfo.find(
+                charger => charger.name === sessions[index].chargerId
+            );
+
+            if (!chargerInfo) {
+                return null;
+            }
+
+            const session = sessions[index];
+            const durationInMs = session.endTime - session.startTime;
+            const durationInSeconds = Math.floor(durationInMs / 1000);
+            const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
+            const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
+            const formattedDuration = `${hours}:${minutes}:${seconds}`;
+
+            return {
+                locationName: location.locationName,
+                address: location.address,
+                createdAt: session.createdAt,
+                status: session.status,
+                chargerName: session.chargerId,
+                chargerType: chargerInfo.type,
+                powerOutput: chargerInfo.powerOutput,
+                chargeTime: formattedDuration,
+            };
+        });
+
+        // Remove null entries
+        const infoData = results.filter(result => result !== null);
+
+        if (infoData.length === 0) {
+            return res.json({
+                status: false,
+                message: 'Charger details not found in any location',
+            });
+        }
+
+        // Find the specific chargerInfo within the location
+        // const chargerInfo = chargerLocation.chargerInfo.find(charger => charger.name === sessions.chargerId);
+
+        // if (!chargerInfo) {
+        //     return res.json({ status: false, message: 'Charger details not found in the location' });
+        // }
+
+        // const durationInMs = sessions.endTime - sessions.startTime;
+        // const durationInSeconds = Math.floor(durationInMs / 1000);
+        // const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
+        // const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
+        // const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
+        // const formattedDuration = `${hours}:${minutes}:${seconds}`;
+
+        // if (sessions.length === 0) {
+        //     return res.json({
+        //         status: false,
+        //         message: 'No charging sessions found for this phone number',
+        //     });
+        // }
+        // const infoData = {
+        //     "locationName": chargerLocation.locationName,
+        //     "address": chargerLocation.address,
+        //     "createdAt" : sessions.createdAt,
+        //     "status" : sessions.status,
+        //     "chargerName": sessions.chargerId,
+        //     "chargerType": chargerInfo.type,
+        //     "powerOutput": chargerInfo.powerOutput,
+        //     "chargeTime": formattedDuration
+        // }
+
+        res.json({
+            status: true,
+            message: 'Charging session history retrieved successfully',
+            data: infoData,
+        });
+    } catch (error) {
+        console.error('Error fetching charging sessions:', error);
+        res.status(500).json({
+            status: false,
+            message: 'Internal server error',
+        });
+    }
+};
+
 // check weather user is registered or not
 const checkUserRegistration = async (req, res) => {
     const { phoneNumber } = req.params;
@@ -810,6 +933,7 @@ module.exports = {
     addUserVehicle,
     getUserVehicles,
     getUserVehicleById,
+    getHistory,
     updateUserVehicle,
     deleteUserVehicle,
     checkUserRegistration,
