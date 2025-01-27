@@ -84,6 +84,16 @@ exports.checkPaymentBySessionId = async (req, res) => {
     try {
         const { sessionId } = req.body;
         // Find the payment by sessionId
+        const sesID = sessionId.toString();
+        const activeSession = await ChargingSession.findOne({ _id : sesID, status: 'Started' });
+        // console.log(activeSession)
+        if(activeSession){
+            return res.json({
+                status: true,
+                message: 'Session is Active'
+            });
+        }
+
         const payment = await Payment.findOne({ sessionId });
 
         if (!payment) {
