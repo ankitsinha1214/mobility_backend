@@ -868,3 +868,8 @@
 2025-01-27T11:15:51.897Z [31merror[39m: [GET] /users/+916299459950/history - 500 [28ms]
 2025-01-27T11:15:57.651Z [31merror[39m: [GET] /users/+916299459950/history - 500 [26ms]
 2025-01-27T11:34:08.083Z [31merror[39m: [GET] /irj/portal - 404 [1ms]
+2025-01-27T13:18:13.494Z [31merror[39m: [GET] /favicon.ico - 404 [2ms]
+2025-01-27T13:18:47.571Z [31merror[39m: [GET] /geoserver/web/ - 404 [1ms]
+2025-01-27T13:27:37.958Z [31merror[39m: [GET] /favicon.ico - 404 [0ms]
+2025-01-27T13:27:38.485Z [31merror[39m: [GET] /sitemap.xml - 404 [0ms]
+2025-01-27T13:27:38.490Z [31merror[39m: [GET] /robots.txt - 404 [0ms]
