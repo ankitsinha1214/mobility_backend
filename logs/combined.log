@@ -15040,3 +15040,4 @@ HEAD
 2025-01-27T06:13:09.371Z [32minfo[39m: [GET] /users/+916299459950/vehicles - 200 [5ms]
 2025-01-27T06:13:28.914Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-27T06:13:26Z
 2025-01-27T06:24:28.379Z [32minfo[39m: [GET] / - 200 [0ms]
+2025-01-27T06:26:40.343Z [32minfo[39m: Application has started
