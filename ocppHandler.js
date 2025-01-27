@@ -92,6 +92,7 @@
 const logger = require('./logger');
 const { v4: uuidv4 } = require("uuid");
 const ChargingSession = require('./models/chargerSessionModel.js');
+const ChargerLocation = require('./models/chargerLocationModel');
 
 function handleOcppMessage(ws, message, chargerId) {
     const [messageType, messageId, action, payload] = message;
@@ -108,7 +109,7 @@ function handleOcppMessage(ws, message, chargerId) {
                 handleAuthorize(ws, messageId, payload);
                 break;
             case "StatusNotification":
-                handleStatus(ws, messageId, payload);
+                handleStatus(ws, messageId, payload, chargerId);
                 break;
             case "Reset":
                 handleReset(ws, messageId, payload);
@@ -265,7 +266,7 @@ async function handleMeterValues(ws, messageId, payload, chargerId) {
     ws.send(JSON.stringify(response));
 
     const session = await ChargingSession.findOne({ chargerId, "transactionId": String(transactionId) });
-    console.log('meter value session',session);
+    console.log('meter value session', session);
     // const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
     // const session = await ChargingSession.findOneAndUpdate(
     //     { chargerId, status: 'Started' },
@@ -319,9 +320,14 @@ function handleAuthorize(ws, messageId, payload) {
     // console.log("Sent StartTransaction response:", response);
 }
 
-function handleStatus(ws, messageId, payload) {
+async function handleStatus(ws, messageId, payload, chargerId) {
     console.log("Received StatusNotification:", payload);
+    const chargerLocation = await ChargerLocation.findOne({
+        'chargerInfo.name': chargerId
+    }).select('chargerInfo');
 
+    // Find the charger info corresponding to the chargerId in the session
+    const chargerInfo = chargerLocation.chargerInfo.find(charger => charger.name === chargerId);
     // Example payload structure for StatusNotification
     // {
     //   connectorId: 1,
@@ -331,6 +337,11 @@ function handleStatus(ws, messageId, payload) {
     // }
 
     const { connectorId, errorCode, status, timestamp } = payload;
+    chargerInfo.status = status;
+
+    // Save the updated chargerLocation back to the database
+    await chargerLocation.save();
+    console.log(`Charger status updated successfully for chargerId: ${chargerId}`);
     // if (status !== 'Preparing') {
     //   return;
     // }
@@ -360,7 +371,7 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
     const transactionId = payload?.transactionId;
     // const session = await ChargingSession.findOne({ transactionId, status: 'Started' });
 
-    const session = await ChargingSession.findOne({ chargerId , "transactionId": String(transactionId) });
+    const session = await ChargingSession.findOne({ chargerId, "transactionId": String(transactionId) });
     // const session = await ChargingSession.findOne({ chargerId, status: 'Started' });
 
     //  const session = await ChargingSession.findOneAndUpdate(
@@ -370,13 +381,13 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
     // );
     // Update session details
 
-    if(session){
+    if (session) {
         session.endTime = (payload?.timestamp);
         session.status = "Stopped";
         session.reason = payload?.reason;
         session.endMeterValue = payload?.meterStop;
     }
-    else{
+    else {
         console.log(`Session stop value not updated for charger ID ${chargerId}`);
     }
 
@@ -390,14 +401,14 @@ async function handleStopTransaction(ws, messageId, payload, chargerId) {
         // await session.save();
         // Save the session after 5 seconds
         // setTimeout(async () => {
-            try {
-                if(session){
+        try {
+            if (session) {
                 await session.save();
                 console.log(`Session saved successfully for session ID: ${session._id}`);
-                }
-            } catch (error) {
-                console.error('Failed to save session after 5 seconds:', error);
             }
+        } catch (error) {
+            console.error('Failed to save session after 5 seconds:', error);
+        }
         // }, 5000); // 5 seconds delay
 
         console.log("Sent StopTransaction response:", response);

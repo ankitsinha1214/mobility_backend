@@ -184,6 +184,28 @@ const startStopChargingSession = async (req, res) => {
     const messageId = generateUniqueId(); // Generate a unique ID for the message
 
     try {
+         // Fetch the current charger status
+         const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': chargerId }).select('chargerInfo');
+         const chargerInfo = chargerLocation?.chargerInfo.find(charger => charger.name === chargerId);
+ 
+         if (!chargerInfo) {
+             return res.json({ status: false, message: 'Charger not found.' });
+         }
+          // Check if the status is valid for the action
+        if (action === 'start' && chargerInfo.status !== 'Preparing') {
+            return res.json({
+                status: false,
+                message: `Cannot start charging. Charger status is ${chargerInfo.status}, but it must be 'Preparing'.`,
+            });
+        }
+
+        if (action === 'stop' && chargerInfo.status !== 'Charging') {
+            return res.json({
+                status: false,
+                message: `Cannot stop charging. Charger status is ${chargerInfo.status}, but it must be 'Charging'.`,
+            });
+        }
+        
         const activeSession = await ChargingSession.findOne({ chargerId, status: 'Started' });
 
         // Validate start/stop actions

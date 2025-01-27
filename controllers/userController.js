@@ -732,13 +732,14 @@ const getHistory = async (req, res) => {
                 const formattedDuration = `${hours}:${minutes}:${seconds}`;
 
                 // Fetch payment details for the session
-                const payment = await Payment.findOne({ sessionId: session._id }).select('method amount status');
+                const payment = await Payment.findOne({ sessionId: session._id }).select('method amount status id');
                 return {
                     locationName: location.locationName,
                     address: location.address,
                     createdAt: session.createdAt,
                     status: session.status,
                     chargerName: session.chargerId,
+                    transactionId: payment.id,
                     EnergyConsumed: meterValueDifference,
                     chargerType: chargerInfo.type,
                     powerOutput: chargerInfo.powerOutput,
