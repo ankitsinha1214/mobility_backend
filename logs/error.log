@@ -852,3 +852,6 @@
 2025-01-27T07:21:19.179Z [31merror[39m: [DELETE] /charger-locations/delete-charger - 500 [8ms]
 2025-01-27T07:21:52.201Z [31merror[39m: [POST] /charger-locations/add-charger - 500 [10ms]
 2025-01-27T07:23:53.388Z [31merror[39m: [DELETE] /charger-locations/delete-charger - 500 [13ms]
+2025-01-27T09:44:36.035Z [31merror[39m: [POST] /session/reset - 500 [2ms]
+2025-01-27T09:58:59.620Z [31merror[39m: [PUT] /charger-locations/32ed2319730b6de120ed3a1a - 500 [10ms]
+2025-01-27T09:59:12.926Z [31merror[39m: [PUT] /charger-locations/32ed2319730b6de120ed3a1a - 500 [5ms]
