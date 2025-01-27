@@ -841,3 +841,6 @@
 2025-01-26T15:35:31.240Z [31merror[39m: [POST] /sdk - 404 [1ms]
 2025-01-26T15:35:31.969Z [31merror[39m: [GET] /HNAP1 - 404 [0ms]
 2025-01-26T15:35:31.972Z [31merror[39m: [GET] /evox/about - 404 [0ms]
+2025-01-26T22:44:36.097Z [31merror[39m: [GET] /favicon.ico - 404 [3ms]
+2025-01-27T03:03:19.362Z [31merror[39m: [GET] /download/powershell/ - 404 [3ms]
+2025-01-27T03:03:19.622Z [31merror[39m: [GET] /get.php - 404 [1ms]
