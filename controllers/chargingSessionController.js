@@ -3,6 +3,7 @@ const { getClient } = require('../ocppConnect.js');
 const ChargingSession = require('../models/chargerSessionModel.js');
 const ChargerLocation = require('../models/chargerLocationModel');
 const moment = require('moment-timezone');
+const User = require('../models/userModel');
 
 // Helper function to calculate energy consumed
 const calculateEnergyConsumed = (startMeterValue, endMeterValue) => {
@@ -178,50 +179,73 @@ const startStopChargingSession = async (req, res) => {
 
     const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
     if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
-        return res.json({ status: false, message: `WebSocket connection not established for charger ID ${chargerId}` });
+        return res.json({ status: false, message: `WebSocket not established for charger ID ${chargerId}` });
     }
 
     const messageId = generateUniqueId(); // Generate a unique ID for the message
 
     try {
-         // Fetch the current charger status
-         const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': chargerId }).select('chargerInfo');
-         const chargerInfo = chargerLocation?.chargerInfo.find(charger => charger.name === chargerId);
- 
-         if (!chargerInfo) {
-             return res.json({ status: false, message: 'Charger not found.' });
-         }
-          // Check if the status is valid for the action
+        // Fetch the current charger status
+        const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': chargerId }).select('chargerInfo');
+        const chargerInfo = chargerLocation?.chargerInfo.find(charger => charger.name === chargerId);
+
+        if (!chargerInfo) {
+            return res.json({ status: false, message: 'Charger not found.' });
+        }
+        // Check if the status is valid for the action
         if (action === 'start' && chargerInfo.status !== 'Preparing') {
             return res.json({
                 status: false,
-                message: `Cannot start charging. Charger status is ${chargerInfo.status}, but it must be 'Preparing'.`,
+                message: `Cannot start, charger not in Preparing`,
+                // message: `Cannot start charging. Charger status is ${chargerInfo.status}, but it must be 'Preparing'.`,
             });
         }
 
         if (action === 'stop' && chargerInfo.status !== 'Charging') {
             return res.json({
                 status: false,
-                message: `Cannot stop charging. Charger status is ${chargerInfo.status}, but it must be 'Charging'.`,
+                message: 'Cannot stop, charger not Charging',
+                // message: `Cannot stop charging. Charger status is ${chargerInfo.status}, but it must be 'Charging'.`,
             });
         }
-        
+
         const activeSession = await ChargingSession.findOne({ chargerId, status: 'Started' });
 
         // Validate start/stop actions
         if (action === 'start' && activeSession) {
             return res.json({
                 status: false,
-                message: 'A previous transaction is still in progress. Please wait for it to complete before starting a new one.',
+                message: 'Previous transaction still in progress',
+                // message: 'A previous transaction is still in progress. Please wait for it to complete before starting a new one.',
             });
         }
         if (action === 'stop' && !activeSession) {
             return res.json({
                 status: false,
-                message: 'No Active Session Found to stop the Charger.',
+                message: 'No Active Session to stop.',
             });
         }
         if (action === 'start') {
+            // **User Validation**
+            const user = await User.findOne({ phoneNumber: payload?.idTag, status: 'active' });
+            if (!user) {
+                return res.json({
+                    status: false,
+                    message: 'User not found or not active'
+                });
+            }
+
+            // **Check for Active Session for User**
+            const activeUserSession = await ChargingSession.findOne({
+                userPhone: payload?.idTag,
+                status: 'Started'
+            });
+            if (activeUserSession) {
+                return res.json({
+                    status: false,
+                    message: 'Previous transaction still in progress for this User.'
+                });
+            }
             // Send WebSocket message
             const ocppMessage = [
                 2, // MessageTypeId for Call
@@ -244,13 +268,13 @@ const startStopChargingSession = async (req, res) => {
             if (!sessionDetails) {
                 return res.json({
                     status: false,
-                    message: 'No active charging session found for the given transaction.',
+                    message: 'No active session found',
                 });
             }
             if (!sessionDetails?.transactionId) {
                 return res.json({
                     status: false,
-                    message: 'TransactionId is not properly assigned. Please Contact your Provider.',
+                    message: 'Invalid TransactionId',
                 });
             }
             const ocppMessage1 = [
