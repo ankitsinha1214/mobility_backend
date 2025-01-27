@@ -11,10 +11,10 @@ const chargingSessionSchema = new Schema({
         type: String,
         required: true
     },
-    // vehicleId: {
-    //     type: Schema.Types.ObjectId,
-    //     required: true
-    // },
+    vehicleId: {
+        type: Schema.Types.ObjectId,
+        required: true
+    },
     transactionId: {
         type: String,
         required: true,

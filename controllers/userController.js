@@ -682,7 +682,7 @@ const getHistory = async (req, res) => {
                 message: 'No charging sessions found for this phone number',
             });
         }
-        console.log(sessions);
+        // console.log(sessions);
         const chargerLocations = await Promise.all(
             sessions.map(async (session) => {
                 return ChargerLocation.findOne({
@@ -733,17 +733,33 @@ const getHistory = async (req, res) => {
 
                 // Fetch payment details for the session
                 const payment = await Payment.findOne({ sessionId: session._id }).select('method amount status id');
+                const user = await User.findOne({ phoneNumber, status: 'active' }).populate('user_vehicle');
+
+                if (!user) {
+                    return res.json({
+                        status: false,
+                        message: 'User not found or not active'
+                    });
+                }
+                // Validate Vehicle
+                // console.log(user);
+                const userVehicle = user.user_vehicle?.find(vehicle => vehicle._id.toString() === session?.vehicleId.toString());
+                // console.log('user vehicle', userVehicle);
+                // if (!userVehicle) {
+                //     return res.json({ status: false, message: 'Vehicle not associated with the user' });
+                // }
                 return {
                     locationName: location.locationName,
                     address: location.address,
                     createdAt: session.createdAt,
                     status: session.status,
                     chargerName: session.chargerId,
-                    transactionId: payment.id,
+                    transactionId: payment?.id,
                     EnergyConsumed: meterValueDifference,
                     chargerType: chargerInfo.type,
                     powerOutput: chargerInfo.powerOutput,
                     chargeTime: formattedDuration,
+                    vehicle: `${userVehicle?.make} ${userVehicle?.model} ${userVehicle?.variant}` || 'N/A',
                     paymentMethod: payment?.method || 'N/A',
                     paymentAmount: payment?.amount ? `₹ ${(payment.amount / 100).toFixed(2)} /-` : 'N/A',
                     paymentStatus: payment?.status || 'N/A',

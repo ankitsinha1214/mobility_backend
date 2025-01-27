@@ -165,7 +165,7 @@ const calculateEnergyConsumed = (startMeterValue, endMeterValue) => {
 // };
 
 const startStopChargingSession = async (req, res) => {
-    const { action, chargerId, payload } = req.body;
+    const { action, chargerId, payload, vehicleId } = req.body;
     // console.log(req.phoneNumber === payload.idTag);
     // console.log((req.phoneNumber && req.phoneNumber !== payload.idTag));
     // if ((req.phoneNumber && req.phoneNumber !== payload.idTag) || (req.user && req.user !== 'Admin' && req.user !== 'Manager')) {
@@ -234,6 +234,11 @@ const startStopChargingSession = async (req, res) => {
                     message: 'User not found or not active'
                 });
             }
+             // Validate Vehicle
+             const userVehicle = user.user_vehicle?.find(vehicle => vehicle._id.toString() === vehicleId);
+             if (!userVehicle) {
+                 return res.json({ status: false, message: 'Vehicle not associated with the user' });
+             }
 
             // **Check for Active Session for User**
             const activeUserSession = await ChargingSession.findOne({
@@ -300,6 +305,7 @@ const startStopChargingSession = async (req, res) => {
                 // Save the new charging session to the database
                 const sessionData = {
                     chargerId,
+                    vehicleId,
                     userPhone: payload?.idTag,
                     transactionId: Math.floor(10000000 + Math.random() * 90000000), // Random transaction ID
                     startMeterValue: payload?.startMeterValue || 0,
