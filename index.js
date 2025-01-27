@@ -6,17 +6,29 @@ const bodyParser = require('body-parser');
 const { DATABASE } = require('./message.json'); // Adjust path as needed
 const logger = require('./logger');
 const logRequest = require('./middleware/loggerMiddleware');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 // const { WebSocketServer } = require('ws');
 // const WebSocket = require('ws');
 // const { v4: uuidv4 } = require("uuid");
 const app = express();
 const port = process.env.PORT || 8080;
 
+// Rate Limiter (Prevents brute-force attacks)
+const apiLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 15 minutes
+  // windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Limit each IP to 100 requests per windowMs
+  message: { status: false, msg: 'Too many requests, please try again later.' },
+});
+
 // const allClients = new Map();
 
 // Middleware
 app.use(cors());
+app.use(helmet());
 app.use(express.json());
+app.use(apiLimiter);
 app.use(bodyParser.json());
 app.use(logRequest);
 
