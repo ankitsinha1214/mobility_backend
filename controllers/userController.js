@@ -6,6 +6,7 @@ const ChargerLocation = require('../models/chargerLocationModel');
 const { USER } = require("../message.json");
 const { generateToken } = require('../utils/jwtUtil');
 const ChargingSession = require('../models/chargerSessionModel.js');
+const Payment = require('../models/paymentModel');
 
 // Update user password
 const updatepassword = async (req, res) => {
@@ -696,34 +697,58 @@ const getHistory = async (req, res) => {
             return res.json({ status: false, message: 'Charger locations not found.' });
         }
 
-        const results = validLocations.map((location, index) => {
-            const chargerInfo = location.chargerInfo.find(
-                charger => charger.name === sessions[index].chargerId
-            );
+        const results = await Promise.all(
+            validLocations.map(async (location, index) => {
+                const chargerInfo = location.chargerInfo.find(
+                    charger => charger.name === sessions[index].chargerId
+                );
 
-            if (!chargerInfo) {
-                return null;
-            }
+                if (!chargerInfo) {
+                    return null;
+                }
 
-            const session = sessions[index];
-            const durationInMs = session.endTime - session.startTime;
-            const durationInSeconds = Math.floor(durationInMs / 1000);
-            const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
-            const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
-            const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
-            const formattedDuration = `${hours}:${minutes}:${seconds}`;
+                const session = sessions[index];
+                const metadata = session.metadata || [];
+                // Get the 0th index and the highest index
+                const firstEntry = metadata[0]?.values;
+                const lastEntry = metadata[metadata.length - 1]?.values;
+                // Extract meter values and units
+                const firstMeterValueParts = firstEntry['Energy.Active.Import.Register']?.split(' ') || [];
 
-            return {
-                locationName: location.locationName,
-                address: location.address,
-                createdAt: session.createdAt,
-                status: session.status,
-                chargerName: session.chargerId,
-                chargerType: chargerInfo.type,
-                powerOutput: chargerInfo.powerOutput,
-                chargeTime: formattedDuration,
-            };
-        });
+                // Extract meter values
+                const firstMeterValue = parseFloat(firstEntry['Energy.Active.Import.Register']?.split(' ')[0] || 0);
+                const lastMeterValue = parseFloat(lastEntry['Energy.Active.Import.Register']?.split(' ')[0] || 0);
+
+                // Extract the unit (assuming both entries have the same unit)
+                const unit = firstMeterValueParts[1] || 'Wh';
+                // Calculate the difference
+                const meterValueDifference = `${(lastMeterValue - firstMeterValue).toFixed(4)} ${unit}`;
+
+                const durationInMs = session.endTime - session.startTime;
+                const durationInSeconds = Math.floor(durationInMs / 1000);
+                const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
+                const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
+                const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
+                const formattedDuration = `${hours}:${minutes}:${seconds}`;
+
+                // Fetch payment details for the session
+                const payment = await Payment.findOne({ sessionId: session._id }).select('method amount status');
+                return {
+                    locationName: location.locationName,
+                    address: location.address,
+                    createdAt: session.createdAt,
+                    status: session.status,
+                    chargerName: session.chargerId,
+                    EnergyConsumed: meterValueDifference,
+                    chargerType: chargerInfo.type,
+                    powerOutput: chargerInfo.powerOutput,
+                    chargeTime: formattedDuration,
+                    paymentMethod: payment?.method || 'N/A',
+                    paymentAmount: payment?.amount ? `₹ ${(payment.amount / 100).toFixed(2)} /-` : 'N/A',
+                    paymentStatus: payment?.status || 'N/A',
+                };
+            })
+        );
 
         // Remove null entries
         const infoData = results.filter(result => result !== null);
@@ -734,37 +759,6 @@ const getHistory = async (req, res) => {
                 message: 'Charger details not found in any location',
             });
         }
-
-        // Find the specific chargerInfo within the location
-        // const chargerInfo = chargerLocation.chargerInfo.find(charger => charger.name === sessions.chargerId);
-
-        // if (!chargerInfo) {
-        //     return res.json({ status: false, message: 'Charger details not found in the location' });
-        // }
-
-        // const durationInMs = sessions.endTime - sessions.startTime;
-        // const durationInSeconds = Math.floor(durationInMs / 1000);
-        // const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
-        // const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
-        // const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
-        // const formattedDuration = `${hours}:${minutes}:${seconds}`;
-
-        // if (sessions.length === 0) {
-        //     return res.json({
-        //         status: false,
-        //         message: 'No charging sessions found for this phone number',
-        //     });
-        // }
-        // const infoData = {
-        //     "locationName": chargerLocation.locationName,
-        //     "address": chargerLocation.address,
-        //     "createdAt" : sessions.createdAt,
-        //     "status" : sessions.status,
-        //     "chargerName": sessions.chargerId,
-        //     "chargerType": chargerInfo.type,
-        //     "powerOutput": chargerInfo.powerOutput,
-        //     "chargeTime": formattedDuration
-        // }
 
         res.json({
             status: true,
