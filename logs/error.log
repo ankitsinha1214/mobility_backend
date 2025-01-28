@@ -904,3 +904,8 @@
 2025-01-28T09:50:03.346Z [31merror[39m: [POST] /charger-locations/get-charger-info-by-name - 401 [10ms]
 2025-01-28T10:01:20.264Z [31merror[39m: [GET] /users/+916299459950/vehicles - 401 [4ms]
 2025-01-28T10:01:22.918Z [31merror[39m: [POST] /charger-locations/location/range - 401 [1ms]
+2025-01-28T11:42:36.936Z [31merror[39m: [POST] /payment - 500 [9ms]
+2025-01-28T11:45:40.312Z [31merror[39m: [POST] /reviews/ - 500 [10ms]
+2025-01-28T11:47:10.646Z [31merror[39m: [POST] /reviews/ - 500 [10ms]
+2025-01-28T11:47:38.068Z [31merror[39m: [POST] /reviews/ - 500 [10ms]
+2025-01-28T11:52:40.920Z [31merror[39m: [POST] /reviews/ - 500 [9ms]
