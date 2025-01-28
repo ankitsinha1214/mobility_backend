@@ -780,7 +780,6 @@ const getChargerSessionsDetails = async (req, res) => {
             message: 'Charger info retrieved successfully',
             data: {
                 location: {
-                    locationId: chargerLocation._id,
                     locationName: chargerLocation.locationName,
                     locationType: chargerLocation.locationType,
                     // state: chargerLocation.state,
