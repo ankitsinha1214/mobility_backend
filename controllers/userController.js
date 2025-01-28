@@ -275,6 +275,30 @@ const getPaginatedUser = async (req, res) => {
         };
         const totalActiveCount = await User.countDocuments(activeFilterCondition);
 
+         // Count users by vehicle type
+         const vehicleCounts = await User.aggregate([
+            { $match: filterCondition }, // Apply the filter condition
+            { $unwind: "$user_vehicle" }, // Unwind the user_vehicle array
+            {
+                $group: {
+                    _id: "$user_vehicle.type", // Group by the 'type' field in user_vehicle
+                    count: { $sum: 1 },
+                },
+            },
+        ]);
+        console.log(vehicleCounts);
+
+        // Format the vehicle counts for response
+const vehicleTypeCounts = {
+    "2-Wheeler": 0,
+    "3-Wheeler": 0,
+    "4-Wheeler": 0,
+};
+
+// Populate the counts dynamically
+vehicleCounts.forEach(vehicle => {
+    vehicleTypeCounts[vehicle._id] = vehicle.count || 0;
+});
         // Return paginated results along with total count for frontend table management
         return res.json({
             success: true,
@@ -285,6 +309,7 @@ const getPaginatedUser = async (req, res) => {
                 currentPage: page,
                 totalPages: Math.ceil(totalCount / limit),
             },
+            vehicleCounts: vehicleTypeCounts,
         });
     } catch (error) {
         console.error('Error fetching users:', error);
