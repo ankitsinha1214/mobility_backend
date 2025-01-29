@@ -17,9 +17,10 @@ const createChargerLocation = async (req, res) => {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
-        const { direction, freepaid, salesManager, dealer, facilities, chargerInfo } = req.body;
+        const { direction, freepaid, parkingCost, salesManager, dealer, facilities, chargerInfo } = req.body;
         const parsedDirection = JSON.parse(direction);
         const parsedFreepaid = JSON.parse(freepaid);
+        const parsedparkingCost = JSON.parse(parkingCost);
         const parsedSalesManager = JSON.parse(salesManager);
         const parsedDealer = JSON.parse(dealer);
         const parsedFacilities = JSON.parse(facilities);
@@ -60,7 +61,7 @@ const createChargerLocation = async (req, res) => {
         // const chargerLocation = new ChargerLocation({...req.body, locationImage : awsImgKey});
         const chargerLocation = new ChargerLocation({
             ...req.body, locationImage: imageKeys, direction: parsedDirection,
-            freepaid: parsedFreepaid, salesManager: parsedSalesManager, dealer: parsedDealer, facilities: parsedFacilities, chargerInfo: parsedChargerInfo
+            freepaid: parsedFreepaid, parkingCost: parsedparkingCost, salesManager: parsedSalesManager, dealer: parsedDealer, facilities: parsedFacilities, chargerInfo: parsedChargerInfo
         });
         // const chargerLocation = new ChargerLocation(req.body);
         await chargerLocation.save();
