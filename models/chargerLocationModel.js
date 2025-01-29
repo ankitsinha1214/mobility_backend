@@ -144,6 +144,16 @@ const chargerLocationSchema = new Schema({
         type: freepaidSchema,
         required: true,
     },
+    parkingCost: {
+        amount: {
+            type: Number, // Amount of the cost
+            // required: true
+        },
+        currency: {
+            type: String, // Currency code (e.g., USD, EUR)
+            // required: true
+        }
+    },
     salesManager: {
         type: contactSchema,
         required: true,
