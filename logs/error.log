@@ -917,3 +917,6 @@
 2025-01-29T03:13:10.314Z [31merror[39m: [GET] /get.php - 404 [0ms]
 2025-01-29T03:23:55.546Z [31merror[39m: [GET] /favicon.ico - 404 [0ms]
 2025-01-29T03:24:35.310Z [31merror[39m: [GET] /geoserver/web/ - 404 [1ms]
+2025-01-29T11:44:29.251Z [31merror[39m: [GET] /charger-locations - 401 [1ms]
+2025-01-29T11:44:56.312Z [31merror[39m: [GET] /charger-locations - 401 [0ms]
+2025-01-29T12:03:26.224Z [31merror[39m: [GET] /charger-locations - 401 [0ms]
