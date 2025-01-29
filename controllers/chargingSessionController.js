@@ -472,6 +472,7 @@ const getSessionData = async (req, res) => {
         // const meterValueDifference = lastMeterValue - firstMeterValue;
         // Response
         const status = session?.status;
+        const reason = session?.reason;
         // const startTime = session?.startTime;
         // Format startTime as per timezone
         const startTimeIST = moment(session?.startTime).tz(timezone).format('YYYY-MM-DD HH:mm:ss');
@@ -484,6 +485,7 @@ const getSessionData = async (req, res) => {
                 meterValueDifference,
                 costPerUnit,
                 status,
+                reason,
                 startTimeIST
             },
         });
