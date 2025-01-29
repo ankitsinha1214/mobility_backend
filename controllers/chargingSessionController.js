@@ -543,7 +543,7 @@ const getSessionReceipt = async (req, res) => {
         const totalEnergyCost = energyConsumed * costPerUnit;
 
         // Dummy values for now
-        const parkingTariff = chargerLocation.freepaid.parking ? 'FREE' : 'PAID';
+        const parkingTariff = chargerLocation.freepaid.parking ? 'FREE' : chargerLocation.parkingCost.currency + ' ' + chargerLocation.parkingCost.amount;
         const platformFee = "FREE";
         // var convenienceFee = "FREE";
         let convenienceFee = "FREE";
