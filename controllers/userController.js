@@ -843,6 +843,7 @@ const checkUserRegistration = async (req, res) => {
                 message: "User is registered",
                 token: token,
                 sessionId: session ? session._id : null,
+                startTime: session ? session.startTime : null,
                 status: session ? session.status : "No active session"
             });
 
