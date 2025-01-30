@@ -190,7 +190,13 @@ const addUser = async (req, res) => {
         console.log(userId);
         const { token } = generateToken(userId);
 
-        return res.json({ success: true, data: userDataToSend, message: USER.USER_CREATED, token: token });
+        return res.json({ success: true, data: userDataToSend, message: USER.USER_CREATED, 
+            token: token,
+            sessionId: null,
+            startTime: null,
+            chargerId: null,
+            status: "No active session"
+         });
     } catch (error) {
         console.error('Error:', error);
         if (error.keyValue) {
