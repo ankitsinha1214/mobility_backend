@@ -60,6 +60,7 @@
 
 const { WebSocketServer } = require('ws');
 const { handleOcppMessage } = require('./ocppHandler');
+const ChargerLocation = require('./models/chargerLocationModel');
 
 // Store all active WebSocket connections in a Map
 const clients = new Map(); // Key: chargerId, Value: WebSocket instance
@@ -69,7 +70,7 @@ const wss = new WebSocketServer({ noServer: true }); // Use noServer to manually
 // HTTP server to listen for WebSocket upgrade requests
 const server = require('http').createServer();
 
-server.on('upgrade', (request, socket, head) => {
+server.on('upgrade', async (request, socket, head) => {
     const urlParts = request.url.split('/'); // Split the URL path
     const chargerId = urlParts[urlParts.length - 1]; // Extract the charger ID (last part of the URL)
 
@@ -78,11 +79,63 @@ server.on('upgrade', (request, socket, head) => {
         socket.destroy(); // Reject the connection if the charger ID is missing
         return;
     }
+    try {
+        // Fetch charger location details based on chargerId
+        const chargerLocation = await ChargerLocation.findOne({ "chargerInfo.name": chargerId });
+        if (!chargerLocation) {
+            console.warn(`Location is not registered for Charger ID ${chargerId}. Informing client.`);
 
-    wss.handleUpgrade(request, socket, head, (ws) => {
-        ws.chargerId = chargerId; // Attach the charger ID to the WebSocket object
-        wss.emit('connection', ws, request);
-    });
+            // Create a WebSocket connection to send the message
+            wss.handleUpgrade(request, socket, head, (ws) => {
+                const errorMessage = [
+                    4, // MessageTypeId for CallError
+                    "1221", // Message ID
+                    "NotImplemented", // OCPP error code (e.g., NotImplemented, InternalError, ProtocolError, etc.)
+                    `Charger ID ${chargerId} is not registered.`, // Human-readable description
+                    "Please register your charger in CMS before connecting." // Additional error details (optional)
+                ];
+                ws.send(JSON.stringify(errorMessage));
+                // ws.send(JSON.stringify({
+                //     error: true,
+                //     message: "Charger location not found.",
+                //     details: `Charger ID ${chargerId} is not registered.`,
+                //     solution: "Please register your charger in CMS before connecting."
+                // }));
+                ws.close(); // Close the connection after sending the message
+            });
+            return;
+        }
+
+        // Find the charger info corresponding to the chargerId in the session
+        const chargerInfo = chargerLocation.chargerInfo.find(charger => charger.name === chargerId);
+        if (!chargerInfo) {
+            console.warn(`Charger ID ${chargerId} is not registered. Informing client.`);
+
+            // Create a WebSocket connection to send the message
+            wss.handleUpgrade(request, socket, head, (ws) => {
+                const errorMessage = [
+                    4, // MessageTypeId for CallError
+                    "1331", // Message ID
+                    "NotImplemented", // OCPP error code (e.g., NotImplemented, InternalError, ProtocolError, etc.)
+                    `Charger ID ${chargerId} is not available in the registered location.`, // Human-readable description
+                    "Please verify the charger ID or register it in CMS." // Additional error details (optional)
+                ];
+                ws.send(JSON.stringify(errorMessage));
+                ws.close(); // Close the connection after sending the message
+            });
+            return;
+        }
+        // Check if charger exists in the database
+        // const chargerExists = await ChargerLocation.exists({ chargerId });
+
+        wss.handleUpgrade(request, socket, head, (ws) => {
+            ws.chargerId = chargerId; // Attach the charger ID to the WebSocket object
+            wss.emit('connection', ws, request);
+        });
+    } catch (error) {
+        console.error('Database error while checking charger existence:', error);
+        socket.destroy();
+    }
 });
 
 wss.on("connection", (ws) => {

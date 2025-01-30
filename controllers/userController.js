@@ -844,6 +844,7 @@ const checkUserRegistration = async (req, res) => {
                 token: token,
                 sessionId: session ? session._id : null,
                 startTime: session ? session.startTime : null,
+                chargerId: session ? session.chargerId : null,
                 status: session ? session.status : "No active session"
             });
 
