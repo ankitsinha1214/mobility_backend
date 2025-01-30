@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 const User = require('../models/userModel');
+const SandmUser = require('../models/userSandmModel');
 
 const fetchUser = async(req, res, next) => {
     // Get the token from the authorization header
@@ -22,6 +23,15 @@ const fetchUser = async(req, res, next) => {
             if (!user) {
                 return res.status(401).json({ success: false, message: "User not found or Inactive." });
             }
+        }
+        if (data.role) {
+            // Optional: Verify if the user exists in the database (based on the ID)
+            const userId = data._id;
+            const userSandm = await SandmUser.findOne({ _id: userId });
+            if (!userSandm) {
+                return res.status(401).json({ success: false, message: "User not found or Inactive." });
+            }
+            console.log(userSandm);
         }
         // console.log(req);
         next();

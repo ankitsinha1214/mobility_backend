@@ -275,8 +275,8 @@ const getPaginatedUser = async (req, res) => {
         };
         const totalActiveCount = await User.countDocuments(activeFilterCondition);
 
-         // Count users by vehicle type
-         const vehicleCounts = await User.aggregate([
+        // Count users by vehicle type
+        const vehicleCounts = await User.aggregate([
             { $match: filterCondition }, // Apply the filter condition
             { $unwind: "$user_vehicle" }, // Unwind the user_vehicle array
             {
@@ -289,16 +289,16 @@ const getPaginatedUser = async (req, res) => {
         console.log(vehicleCounts);
 
         // Format the vehicle counts for response
-const vehicleTypeCounts = {
-    "2-Wheeler": 0,
-    "3-Wheeler": 0,
-    "4-Wheeler": 0,
-};
+        const vehicleTypeCounts = {
+            "2-Wheeler": 0,
+            "3-Wheeler": 0,
+            "4-Wheeler": 0,
+        };
 
-// Populate the counts dynamically
-vehicleCounts.forEach(vehicle => {
-    vehicleTypeCounts[vehicle._id] = vehicle.count || 0;
-});
+        // Populate the counts dynamically
+        vehicleCounts.forEach(vehicle => {
+            vehicleTypeCounts[vehicle._id] = vehicle.count || 0;
+        });
         // Return paginated results along with total count for frontend table management
         return res.json({
             success: true,
@@ -829,9 +829,23 @@ const checkUserRegistration = async (req, res) => {
                 // _id : user._id.toString(),
                 phoneNumber: user.phoneNumber
             };
-            console.log(userId);
+            // console.log(userId);
             const { token } = generateToken(userId);
-            return res.json({ success: true, data: user, message: "User is registered", token: token });
+
+            // Find the most recent charging session for this user (latest createdAt)
+            const session = await ChargingSession.findOne({ userPhone: phoneNumber })
+                .sort({ createdAt: -1 }) // Sort descending (latest first)
+                .limit(1); // Get only the most recent session
+
+            return res.json({
+                success: true,
+                data: user,
+                message: "User is registered",
+                token: token,
+                sessionId: session ? session._id : null,
+                status: session ? session.status : "No active session"
+            });
+
         } else {
             return res.json({ success: false, message: "User is not registered" });
         }
