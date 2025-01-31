@@ -614,8 +614,46 @@ const getSessionReceipt = async (req, res) => {
     }
 }
 
+const getAllSessions = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+        const sessions = await ChargingSession.find();
+        if (sessions.length === 0) {
+            return res.json({ success: false, message: 'No Session Found.' });
+        }
+          // Map through sessions and fetch location info based on chargerId
+          const enrichedSessions = await Promise.all(sessions.map(async (session) => {
+            const chargerLocation = await ChargerLocation.findOne({
+                'chargerInfo.name': session.chargerId  // Match chargerId within chargerInfo array
+            }).select('locationName address city state status');
+                // direction 
+             // Calculate Charging Duration using metadata timestamps
+             const metadata = session.metadata || [];
+             const startTime = metadata[0]?.timestamp || session.startTime;
+             const endTime = metadata[metadata.length - 1]?.timestamp || session.endTime;
+             const durationInMs = new Date(endTime) - new Date(startTime);
+             const durationInSeconds = Math.floor(durationInMs / 1000);
+             const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
+             const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
+             const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
+             const chargingDuration = `${hours}:${minutes}:${seconds}`;
+            return {
+                ...session.toObject(),
+                chargerLocation: chargerLocation || null,  // Attach location info, or null if not found
+                duration: chargingDuration || null,  // Attach location info, or null if not found
+            };
+        }));
+        return res.json({ success: true, data: enrichedSessions, message: 'All Sessions Retrieved Successfully!!!' });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Failed to retrieve locations', error: error.message });
+    }
+};
+
 const generateUniqueId = () => {
     return 'uuid-' + Math.random().toString(36).substring(2, 15); // Example UUID generator
 };
 
-module.exports = { startStopChargingSession, resetChargingSession, getSessionData, getSessionReceipt };
+module.exports = { startStopChargingSession, resetChargingSession, getSessionData, getSessionReceipt, getAllSessions };
