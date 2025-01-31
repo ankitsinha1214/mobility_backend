@@ -18740,3 +18740,247 @@ HEAD
 2025-01-31T07:03:13.821Z [32minfo[39m: [GET] /api/charger-locations - 304 [24ms]
 2025-01-31T07:03:13.851Z [32minfo[39m: [GET] /api/charger-locations/location-type-count - 200 [8ms]
 2025-01-31T07:03:14.724Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [8ms]
+2025-01-31T07:06:18.846Z [32minfo[39m: Application has started
+2025-01-31T07:06:27.151Z [32minfo[39m: [GET] /api/charger-locations - 200 [45ms]
+2025-01-31T07:06:27.157Z [32minfo[39m: [GET] /api/charger-locations/location-type-count - 304 [40ms]
+2025-01-31T07:06:31.061Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [14ms]
+2025-01-31T07:10:44.122Z [32minfo[39m: [GET] /api/users/+916299459950/vehicles - 200 [9ms]
+2025-01-31T07:10:44.538Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [5ms]
+2025-01-31T07:10:44.558Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [14ms]
+2025-01-31T07:10:44.985Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [25ms]
+2025-01-31T07:11:59.754Z [32minfo[39m: [GET] /api/vehicle/all - 304 [53ms]
+2025-01-31T07:11:59.757Z [32minfo[39m: [GET] /api/location/structured/all - 304 [50ms]
+2025-01-31T07:11:59.771Z [32minfo[39m: [GET] /api/users/get/pagination?page=1&limit=10&search=&sortField=&sortOrder=asc - 304 [67ms]
+2025-01-31T07:12:03.675Z [32minfo[39m: [GET] /api/site-surveys - 304 [24ms]
+2025-01-31T07:12:05.950Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T07:12:04Z
+2025-01-31T07:12:06.876Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T07:12:05Z
+2025-01-31T07:12:09.787Z [32minfo[39m: [GET] /api/pre-installations - 304 [16ms]
+2025-01-31T07:12:14.288Z [32minfo[39m: [GET] /api/user-service-and-maintenance - 200 [10ms]
+2025-01-31T07:12:14.293Z [32minfo[39m: [GET] /api/notification-service-and-maintenance - 304 [14ms]
+2025-01-31T07:12:27.325Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [24ms]
+2025-01-31T07:13:18.332Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [11ms]
+2025-01-31T07:13:18.548Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T07:13:17Z
+2025-01-31T07:13:32.246Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [24ms]
+2025-01-31T07:13:38.372Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [21ms]
+2025-01-31T07:14:07.754Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [10ms]
+2025-01-31T07:14:09.831Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [9ms]
+2025-01-31T07:14:19.702Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T07:14:18Z
+2025-01-31T07:14:27.570Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [11ms]
+2025-01-31T07:14:28.250Z [32minfo[39m: [GET] /api/users/+916299459950/vehicles - 200 [7ms]
+2025-01-31T07:14:34.121Z [32minfo[39m: [POST] /api/charger-locations/get-charger-info-by-name - 200 [7ms]
+2025-01-31T07:18:36.992Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T07:18:35Z
+2025-01-31T07:18:37.981Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T07:18:36Z
+2025-01-31T07:18:57.360Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [8ms]
+2025-01-31T07:19:26.502Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T07:19:24Z
+2025-01-31T07:19:52.357Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [9ms]
+2025-01-31T07:19:54.740Z [32minfo[39m: [POST] /api/session/transaction - 200 [1076ms]
+2025-01-31T07:19:55.230Z [32minfo[39m: [POST] /api/charger-locations/get-charger-info-by-name - 200 [7ms]
+2025-01-31T07:19:58.701Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-01-31T07:19:56Z
+2025-01-31T07:20:02.473Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [13ms]
+2025-01-31T07:20:15.369Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [10ms]
+2025-01-31T07:20:17.727Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [17ms]
+2025-01-31T07:20:26.962Z [32minfo[39m: [POST] /api/charger-locations/get-charger-info-by-name - 200 [6ms]
+2025-01-31T07:20:31.911Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [9ms]
+2025-01-31T07:20:36.370Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [24ms]
+2025-01-31T07:20:39.423Z [32minfo[39m: [POST] /api/charger-locations/get-charger-info-by-name - 200 [7ms]
+2025-01-31T07:20:40.488Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [10ms]
+2025-01-31T07:20:44.399Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [9ms]
+2025-01-31T07:20:59.782Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [9ms]
+2025-01-31T07:21:15.209Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [8ms]
+2025-01-31T07:21:26.241Z [31merror[39m: [GET] / - 404 [2ms]
+2025-01-31T07:21:30.660Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [9ms]
+2025-01-31T07:21:47.683Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [9ms]
+2025-01-31T07:21:57.387Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [10ms]
+2025-01-31T07:22:02.889Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [9ms]
+2025-01-31T07:22:03.380Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [16ms]
+2025-01-31T07:22:15.878Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [17ms]
+2025-01-31T07:22:18.146Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [10ms]
+2025-01-31T07:22:33.462Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [9ms]
+2025-01-31T07:22:48.781Z [32minfo[39m: [POST] /api/session/get-session-info - 200 [8ms]
+2025-01-31T07:22:58.597Z [32minfo[39m: [POST] /api/session/transaction - 200 [973ms]
+2025-01-31T07:22:59.309Z [32minfo[39m: [POST] /api/session/get-session-receipt - 200 [10ms]
+2025-01-31T07:23:00.990Z [32minfo[39m: StatusNotification - Connector: 1, Status: Finishing, ErrorCode: NoError, Timestamp: 2025-01-31T07:22:59Z
+2025-01-31T07:23:33.373Z [32minfo[39m: [POST] /api/payment - 200 [24ms]
+2025-01-31T07:23:33.536Z [32minfo[39m: [GET] /api/reviews/hasReviewed/+916299459950/1ab83f609f8d329cd9b96969 - 200 [8ms]
+2025-01-31T07:23:36.158Z [32minfo[39m: [GET] /api/users/+916299459950/vehicles - 200 [6ms]
+2025-01-31T07:23:36.298Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [3ms]
+2025-01-31T07:23:36.390Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [17ms]
+2025-01-31T07:23:36.703Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [10ms]
+2025-01-31T07:23:38.614Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [11ms]
+2025-01-31T07:23:45.356Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [9ms]
+2025-01-31T07:23:45.865Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [13ms]
+2025-01-31T07:23:47.189Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [8ms]
+2025-01-31T07:24:01.965Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T07:24:00Z
+2025-01-31T07:24:30.555Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [10ms]
+2025-01-31T07:25:25.361Z [32minfo[39m: [GET] /api/users/+916299459950/vehicles - 200 [7ms]
+2025-01-31T07:37:57.231Z [31merror[39m: [GET] / - 404 [1ms]
+2025-01-31T07:54:54.465Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [9ms]
+2025-01-31T07:55:07.376Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [8ms]
+2025-01-31T07:55:14.713Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [16ms]
+2025-01-31T07:56:44.581Z [32minfo[39m: [GET] /api/location/structured/all - 304 [6ms]
+2025-01-31T07:56:44.595Z [32minfo[39m: [GET] /api/vehicle/all - 304 [23ms]
+2025-01-31T07:56:44.612Z [32minfo[39m: [GET] /api/users/get/pagination?page=1&limit=10&search=&sortField=&sortOrder=asc - 304 [36ms]
+2025-01-31T07:56:47.616Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [17ms]
+2025-01-31T07:56:57.426Z [31merror[39m: [GET] / - 404 [0ms]
+2025-01-31T07:57:16.583Z [32minfo[39m: [GET] /api/charger-locations - 200 [13ms]
+2025-01-31T07:57:27.697Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [11ms]
+2025-01-31T07:59:18.853Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T07:59:16Z
+2025-01-31T07:59:19.757Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T07:59:17Z
+2025-01-31T07:59:31.941Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T07:59:29Z
+2025-01-31T07:59:37.087Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T07:59:35Z
+2025-01-31T07:59:43.181Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T07:59:41Z
+2025-01-31T08:00:56.816Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:00:54Z
+2025-01-31T08:01:31.230Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [11ms]
+2025-01-31T08:02:51.044Z [32minfo[39m: [GET] /api/user-service-and-maintenance/admins-managers - 304 [7ms]
+2025-01-31T08:02:53.298Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [21ms]
+2025-01-31T08:02:55.830Z [32minfo[39m: [GET] /api/user-service-and-maintenance/admins-managers - 304 [10ms]
+2025-01-31T08:03:46.919Z [32minfo[39m: [POST] /api/user-service-and-maintenance/register - 200 [148ms]
+2025-01-31T08:03:52.245Z [32minfo[39m: [GET] /api/user-service-and-maintenance/admins-managers - 200 [6ms]
+2025-01-31T08:04:32.239Z [32minfo[39m: [POST] /api/user-service-and-maintenance/login - 200 [3ms]
+2025-01-31T08:04:39.537Z [32minfo[39m: [POST] /api/user-service-and-maintenance/login - 200 [116ms]
+2025-01-31T08:04:50.307Z [31merror[39m: [GET] /api/charger-locations - 401 [1ms]
+2025-01-31T08:05:00.944Z [32minfo[39m: [POST] /api/user-service-and-maintenance/login - 200 [116ms]
+2025-01-31T08:05:07.039Z [32minfo[39m: [POST] /api/user-service-and-maintenance/login - 200 [115ms]
+2025-01-31T08:05:07.174Z [32minfo[39m: [GET] /api/charger-locations - 200 [18ms]
+2025-01-31T08:05:07.414Z [32minfo[39m: [GET] /api/charger-locations - 304 [12ms]
+2025-01-31T08:05:13.357Z [32minfo[39m: [POST] /api/user-service-and-maintenance/login - 200 [115ms]
+2025-01-31T08:05:13.500Z [32minfo[39m: [GET] /api/charger-locations - 304 [23ms]
+2025-01-31T08:05:13.775Z [32minfo[39m: [GET] /api/charger-locations - 200 [13ms]
+2025-01-31T08:05:28.417Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [9ms]
+2025-01-31T08:06:50.467Z [32minfo[39m: [GET] /api/location/structured/all - 304 [3ms]
+2025-01-31T08:06:50.488Z [32minfo[39m: [GET] /api/vehicle/all - 304 [23ms]
+2025-01-31T08:06:50.509Z [32minfo[39m: [GET] /api/users/get/pagination?page=1&limit=10&search=&sortField=&sortOrder=asc - 304 [16ms]
+2025-01-31T08:06:56.360Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [8ms]
+2025-01-31T08:06:57.354Z [32minfo[39m: [GET] /api/charger-locations - 304 [12ms]
+2025-01-31T08:07:20.573Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [8ms]
+2025-01-31T08:09:32.395Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:09:30Z
+2025-01-31T08:09:33.297Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:09:31Z
+2025-01-31T08:10:35.329Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T08:10:33Z
+2025-01-31T08:11:11.680Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:11:09Z
+2025-01-31T08:11:16.803Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T08:11:14Z
+2025-01-31T08:11:22.038Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:11:19Z
+2025-01-31T08:11:24.425Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T08:11:22Z
+2025-01-31T08:12:11.393Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:12:09Z
+2025-01-31T08:12:13.793Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T08:12:11Z
+2025-01-31T08:12:19.595Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:12:17Z
+2025-01-31T08:12:24.794Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T08:12:22Z
+2025-01-31T08:12:25.658Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:12:23Z
+2025-01-31T08:12:28.233Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T08:12:26Z
+2025-01-31T08:13:04.583Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:13:02Z
+2025-01-31T08:14:55.500Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [20ms]
+2025-01-31T08:15:53.937Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [7ms]
+2025-01-31T08:15:55.952Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [7ms]
+2025-01-31T08:16:45.152Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [9ms]
+2025-01-31T08:16:48.199Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [9ms]
+2025-01-31T08:18:06.781Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [7ms]
+2025-01-31T08:19:56.448Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [16ms]
+2025-01-31T08:19:59.759Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [8ms]
+2025-01-31T08:20:15.855Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [7ms]
+2025-01-31T08:20:18.931Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [7ms]
+2025-01-31T08:21:45.843Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T08:21:44Z
+2025-01-31T08:22:22.872Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:22:21Z
+2025-01-31T08:22:26.663Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T08:22:25Z
+2025-01-31T08:22:31.068Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:22:29Z
+2025-01-31T08:23:03.790Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [7ms]
+2025-01-31T08:23:23.496Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [14ms]
+2025-01-31T08:23:27.158Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [7ms]
+2025-01-31T08:23:32.889Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T08:23:31Z
+2025-01-31T08:23:36.974Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [8ms]
+2025-01-31T08:23:56.202Z [32minfo[39m: [GET] /api/charger-locations - 200 [13ms]
+2025-01-31T08:23:56.206Z [32minfo[39m: [GET] /api/charger-locations/location-type-count - 200 [15ms]
+2025-01-31T08:23:58.760Z [32minfo[39m: [GET] /api/reviews/location/6799fc47f5330c31beb3bcc5 - 200 [9ms]
+2025-01-31T08:24:01.298Z [32minfo[39m: [GET] /api/charger-locations - 304 [15ms]
+2025-01-31T08:24:01.301Z [32minfo[39m: [GET] /api/charger-locations/location-type-count - 200 [16ms]
+2025-01-31T08:24:03.914Z [32minfo[39m: [GET] /api/reviews/location/62780acf20e231acd103a2c2 - 200 [8ms]
+2025-01-31T08:24:05.697Z [32minfo[39m: [GET] /api/charger-locations - 304 [12ms]
+2025-01-31T08:24:05.700Z [32minfo[39m: [GET] /api/charger-locations/location-type-count - 304 [14ms]
+2025-01-31T08:24:08.376Z [32minfo[39m: [GET] /api/reviews/location/1eec672310d9e5d899865d3b - 200 [8ms]
+2025-01-31T08:24:12.208Z [32minfo[39m: [GET] /api/charger-locations - 304 [24ms]
+2025-01-31T08:24:12.219Z [32minfo[39m: [GET] /api/charger-locations/location-type-count - 304 [33ms]
+2025-01-31T08:24:18.383Z [32minfo[39m: [GET] /api/reviews/location/62780acf20e231acd103a2c2 - 304 [9ms]
+2025-01-31T08:24:23.496Z [32minfo[39m: [GET] /api/charger-locations - 304 [13ms]
+2025-01-31T08:24:23.501Z [32minfo[39m: [GET] /api/charger-locations/location-type-count - 200 [15ms]
+2025-01-31T08:24:27.063Z [32minfo[39m: [GET] /api/reviews/location/32ed2319730b6de120ed3a1a - 304 [8ms]
+2025-01-31T08:24:28.940Z [32minfo[39m: [GET] /api/charger-locations - 304 [13ms]
+2025-01-31T08:24:28.943Z [32minfo[39m: [GET] /api/charger-locations/location-type-count - 200 [14ms]
+2025-01-31T08:24:31.636Z [32minfo[39m: [GET] /api/reviews/location/8ae10691dcef35b7b8d5e3d5 - 304 [8ms]
+2025-01-31T08:24:33.686Z [32minfo[39m: [GET] /api/charger-locations - 200 [22ms]
+2025-01-31T08:24:33.697Z [32minfo[39m: [GET] /api/charger-locations/location-type-count - 200 [31ms]
+2025-01-31T08:24:41.426Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [7ms]
+2025-01-31T08:25:54.574Z [31merror[39m: [GET] / - 404 [1ms]
+2025-01-31T08:25:57.928Z [32minfo[39m: [GET] /api/charger-locations - 304 [12ms]
+2025-01-31T08:26:38.309Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [9ms]
+2025-01-31T08:26:43.381Z [32minfo[39m: [GET] /api/charger-locations - 304 [11ms]
+2025-01-31T08:34:34.134Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:34:32Z
+2025-01-31T08:36:21.353Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [9ms]
+2025-01-31T08:36:28.086Z [32minfo[39m: [GET] /api/charger-locations - 200 [12ms]
+2025-01-31T08:36:41.330Z [31merror[39m: [GET] /favicon.ico - 404 [0ms]
+2025-01-31T08:38:18.506Z [32minfo[39m: [GET] /api/location/structured/all - 304 [4ms]
+2025-01-31T08:38:18.538Z [32minfo[39m: [GET] /api/vehicle/all - 304 [37ms]
+2025-01-31T08:38:18.554Z [32minfo[39m: [GET] /api/users/get/pagination?page=1&limit=10&search=&sortField=&sortOrder=asc - 304 [51ms]
+2025-01-31T08:38:32.142Z [32minfo[39m: [GET] /api/charger-locations - 304 [16ms]
+2025-01-31T08:38:59.709Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [12ms]
+2025-01-31T08:39:01.850Z [32minfo[39m: [GET] /api/charger-locations - 304 [12ms]
+2025-01-31T08:43:48.128Z [31merror[39m: [GET] / - 404 [1ms]
+2025-01-31T08:43:55.180Z [31merror[39m: [POST] /sdk - 404 [4ms]
+2025-01-31T08:43:55.181Z [31merror[39m: [GET] /nmaplowercheck1738313034 - 404 [0ms]
+2025-01-31T08:43:55.183Z [31merror[39m: [GET] / - 404 [1ms]
+2025-01-31T08:43:55.612Z [31merror[39m: [GET] /HNAP1 - 404 [1ms]
+2025-01-31T08:43:55.664Z [31merror[39m: [GET] /evox/about - 404 [1ms]
+2025-01-31T08:43:57.693Z [31merror[39m: [GET] / - 404 [1ms]
+2025-01-31T08:43:58.157Z [31merror[39m: [GET] / - 404 [1ms]
+2025-01-31T08:53:08.170Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T08:53:06Z
+2025-01-31T08:53:09.190Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:53:07Z
+2025-01-31T08:53:19.238Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T08:53:17Z
+2025-01-31T08:53:23.613Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:53:21Z
+2025-01-31T08:53:24.639Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T08:53:22Z
+2025-01-31T08:53:35.643Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T08:53:33Z
+2025-01-31T08:54:10.978Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T08:54:08Z
+2025-01-31T08:54:11.703Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T08:54:08Z
+2025-01-31T08:56:54.741Z [32minfo[39m: [GET] /api/charger-locations - 200 [14ms]
+2025-01-31T08:56:54.745Z [32minfo[39m: [GET] /api/charger-locations/location-type-count - 200 [14ms]
+2025-01-31T08:56:55.795Z [32minfo[39m: [GET] /api/location/structured/all - 304 [4ms]
+2025-01-31T08:56:55.953Z [32minfo[39m: [GET] /api/vehicle/all - 304 [16ms]
+2025-01-31T08:56:55.963Z [32minfo[39m: [GET] /api/users/get/pagination?page=1&limit=10&search=&sortField=&sortOrder=asc - 304 [25ms]
+2025-01-31T08:56:57.979Z [32minfo[39m: [GET] /api/charger-locations - 304 [10ms]
+2025-01-31T09:06:45.832Z [31merror[39m: [GET] / - 404 [0ms]
+2025-01-31T09:06:46.146Z [31merror[39m: [GET] /download/powershell/ - 404 [1ms]
+2025-01-31T09:06:46.452Z [31merror[39m: [GET] /get.php - 404 [0ms]
+2025-01-31T09:16:26.218Z [31merror[39m: [GET] /covenantuser/login - 404 [0ms]
+2025-01-31T09:16:26.303Z [31merror[39m: [GET] /new/login - 404 [1ms]
+2025-01-31T09:16:26.453Z [31merror[39m: [GET] /api/panelhash - 404 [0ms]
+2025-01-31T09:16:26.754Z [31merror[39m: [GET] /admin/console/index.html - 404 [0ms]
+2025-01-31T09:16:32.905Z [31merror[39m: [GET] /login - 404 [1ms]
+2025-01-31T09:16:42.581Z [31merror[39m: [GET] / - 404 [1ms]
+2025-01-31T09:19:35.818Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T09:19:34Z
+2025-01-31T09:19:36.678Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T09:19:35Z
+2025-01-31T09:20:17.524Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T09:20:15Z
+2025-01-31T09:20:25.533Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T09:20:23Z
+2025-01-31T09:20:32.603Z [31merror[39m: [POST] /init - 404 [0ms]
+2025-01-31T09:20:39.749Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T09:20:38Z
+2025-01-31T09:20:49.958Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T09:20:48Z
+2025-01-31T09:20:53.178Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T09:20:51Z
+2025-01-31T09:21:30.148Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T09:21:28Z
+2025-01-31T09:22:11.947Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T09:22:10Z
+2025-01-31T09:22:48.174Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T09:22:46Z
+2025-01-31T09:22:59.773Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T09:22:58Z
+2025-01-31T09:23:36.254Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T09:23:34Z
+2025-01-31T09:23:37.020Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-01-31T09:23:34Z
+2025-01-31T09:23:42.898Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T09:23:41Z
+2025-01-31T09:23:46.813Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T09:23:45Z
+2025-01-31T09:24:23.147Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T09:24:21Z
+2025-01-31T09:24:41.120Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T09:24:38Z
+2025-01-31T09:25:18.170Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T09:25:15Z
+2025-01-31T09:25:44.438Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T09:25:41Z
+2025-01-31T09:26:22.193Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T09:26:19Z
+2025-01-31T09:27:08.796Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T09:27:06Z
+2025-01-31T09:46:23.680Z [31merror[39m: [GET] / - 404 [0ms]
+2025-01-31T10:02:57.332Z [31merror[39m: [GET] / - 404 [1ms]
+2025-01-31T10:11:40.679Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-01-31T10:11:38Z
+2025-01-31T10:11:41.598Z [32minfo[39m: StatusNotification - Connector: 1, Status: Faulted, ErrorCode: OtherError, Timestamp: 2025-01-31T10:11:39Z
+2025-01-31T10:22:45.810Z [32minfo[39m: [GET] /api/charger-locations - 200 [18ms]
+2025-01-31T10:22:53.609Z [32minfo[39m: [GET] /api/reviews/location/32ed2319730b6de120ed3a1a - 304 [13ms]
+2025-01-31T10:23:10.619Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [10ms]
+2025-01-31T10:23:15.071Z [32minfo[39m: [GET] /api/charger-locations - 304 [15ms]
+2025-01-31T10:23:15.743Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [20ms]
+2025-01-31T10:23:27.569Z [32minfo[39m: [GET] /api/charger-locations - 304 [21ms]
