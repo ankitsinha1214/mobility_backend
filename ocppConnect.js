@@ -147,6 +147,19 @@ wss.on("connection", (ws) => {
     ws.on('message', (message) => {
         console.log(`Received from charger ${chargerId}: %s`, message);
         try {
+            // Update lastPing in the database asynchronously without awaiting
+            ChargerLocation.findOneAndUpdate(
+                { "chargerInfo.name": chargerId },
+                { $set: { "chargerInfo.$.lastPing": new Date() } }, // Update lastPing
+                { new: true }
+            ).then((chargerLocation) => {
+                if (chargerLocation) {
+                    console.log(`Updated lastPing for charger ${chargerId}`);
+                }
+            }).catch((error) => {
+                console.error(`Failed to update lastPing for charger ${chargerId}:`, error);
+            });
+
             const parsedMessage = JSON.parse(message);
             console.log("Message in Array", parsedMessage);
             handleOcppMessage(ws, parsedMessage, chargerId);
@@ -156,6 +169,19 @@ wss.on("connection", (ws) => {
     });
 
     ws.on('close', () => {
+        // Update status in the database asynchronously without awaiting
+        ChargerLocation.findOneAndUpdate(
+            { "chargerInfo.name": chargerId },
+            { $set: { "chargerInfo.$.status": "Inactive" } }, // Update status
+            { new: true }
+        ).then((chargerLocation) => {
+            if (chargerLocation) {
+                console.log(`Updated status to Inactive for charger ${chargerId}`);
+            }
+        }).catch((error) => {
+            console.error(`Failed to update status to Inactive for charger ${chargerId}:`, error);
+        });
+
         console.log(`Charger ${chargerId} disconnected`);
         clients.delete(chargerId); // Remove the client from the Map when disconnected
     });

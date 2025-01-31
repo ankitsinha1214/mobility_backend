@@ -103,6 +103,10 @@ const chargerInfoSchema = new Schema({
     },
     maxVoltage: {
         type: String, // Max voltage in volts
+    },
+    lastPing: {
+        type: Date, 
+        default: null // Not required, defaults to null if not provided
     }
 });
 

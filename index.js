@@ -8,6 +8,7 @@ const logger = require('./logger');
 const logRequest = require('./middleware/loggerMiddleware');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const startChargerStatusUpdater = require('./services/updateChargerStatus');
 // const { WebSocketServer } = require('ws');
 // const WebSocket = require('ws');
 // const { v4: uuidv4 } = require("uuid");
@@ -115,6 +116,9 @@ mongoose.connect(dbConfig.mongoURI, dbConfig.options)
 logger.info('Application has started');
 
 app.use('/api', require('./routes')); // Centralized route handling
+
+// Cron Jobs updater
+startChargerStatusUpdater();
 
 // app.get('/', (_req, res) => {
 //   res.send({ message: 'Welcome to Backend of Esyasoft Mobility!!' });

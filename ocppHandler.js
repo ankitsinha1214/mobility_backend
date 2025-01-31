@@ -338,6 +338,7 @@ async function handleStatus(ws, messageId, payload, chargerId) {
 
     const { connectorId, errorCode, status, timestamp } = payload;
     chargerInfo.status = status;
+    chargerInfo.lastPing = timestamp;
 
     // Save the updated chargerLocation back to the database
     await chargerLocation.save();
