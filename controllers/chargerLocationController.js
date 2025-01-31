@@ -1,4 +1,5 @@
 const ChargerLocation = require('../models/chargerLocationModel');
+const User = require('../models/userModel');
 const SiteSurvey = require('../models/siteSurveyModel');
 const PreInstallation = require('../models/preInstallationModel');
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
@@ -798,6 +799,93 @@ const getChargerSessionsDetails = async (req, res) => {
     }
 };
 
+const getDashboardData = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+
+        // Fetch only chargerInfo field from all documents
+        const chargerLocations = await ChargerLocation.find({}, 'chargerInfo');
+
+        // Fetch users data for vehicle type count
+        const users = await User.find({}, 'user_vehicle');
+        if (chargerLocations.length === 0) {
+            return res.json({
+                success: false,
+                message: 'No chargers found',
+                data: {
+                    totalChargers: 0,
+                    availableChargers: 0,
+                    inUseChargers: 0,
+                    inactiveChargers: 0,
+                    twoWheelerUsers: 0,
+                    threeWheelerUsers: 0,
+                    fourWheelerUsers: 0
+                }
+            });
+        }
+
+        // Initialize counters
+        let totalChargers = 0;
+        let availableChargers = 0;
+        let inUseChargers = 0;
+        let inactiveChargers = 0;
+
+        // Initialize counters for vehicle types
+        let twoWheelerUsers = 0;
+        let threeWheelerUsers = 0;
+        let fourWheelerUsers = 0;
+
+        // Loop through all locations and count chargers based on status
+        chargerLocations.forEach(location => {
+            location.chargerInfo.forEach(charger => {
+                totalChargers++;
+                if (charger.status === 'Available') {
+                    availableChargers++;
+                } else if (charger.status === 'Inactive') {
+                    inactiveChargers++;
+                }
+                // else if (charger.status === 'Charging' || charger.status === 'Preparing') {
+                else {
+                    inUseChargers++;
+                }
+            });
+        });
+
+        // Count users based on vehicle type
+        users.forEach(user => {
+            user.user_vehicle.forEach(vehicle => {
+                if (vehicle.type === '2-Wheeler') {
+                    twoWheelerUsers++;
+                } else if (vehicle.type === '3-Wheeler') {
+                    threeWheelerUsers++;
+                } else if (vehicle.type === '4-Wheeler') {
+                    fourWheelerUsers++;
+                }
+            });
+        });
+
+        res.json({
+            success: true,
+            data: {
+                totalChargers,
+                availableChargers,
+                inUseChargers,
+                inactiveChargers,
+                twoWheelerUsers,
+                threeWheelerUsers,
+                fourWheelerUsers
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+};
 
 module.exports = {
     createChargerLocation,
@@ -819,5 +907,6 @@ module.exports = {
     getChargerLocationsInRange,
     searchChargerLocations,
     getChargerLocationsInfoByName,
-    getChargerSessionsDetails
+    getChargerSessionsDetails,
+    getDashboardData
 };

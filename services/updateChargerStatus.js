@@ -3,7 +3,7 @@ const cron = require('node-cron');
 
 const updateChargerStatus = async () => {
     try {
-        const thirtyMinutesAgo = new Date(Date.now() - 15 * 60 * 1000); // check last ping for 15 mins
+        const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000); // check last ping for 15 mins
 
         const chargersToUpdate = await ChargerLocation.find({
             'chargerInfo.lastPing': { $lte: thirtyMinutesAgo },
