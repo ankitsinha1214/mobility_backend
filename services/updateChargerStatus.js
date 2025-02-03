@@ -5,10 +5,19 @@ const updateChargerStatus = async () => {
     try {
         const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000); // check last ping for 15 mins
 
+        // const chargersToUpdate = await ChargerLocation.find({
+        //     'chargerInfo.lastPing': { $lte: thirtyMinutesAgo },
+        //     'chargerInfo.status': { $ne: 'Inactive' },
+        // });
         const chargersToUpdate = await ChargerLocation.find({
-            'chargerInfo.lastPing': { $lte: thirtyMinutesAgo },
-            'chargerInfo.status': { $ne: 'Inactive' },
+            chargerInfo: {
+                $elemMatch: {
+                    lastPing: { $lte: thirtyMinutesAgo },
+                    status: { $ne: 'Inactive' },
+                },
+            },
         });
+        console.log(chargersToUpdate);
 
         if (chargersToUpdate.length > 0) {
             for (let location of chargersToUpdate) {

@@ -25,6 +25,7 @@ const fetchUser = async(req, res, next) => {
             }
         }
         if (data.role) {
+            // console.log('hi')
             // Optional: Verify if the user exists in the database (based on the ID)
             const userId = data._id;
             const userSandm = await SandmUser.findOne({ _id: userId });

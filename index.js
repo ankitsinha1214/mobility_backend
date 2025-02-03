@@ -115,7 +115,8 @@ mongoose.connect(dbConfig.mongoURI, dbConfig.options)
 
 logger.info('Application has started');
 
-app.use('/api', require('./routes')); // Centralized route handling
+app.use('/', require('./routes')); // Centralized route handling for test
+// app.use('/api', require('./routes')); // Centralized route handling
 
 // Cron Jobs updater
 startChargerStatusUpdater();
