@@ -1613,3 +1613,6 @@
 2025-02-03T11:37:40.699Z [31merror[39m: [POST] /api/jbackend/deleteservice - 404 [1ms]
 2025-02-03T12:05:09.489Z [31merror[39m: [GET] / - 404 [0ms]
 2025-02-03T12:17:57.224Z [31merror[39m: [GET] / - 404 [0ms]
+2025-02-03T13:34:22.712Z [31merror[39m: [GET] /api/users/check-registration/+916299459950 - 404 [4ms]
+2025-02-03T13:34:23.116Z [31merror[39m: [GET] /api/location/structured/all - 404 [1ms]
+2025-02-03T13:35:01.692Z [31merror[39m: [GET] /api/charger-locations/chargers/all - 404 [1ms]

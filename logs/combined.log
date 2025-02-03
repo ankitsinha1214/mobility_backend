@@ -20902,3 +20902,7 @@ HEAD
 2025-02-03T13:06:09.764Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [15ms]
 2025-02-03T13:06:11.780Z [32minfo[39m: [GET] /api/users/+916299459950/vehicles - 200 [7ms]
 2025-02-03T13:08:33.014Z [32minfo[39m: [GET] /api/users/+916299459950/vehicles - 200 [7ms]
+2025-02-03T13:17:23.031Z [32minfo[39m: Application has started
+2025-02-03T13:34:22.712Z [31merror[39m: [GET] /api/users/check-registration/+916299459950 - 404 [4ms]
+2025-02-03T13:34:23.116Z [31merror[39m: [GET] /api/location/structured/all - 404 [1ms]
+2025-02-03T13:35:01.692Z [31merror[39m: [GET] /api/charger-locations/chargers/all - 404 [1ms]
