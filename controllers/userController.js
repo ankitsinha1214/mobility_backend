@@ -843,12 +843,15 @@ const checkUserRegistration = async (req, res) => {
                 .sort({ createdAt: -1 }) // Sort descending (latest first)
                 .limit(1); // Get only the most recent session
 
+                const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': session?.chargerId }).select('_id');
+                // console.log(chargerLocation)
             return res.json({
                 success: true,
                 data: user,
                 message: "User is registered",
                 token: token,
                 sessionId: session ? session._id : null,
+                locationId: chargerLocation ? chargerLocation._id : null,
                 startTime: session ? session.startTime : null,
                 chargerId: session ? session.chargerId : null,
                 status: session ? session.status : "No active session"

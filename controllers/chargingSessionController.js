@@ -9,6 +9,16 @@ const User = require('../models/userModel');
 const calculateEnergyConsumed = (startMeterValue, endMeterValue) => {
     return (endMeterValue - startMeterValue); // energy consumed in kWh
 };
+const getCurrencySymbol = (currencyCode) => {
+    switch(currencyCode) {
+      case "INR":
+        return "₹";  // Indian Rupee symbol
+      case "USD":
+        return "$";  // Dollar symbol
+      default:
+        return "";  // Return an empty string if the currency is not INR or USD
+    }
+  };
 // const startStopChargingSession = async (req, res) => {
 //     const { action, chargerId, payload } = req.body;
 
@@ -543,7 +553,7 @@ const getSessionReceipt = async (req, res) => {
         const totalEnergyCost = energyConsumed * costPerUnit;
 
         // Dummy values for now
-        const parkingTariff = chargerLocation.freepaid.parking ? 'FREE' : chargerLocation.parkingCost.currency + ' ' + chargerLocation.parkingCost.amount;
+        const parkingTariff = chargerLocation.freepaid.parking ? 'FREE' : getCurrencySymbol(chargerLocation.parkingCost.currency) + ' ' + chargerLocation.parkingCost.amount;
         const platformFee = "FREE";
         // var convenienceFee = "FREE";
         let convenienceFee = "FREE";
@@ -563,6 +573,9 @@ const getSessionReceipt = async (req, res) => {
 
         // Calculate grand total
         let grandTotal = totalEnergyCost + gstAmount + convenienceFeeValue;
+        if(!chargerLocation.freepaid.parking){
+            grandTotal += chargerLocation.parkingCost.amount;
+        }
         // var grandTotal = totalEnergyCost + gstAmount;
         // if (totalEnergyCost < 1) {
         //     grandTotal += 1;
@@ -584,7 +597,7 @@ const getSessionReceipt = async (req, res) => {
                     { "Charger ID": session.chargerId },
                     { "Charger duration": formattedDuration },  // Convert to minutes
                     { "Energy consumed": `${energyConsumed} Wh` },
-                    { "Cost per Unit": `${costPerUnit} ${chargerInfo.costPerUnit.currency}` },
+                    { "Cost per Unit": `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}` },
                     // { "Idle rate": "FREE" }  // Dummy value
                 ]
             },
