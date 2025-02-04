@@ -175,7 +175,7 @@ const getCurrencySymbol = (currencyCode) => {
 // };
 
 const startStopChargingSession = async (req, res) => {
-    const { action, chargerId, payload, vehicleId } = req.body;
+    const { action, chargerId, payload, vehicleId, sessionReason } = req.body;
     // console.log(req.phoneNumber === payload.idTag);
     // console.log((req.phoneNumber && req.phoneNumber !== payload.idTag));
     // if ((req.phoneNumber && req.phoneNumber !== payload.idTag) || (req.user && req.user !== 'Admin' && req.user !== 'Manager')) {
@@ -183,6 +183,7 @@ const startStopChargingSession = async (req, res) => {
     // }
     // console.log('entered');
     // return;
+   
     if (!action || !['start', 'stop'].includes(action)) {
         return res.status(400).json({ status: false, message: 'Invalid action specified' });
     }
@@ -190,6 +191,21 @@ const startStopChargingSession = async (req, res) => {
     const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
     if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
         return res.json({ status: false, message: `WebSocket not established for charger ID ${chargerId}` });
+    }
+
+    let createdBy = '';
+
+    if(req.phn){
+        if(req.phn === payload.idTag){
+            return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
+        }
+        createdBy = 'Consumer User';
+    }
+    if(req.user){
+        if(req.user !== 'Admin' && req.user !== 'Manager'){
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+            createdBy = req.user;
     }
 
     const messageId = generateUniqueId(); // Generate a unique ID for the message
@@ -317,6 +333,8 @@ const startStopChargingSession = async (req, res) => {
                     chargerId,
                     vehicleId,
                     userPhone: payload?.idTag,
+                    startCreatedBy: createdBy,
+                    startReason: sessionReason,
                     transactionId: Math.floor(10000000 + Math.random() * 90000000), // Random transaction ID
                     startMeterValue: payload?.startMeterValue || 0,
                 };
@@ -335,7 +353,7 @@ const startStopChargingSession = async (req, res) => {
                 const sessionId = payload?.sessionId;
                 const sessionDetails = await ChargingSession.findOneAndUpdate(
                     { _id: sessionId },
-                    { status: 'Stopped', endTime: new Date() },
+                    { status: 'Stopped', endTime: new Date(), stopCreatedBy: createdBy, stopReason: sessionReason, },
                     { new: true }
                 );
 

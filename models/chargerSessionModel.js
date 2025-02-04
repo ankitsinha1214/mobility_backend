@@ -41,6 +41,18 @@ const chargingSessionSchema = new Schema({
     endMeterValue: {
         type: Number, // in kWh 
     },
+    startReason: {
+        type: String, // in kWh 
+    },
+    startCreatedBy: {
+        type: String, // in kWh 
+    },
+    stopCreatedBy: {
+        type: String, // in kWh 
+    },
+    stopReason: {
+        type: String, // stop reason  
+    },
     // cost: {
     //     amount: {
     //         type: Number, // Amount of the cost
