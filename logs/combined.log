@@ -21246,3 +21246,57 @@ HEAD
 2025-02-04T08:16:34.282Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-02-04T08:16:31Z
 2025-02-04T08:16:43.695Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-02-04T08:16:41Z
 2025-02-04T08:30:23.857Z [31merror[39m: [GET] / - 404 [0ms]
+2025-02-04T08:35:14.537Z [32minfo[39m: Application has started
+2025-02-04T08:36:03.867Z [32minfo[39m: [GET] /api/users/+916299459950/vehicles - 200 [21ms]
+2025-02-04T08:36:03.871Z [32minfo[39m: [POST] /api/payment/check-payment-status - 200 [40ms]
+2025-02-04T08:36:04.582Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [6ms]
+2025-02-04T08:36:04.632Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [21ms]
+2025-02-04T08:36:04.984Z [32minfo[39m: [POST] /api/session/get-session-receipt - 200 [30ms]
+2025-02-04T08:36:05.220Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [16ms]
+2025-02-04T08:36:10.391Z [32minfo[39m: Application has started
+2025-02-04T08:36:49.172Z [32minfo[39m: [GET] /api/charger-locations - 200 [50ms]
+2025-02-04T08:36:49.189Z [32minfo[39m: [POST] /api/charger-locations/dashboard/get-data - 200 [56ms]
+2025-02-04T08:36:50.220Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [29ms]
+2025-02-04T08:36:52.390Z [32minfo[39m: [GET] /api/session/ - 200 [110ms]
+2025-02-04T08:37:08.191Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [12ms]
+2025-02-04T08:37:08.972Z [32minfo[39m: [POST] /api/payment - 200 [37ms]
+2025-02-04T08:37:09.142Z [32minfo[39m: [GET] /api/reviews/hasReviewed/+916299459950/32ed2319730b6de120ed3a1a - 200 [17ms]
+2025-02-04T08:37:11.760Z [32minfo[39m: [GET] /api/users/+916299459950/vehicles - 200 [21ms]
+2025-02-04T08:37:11.908Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [6ms]
+2025-02-04T08:37:11.942Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [14ms]
+2025-02-04T08:37:12.343Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [30ms]
+2025-02-04T08:37:12.414Z [32minfo[39m: [GET] /api/session/ - 200 [104ms]
+2025-02-04T08:37:52.887Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-02-04T08:37:51Z
+2025-02-04T08:37:53.810Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-02-04T08:37:52Z
+2025-02-04T08:37:57.021Z [32minfo[39m: [POST] /api/charger-locations/get-charger-info-by-name - 200 [9ms]
+2025-02-04T08:38:01.709Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-02-04T08:37:59Z
+2025-02-04T08:38:09.752Z [31merror[39m: [POST] /api/session/transaction - 401 [6ms]
+2025-02-04T08:38:32.200Z [32minfo[39m: [GET] /api/users/check-registration/+916299459950 - 200 [12ms]
+2025-02-04T08:38:32.516Z [32minfo[39m: [GET] /api/users/+916299459950/vehicles - 200 [8ms]
+2025-02-04T08:38:32.665Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [24ms]
+2025-02-04T08:38:32.708Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [5ms]
+2025-02-04T08:38:33.118Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [15ms]
+2025-02-04T08:38:37.635Z [32minfo[39m: [POST] /api/charger-locations/get-charger-info-by-name - 200 [15ms]
+2025-02-04T08:38:41.467Z [31merror[39m: [POST] /api/session/transaction - 401 [5ms]
+2025-02-04T08:39:42.331Z [32minfo[39m: [GET] /api/users/check-registration/+916299459950 - 200 [11ms]
+2025-02-04T08:39:42.641Z [32minfo[39m: [GET] /api/users/+916299459950/vehicles - 200 [8ms]
+2025-02-04T08:39:42.831Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [5ms]
+2025-02-04T08:39:42.900Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [19ms]
+2025-02-04T08:39:43.184Z [32minfo[39m: [POST] /api/charger-locations/location/range - 200 [16ms]
+2025-02-04T08:41:23.840Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [14ms]
+2025-02-04T08:42:50.957Z [32minfo[39m: Application has started
+2025-02-04T08:43:00.652Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 304 [34ms]
+2025-02-04T08:43:27.610Z [32minfo[39m: StatusNotification - Connector: 0, Status: Available, ErrorCode: NoError, Timestamp: 2025-02-04T08:43:26Z
+2025-02-04T08:43:27.868Z [32minfo[39m: [POST] /api/session/transaction - 200 [13ms]
+2025-02-04T08:43:28.480Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-02-04T08:43:27Z
+2025-02-04T08:43:39.190Z [32minfo[39m: StatusNotification - Connector: 1, Status: Preparing, ErrorCode: NoError, Timestamp: 2025-02-04T08:43:37Z
+2025-02-04T08:43:44.931Z [32minfo[39m: [POST] /api/session/transaction - 200 [1124ms]
+2025-02-04T08:43:46.007Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [18ms]
+2025-02-04T08:43:48.058Z [32minfo[39m: StatusNotification - Connector: 1, Status: Charging, ErrorCode: NoError, Timestamp: 2025-02-04T08:43:46Z
+2025-02-04T08:45:30.373Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [11ms]
+2025-02-04T08:45:34.983Z [32minfo[39m: [GET] /api/session/ - 200 [111ms]
+2025-02-04T08:45:49.848Z [32minfo[39m: [POST] /api/session/transaction - 200 [771ms]
+2025-02-04T08:45:50.230Z [32minfo[39m: [GET] /api/charger-locations/chargers/all - 200 [10ms]
+2025-02-04T08:45:52.241Z [32minfo[39m: StatusNotification - Connector: 1, Status: Finishing, ErrorCode: NoError, Timestamp: 2025-02-04T08:45:50Z
+2025-02-04T08:46:14.019Z [31merror[39m: [GET] / - 404 [2ms]
+2025-02-04T08:46:19.372Z [32minfo[39m: StatusNotification - Connector: 1, Status: Available, ErrorCode: NoError, Timestamp: 2025-02-04T08:46:18Z
