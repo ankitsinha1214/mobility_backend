@@ -187,16 +187,18 @@ const addUser = async (req, res) => {
             _id: newUser._id,
             phoneNumber: newUser.phoneNumber
         };
-        console.log(userId);
-        const { token } = generateToken(userId);
+        // console.log(userId);
+        const { token, iat } = generateToken(userId);
+        await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
 
-        return res.json({ success: true, data: userDataToSend, message: USER.USER_CREATED, 
+        return res.json({
+            success: true, data: userDataToSend, message: USER.USER_CREATED,
             token: token,
             sessionId: null,
             startTime: null,
             chargerId: null,
             status: "No active session"
-         });
+        });
     } catch (error) {
         console.error('Error:', error);
         if (error.keyValue) {
@@ -836,15 +838,17 @@ const checkUserRegistration = async (req, res) => {
                 phoneNumber: user.phoneNumber
             };
             // console.log(userId);
-            const { token } = generateToken(userId);
+            // const { token } = generateToken(userId);
+            const { token, iat } = generateToken(userId);
+            await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
 
             // Find the most recent charging session for this user (latest createdAt)
             const session = await ChargingSession.findOne({ userPhone: phoneNumber })
                 .sort({ createdAt: -1 }) // Sort descending (latest first)
                 .limit(1); // Get only the most recent session
 
-                const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': session?.chargerId }).select('_id');
-                // console.log(chargerLocation)
+            const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': session?.chargerId }).select('_id');
+            // console.log(chargerLocation)
             return res.json({
                 success: true,
                 data: user,

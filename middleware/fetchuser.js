@@ -3,7 +3,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const User = require('../models/userModel');
 const SandmUser = require('../models/userSandmModel');
 
-const fetchUser = async(req, res, next) => {
+const fetchUser = async (req, res, next) => {
     // Get the token from the authorization header
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -22,6 +22,10 @@ const fetchUser = async(req, res, next) => {
             const user = await User.findOne({ phoneNumber: data.phoneNumber });
             if (!user) {
                 return res.status(401).json({ success: false, message: "User not found or Inactive." });
+            }
+            // Verify if the stored `tokenIat` is greater than or equal to the JWT `iat`
+            if (user.tokenIat && data.iat < user.tokenIat) {
+                return res.status(401).json({ success: false, message: "Session expired. Please log in again." });
             }
         }
         if (data.role) {

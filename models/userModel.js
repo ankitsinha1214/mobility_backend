@@ -180,6 +180,10 @@ const userSchema = new Schema({
     type: String,
     default: null
   },
+  tokenIat: { 
+    type: Number,
+    default: null
+  }, 
   user_vehicle: {
     type: [userVehicleSchema], // This makes user_vehicle an array of userVehicleSchema
     required: false // This is optional based on your needs
