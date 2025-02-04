@@ -316,7 +316,7 @@ const getAllChargers = async (req, res) => {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
         // Find all ChargerLocation documents but only return the chargerInfo field
-        const chargers = await ChargerLocation.find({}, 'chargerInfo locationType locationName city state');
+        const chargers = await ChargerLocation.find({}, 'chargerInfo locationType locationName city state address');
 
         if (chargers.length === 0) {
             return res.json({
