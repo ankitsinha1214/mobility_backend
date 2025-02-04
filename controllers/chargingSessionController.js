@@ -10,15 +10,15 @@ const calculateEnergyConsumed = (startMeterValue, endMeterValue) => {
     return (endMeterValue - startMeterValue); // energy consumed in kWh
 };
 const getCurrencySymbol = (currencyCode) => {
-    switch(currencyCode) {
-      case "INR":
-        return "₹";  // Indian Rupee symbol
-      case "USD":
-        return "$";  // Dollar symbol
-      default:
-        return "";  // Return an empty string if the currency is not INR or USD
+    switch (currencyCode) {
+        case "INR":
+            return "₹";  // Indian Rupee symbol
+        case "USD":
+            return "$";  // Dollar symbol
+        default:
+            return "";  // Return an empty string if the currency is not INR or USD
     }
-  };
+};
 // const startStopChargingSession = async (req, res) => {
 //     const { action, chargerId, payload } = req.body;
 
@@ -183,7 +183,7 @@ const startStopChargingSession = async (req, res) => {
     // }
     // console.log('entered');
     // return;
-   
+
     if (!action || !['start', 'stop'].includes(action)) {
         return res.status(400).json({ status: false, message: 'Invalid action specified' });
     }
@@ -195,17 +195,20 @@ const startStopChargingSession = async (req, res) => {
 
     let createdBy = '';
 
-    if(req.phn){
-        if(req.phn === payload.idTag){
+    if (req.phn) {
+        // Remove special characters from both values
+        const cleanPhn = req.phn.replace(/\D/g, "");
+        const cleanIdTag = payload.idTag.replace(/\D/g, "");
+        if (cleanPhn === cleanIdTag) {
             return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
         }
         createdBy = 'Consumer User';
     }
-    if(req.user){
-        if(req.user !== 'Admin' && req.user !== 'Manager'){
+    if (req.user) {
+        if (req.user !== 'Admin' && req.user !== 'Manager') {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
-            createdBy = req.user;
+        createdBy = req.user;
     }
 
     const messageId = generateUniqueId(); // Generate a unique ID for the message
@@ -260,11 +263,11 @@ const startStopChargingSession = async (req, res) => {
                     message: 'User not found or not active'
                 });
             }
-             // Validate Vehicle
-             const userVehicle = user.user_vehicle?.find(vehicle => vehicle._id.toString() === vehicleId);
-             if (!userVehicle) {
-                 return res.json({ status: false, message: 'Vehicle not associated with the user' });
-             }
+            // Validate Vehicle
+            const userVehicle = user.user_vehicle?.find(vehicle => vehicle._id.toString() === vehicleId);
+            if (!userVehicle) {
+                return res.json({ status: false, message: 'Vehicle not associated with the user' });
+            }
 
             // **Check for Active Session for User**
             const activeUserSession = await ChargingSession.findOne({
@@ -591,7 +594,7 @@ const getSessionReceipt = async (req, res) => {
 
         // Calculate grand total
         let grandTotal = totalEnergyCost + gstAmount + convenienceFeeValue;
-        if(!chargerLocation.freepaid.parking){
+        if (!chargerLocation.freepaid.parking) {
             grandTotal += chargerLocation.parkingCost.amount;
         }
         // var grandTotal = totalEnergyCost + gstAmount;
@@ -654,22 +657,22 @@ const getAllSessions = async (req, res) => {
         if (sessions.length === 0) {
             return res.json({ success: false, message: 'No Session Found.' });
         }
-          // Map through sessions and fetch location info based on chargerId
-          const enrichedSessions = await Promise.all(sessions.map(async (session) => {
+        // Map through sessions and fetch location info based on chargerId
+        const enrichedSessions = await Promise.all(sessions.map(async (session) => {
             const chargerLocation = await ChargerLocation.findOne({
                 'chargerInfo.name': session.chargerId  // Match chargerId within chargerInfo array
             }).select('locationName address city state status');
-                // direction 
-             // Calculate Charging Duration using metadata timestamps
-             const metadata = session.metadata || [];
-             const startTime = metadata[0]?.timestamp || session.startTime;
-             const endTime = metadata[metadata.length - 1]?.timestamp || session.endTime;
-             const durationInMs = new Date(endTime) - new Date(startTime);
-             const durationInSeconds = Math.floor(durationInMs / 1000);
-             const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
-             const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
-             const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
-             const chargingDuration = `${hours}:${minutes}:${seconds}`;
+            // direction 
+            // Calculate Charging Duration using metadata timestamps
+            const metadata = session.metadata || [];
+            const startTime = metadata[0]?.timestamp || session.startTime;
+            const endTime = metadata[metadata.length - 1]?.timestamp || session.endTime;
+            const durationInMs = new Date(endTime) - new Date(startTime);
+            const durationInSeconds = Math.floor(durationInMs / 1000);
+            const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
+            const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
+            const chargingDuration = `${hours}:${minutes}:${seconds}`;
             return {
                 ...session.toObject(),
                 chargerLocation: chargerLocation || null,  // Attach location info, or null if not found
