@@ -197,12 +197,13 @@ const startStopChargingSession = async (req, res) => {
 
     if (req.phn) {
         // Remove special characters from both values
-        const cleanPhn = req.phn.replace(/\D/g, "");
-        const cleanIdTag = payload.idTag.replace(/\D/g, "");
+        // const cleanPhn = req.phn.replace(/\D/g, "");
+        // const cleanIdTag = payload.idTag.replace(/\D/g, "");
         // console.log(cleanPhn)
         // console.log(cleanIdTag)
         // console.log(cleanPhn === cleanIdTag)
-        if (cleanPhn !== cleanIdTag) {
+        // if (cleanPhn !== cleanIdTag) {
+        if (req.phn !== payload?.idTag) {
             return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
         }
         createdBy = 'Consumer User';
