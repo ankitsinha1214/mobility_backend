@@ -838,9 +838,9 @@ const checkUserRegistration = async (req, res) => {
                 phoneNumber: user.phoneNumber
             };
             // console.log(userId);
-            // const { token } = generateToken(userId);
-            const { token, iat } = generateToken(userId);
-            await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
+            const { token } = generateToken(userId);
+            // const { token, iat } = generateToken(userId);
+            // await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
 
             // Find the most recent charging session for this user (latest createdAt)
             const session = await ChargingSession.findOne({ userPhone: phoneNumber })

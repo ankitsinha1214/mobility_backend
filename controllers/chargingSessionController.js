@@ -203,9 +203,9 @@ const startStopChargingSession = async (req, res) => {
         // console.log(cleanIdTag)
         // console.log(cleanPhn === cleanIdTag)
         // if (cleanPhn !== cleanIdTag) {
-        if (req.phn !== payload?.idTag) {
-            return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
-        }
+        // if (req.phn !== payload?.idTag) {
+        //     return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
+        // }
         createdBy = 'Consumer User';
     }
     if (req.user) {
