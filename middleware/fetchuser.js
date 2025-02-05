@@ -24,9 +24,9 @@ const fetchUser = async (req, res, next) => {
                 return res.status(401).json({ success: false, message: "User not found or Inactive." });
             }
             // Verify if the stored `tokenIat` is greater than or equal to the JWT `iat`
-            // if (user.tokenIat && data.iat < user.tokenIat) {
-            //     return res.status(401).json({ success: false, message: "Session expired. Please log in again." });
-            // }
+            if (user.tokenIat && data.iat < user.tokenIat) {
+                return res.status(401).json({ success: false, message: "Session expired. Please log in again." });
+            }
         }
         if (data.role) {
             // console.log('hi')
