@@ -189,8 +189,11 @@ const addUser = async (req, res) => {
         };
         // console.log(userId);
         const { token } = generateToken(userId);
-        // const { token, iat } = generateToken(userId);
-        // await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
+        // const { token } = generateToken(userId);
+        const decodedToken = jwt.decode(token); // Decode the token to get iat
+        const iat = decodedToken.iat;
+        console.log(iat);
+        await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
 
         return res.json({
             success: true, data: userDataToSend, message: USER.USER_CREATED,
@@ -840,8 +843,11 @@ const checkUserRegistration = async (req, res) => {
             };
             // console.log(userId);
             const { token } = generateToken(userId);
+            const decodedToken = jwt.decode(token); // Decode the token to get iat
+            const iat = decodedToken.iat;
+            console.log(iat);
             // const { token, iat } = generateToken(userId);
-            // await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
+            await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
 
             // Find the most recent charging session for this user (latest createdAt)
             const session = await ChargingSession.findOne({ userPhone: phoneNumber })
