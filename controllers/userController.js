@@ -190,8 +190,9 @@ const addUser = async (req, res) => {
         // console.log(userId);
         const { token } = generateToken(userId);
         // const { token } = generateToken(userId);
-        const decodedToken = jwt.decode(token); // Decode the token to get iat
-        const iat = decodedToken.iat;
+        // const decodedToken = jwt.decode(token); // Decode the token to get iat
+        // const iat = decodedToken.iat;
+        const iat = Date.now();
         console.log(iat);
         await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
 
@@ -843,8 +844,9 @@ const checkUserRegistration = async (req, res) => {
             };
             // console.log(userId);
             const { token } = generateToken(userId);
-            const decodedToken = jwt.decode(token); // Decode the token to get iat
-            const iat = decodedToken.iat;
+            // const decodedToken = jwt.decode(token); // Decode the token to get iat
+            // const iat = decodedToken.iat;
+            const iat = Date.now();
             console.log(iat);
             // const { token, iat } = generateToken(userId);
             await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
