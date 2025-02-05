@@ -188,8 +188,9 @@ const addUser = async (req, res) => {
             phoneNumber: newUser.phoneNumber
         };
         // console.log(userId);
-        const { token, iat } = generateToken(userId);
-        await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
+        const { token } = generateToken(userId);
+        // const { token, iat } = generateToken(userId);
+        // await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
 
         return res.json({
             success: true, data: userDataToSend, message: USER.USER_CREATED,
