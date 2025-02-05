@@ -19,6 +19,21 @@ const getCurrencySymbol = (currencyCode) => {
             return "";  // Return an empty string if the currency is not INR or USD
     }
 };
+function convertTimestampToDate(timestamp) {
+    const options = { timeZone: 'Asia/Kolkata' };
+    const date = new Date(timestamp).toLocaleDateString('en-IN', options);
+    
+    return date;
+}
+
+function convertTimestampToTime(timestamp) {
+    return new Date(timestamp).toLocaleTimeString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    });
+}
 // const startStopChargingSession = async (req, res) => {
 //     const { action, chargerId, payload } = req.body;
 
@@ -592,12 +607,21 @@ const getSessionReceipt = async (req, res) => {
         // }
         const idleFee = "FREE"; // Example; can be based on idle time
 
-        // Calculate tax (GST 10%)
-        const gst = 0.10;
+        // Calculate tax (GST 05%)
+        const subgst = 0.05;
+        const subgstAmount = totalEnergyCost * subgst;
+
+        const subtotal = totalEnergyCost + subgstAmount;
+
+        // Calculate tax (GST 18%)
+        const gst = 0.18;
         const gstAmount = totalEnergyCost * gst;
+        // // Calculate tax (GST 10%)
+        // const gst = 0.10;
+        // const gstAmount = totalEnergyCost * gst;
 
         // Calculate grand total
-        let grandTotal = totalEnergyCost + gstAmount + convenienceFeeValue;
+        let grandTotal = subtotal + gstAmount + convenienceFeeValue;
         if (!chargerLocation.freepaid.parking) {
             grandTotal += chargerLocation.parkingCost.amount;
         }
@@ -617,29 +641,76 @@ const getSessionReceipt = async (req, res) => {
         // Format the response
         const receipt = [
             {
-                "charger-details": [
-                    { "Charger location": chargerLocation.locationName },
+                "header": [
+                    { "type": chargerInfo.type },
+                    { "powerOutput": chargerInfo.powerOutput },
+                    { "Charger location": chargerLocation.locationName + ', ' + chargerLocation.city},
+                    { "createdAt": convertTimestampToDate(session.createdAt) },
                     { "Charger ID": session.chargerId },
-                    { "Charger duration": formattedDuration },  // Convert to minutes
-                    { "Energy consumed": `${energyConsumed} Wh` },
-                    { "Cost per Unit": `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}` },
+                    // { "Charger duration": formattedDuration },  // Convert to minutes
+                    // { "Energy consumed": `${energyConsumed} Wh` },
+                    // { "Cost per Unit": `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}` },
                     // { "Idle rate": "FREE" }  // Dummy value
                 ]
             },
             {
+                "session-details": [
+                    { "Start time": convertTimestampToTime(session.startTime) },
+                    { "End time": convertTimestampToTime(session.endTime) },
+                    { "Charging duration": formattedDuration },  // Convert to minutes
+                    // { "Energy consumed": `${energyConsumed} Wh` },
+                    // { "Cost per Unit": `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}` },
+                    // { "Idle rate": "FREE" }  // Dummy value
+                ]
+            },
+            {
+                "energy-details": [
+                    ["Energy", "Units", "Rate", "Amount"],
+                    ["Energy Charge", `${energyConsumed} Wh`, `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}`, `₹ ${totalEnergyCost.toFixed(2)}`],
+                    // { "Energy": "Energy Charge" },
+                    // { "Units": convertTimestampToTime(session.endTime) },
+                    // { "Rate": formattedDuration },  // Convert to minutes
+                    // { "Amount": formattedDuration },  // Convert to minutes
+                    // { "Energy consumed": `${energyConsumed} Wh` },
+                    // { "Cost per Unit": `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}` },
+                    // { "Idle rate": "FREE" }  // Dummy value
+                ]
+            },
+            // {
+            //     "charger-details": [
+            //         { "Charger location": chargerLocation.locationName },
+            //         { "Charger ID": session.chargerId },
+            //         { "Charger duration": formattedDuration },  // Convert to minutes
+            //         { "Energy consumed": `${energyConsumed} Wh` },
+            //         { "Cost per Unit": `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}` },
+            //         // { "Idle rate": "FREE" }  // Dummy value
+            //     ]
+            // },
+            {
+                "subtotal details": [
+                    { "GST @ 5% ": `₹ ${subgstAmount.toFixed(2)}` },
+                    { "Subtotal": `₹ ${subtotal.toFixed(2)}` }
+                ]
+            },
+            {
                 "session details": [
-                    { "Total energy cost": `₹ ${totalEnergyCost.toFixed(2)}` },
-                    { "Parking tariff": parkingTariff },
-                    { "Platform fee": platformFee },
-                    { "Convenience fee": convenienceFee },
-                    { "Idle fee": idleFee }
+                    // { "Total energy cost": `₹ ${totalEnergyCost.toFixed(2)}` },
+                    { "Platform Fee": platformFee },
+                    { "Parking Fee": parkingTariff },
+                    { "Convenience Fee": convenienceFee },
+                    { "Idle Fee": idleFee }
                 ]
             },
             {
                 "tax details": [
-                    { "GST 10%": `₹ ${gstAmount.toFixed(2)}` }
+                    { "GST @ 18% ": `₹ ${gstAmount.toFixed(2)}` }
                 ]
             },
+            // {
+            //     "tax details": [
+            //         { "GST 10%": `₹ ${gstAmount.toFixed(2)}` }
+            //     ]
+            // },
             {
                 "Grand Total": `₹ ${grandTotal.toFixed(2)}`
             }
