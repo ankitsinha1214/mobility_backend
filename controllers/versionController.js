@@ -10,7 +10,8 @@ exports.checkVersion = async (req, res) => {
         const isMatch = version === process.env.APP_VERSION;
         var android_url = null;
         var iphone_url = null;
-        if(process.env.FORCE === 'true' && !isMatch){
+        // if(process.env.FORCE === 'true' && !isMatch){
+        if(!isMatch){
             android_url = process.env.ANDROID_URL
             iphone_url = process.env.IPHONE_URL
         }
