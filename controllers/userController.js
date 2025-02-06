@@ -851,7 +851,7 @@ const checkUserRegistration = async (req, res) => {
             const iat = Math.floor(Date.now() / 1000);  // Convert to seconds
             console.log(iat);
             // const { token, iat } = generateToken(userId);
-            await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
+            await User.findByIdAndUpdate(user._id, { tokenIat: iat });
 
             // Find the most recent charging session for this user (latest createdAt)
             const session = await ChargingSession.findOne({ userPhone: phoneNumber })
