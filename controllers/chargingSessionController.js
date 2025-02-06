@@ -484,10 +484,35 @@ const changeConfigurationSession = async (req, res) => {
 
     try {
         client.send(JSON.stringify(ocppMessage)); // Send the message to the specific charger
-        return res.json({
-            status: true,
-            message: `Meter Value configuration command (ChangeConfiguration) initiated for charger ID ${chargerId}`,
-            messageId,
+         // Handle WebSocket response
+         client.once('message', async (response) => {
+            const parsedResponse = JSON.parse(response);
+            const status = parsedResponse[2]?.status;
+
+            if (status === 'Rejected') {
+                return res.json({
+                    status: false,
+                    message: 'Meter Value configuration command was rejected by the charger.',
+                });
+            } else if (status === 'Accepted') {
+                return res.json({
+                    status: true,
+                    message: `Meter Value configuration command (ChangeConfiguration) initiated for charger ID ${chargerId}`,
+                    messageId: messageId,
+                });
+            } else if (status === 'RebootRequired') {
+                // Reboot logic here we have to write
+
+                return res.json({
+                    status: false,
+                    message: `Reboot Required for changing configuration for charger ID ${chargerId}`
+                });
+            } else {
+                return res.json({
+                    status: false,
+                    message: 'Unknown status by charger. Please try again.',
+                });
+            }
         });
     } catch (error) {
         console.error('Error sending WebSocket message:', error);

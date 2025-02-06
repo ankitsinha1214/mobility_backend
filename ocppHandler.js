@@ -1,94 +1,3 @@
-// const ChargingSession = require('./models/chargerSessionModel');
-// const ChargerLocation = require('./models/chargerLocationModel');
-// const User = require('./models/userModel'); // Import User model
-
-// const handleOcppMessage = async (message) => {
-//     try {
-//         const { action, payload } = message;
-
-//         switch (action) {
-//             case 'BootNotification':
-//                 console.log('Boot Notification:', payload);
-//                 // Handle boot notification from the charger
-//                 break;
-
-//             case 'StartTransaction':
-//                 await handleStartTransaction(payload);
-//                 break;
-
-//             case 'StopTransaction':
-//                 await handleStopTransaction(payload);
-//                 break;
-
-//             default:
-//                 console.log('Unhandled action:', action);
-//                 break;
-//         }
-//     } catch (error) {
-//         console.error('Error handling OCPP message:', error);
-//     }
-// };
-
-// const handleStartTransaction = async (payload) => {
-//     const { transactionId, chargerId, userPhoneNumber, timestamp } = payload;
-
-//     // Find charger location by chargerId
-//     const location = await ChargerLocation.findOne({ 'chargerInfo._id': chargerId });
-//     if (!location) {
-//         console.error('Charger not found:', chargerId);
-//         return;
-//     }
-
-//     // Find charger info by chargerId
-//     const chargerInfo = location.chargerInfo.id(chargerId); 
-//     if (!chargerInfo) {
-//         console.error('Charger info not found for chargerId:', chargerId);
-//         return;
-//     }
-
-//     // Find user by phoneNumber
-//     const user = await User.findOne({ phoneNumber: userPhoneNumber });
-//     if (!user) {
-//         console.error('User not found with phone number:', userPhoneNumber);
-//         return;
-//     }
-
-//     const session = new ChargingSession({
-//         charger: chargerId,
-//         user: user._id, // Use the user ID
-//         transactionId,
-//         startTime: new Date(timestamp),
-//         // Include chargerInfo details if needed for session details
-//         // Example: session.chargerName = chargerInfo.name;
-//     });
-
-//     await session.save();
-//     console.log('Charging session started:', session);
-// };
-
-// const handleStopTransaction = async (payload) => {
-//     const { transactionId, timestamp, reason } = payload;
-
-//     const session = await ChargingSession.findOne({ transactionId });
-//     if (!session) {
-//         console.error('Session not found:', transactionId);
-//         return;
-//     }
-
-//     session.endTime = new Date(timestamp);
-//     session.status = 'Stopped';
-//     session.reason = reason;
-
-//     // You might want to calculate additional data using chargerInfo
-//     // Example: session.powerConsumed = calculatePower(session);
-//     // session.cost = calculateCost(session);
-
-//     await session.save();
-//     console.log('Charging session stopped:', session);
-// };
-
-// module.exports = { handleOcppMessage };
-
 const logger = require('./logger');
 const { v4: uuidv4 } = require("uuid");
 const ChargingSession = require('./models/chargerSessionModel.js');
@@ -99,9 +8,6 @@ function handleOcppMessage(ws, message, chargerId) {
 
     if (messageType === 2) { // Call message
         switch (action) {
-            case "ChangeConfiguration":
-                handleChangeConfiguration(ws, messageId, payload);
-                break;
             case "Reboot":
                 handleReboot(ws, messageId, payload);
                 break;
@@ -137,6 +43,15 @@ function handleOcppMessage(ws, message, chargerId) {
                 console.log("Unknown action:", action);
                 sendError(ws, messageId, "NotImplemented", "Unknown action");
         }
+    // } else if (messageType === 3) {
+    //     switch (action) {
+    //         case "ChangeConfiguration":
+    //             handleChangeConfiguration(ws, messageId, payload);
+    //             break;
+    //         default:
+    //             console.log("Unknown action:", action);
+    //             sendError(ws, messageId, "NotImplemented", "Unknown action");
+    //     }
     } else {
         console.log("Unsupported message type:", messageType);
     }
@@ -159,31 +74,38 @@ function sendHeartbeat() {
     }
 }
 
-function handleChangeConfiguration(ws, messageId, payload) {
-    console.log("ChangeConfiguration request received:", payload);
+// function handleChangeConfiguration(ws, messageId, payload) {
+//     console.log("ChangeConfiguration request received:", payload);
 
-    const { key, value } = payload;
+//     const { status } = payload;
+//     // Validate the configuration key-value pair
+//     if (status === "Accepted") // Possible values: "Accepted", "Rejected", "RebootRequired"
+//     {
 
-    // Validate the configuration key-value pair
-    let status = "Accepted"; // Possible values: "Accepted", "Rejected", "RebootRequired"
+//     } else if (status === "Rejected") {
+        
+//     } else if (status === "RebootRequired") {
 
-    // Example validation (you can add logic to check if key-value pairs are valid)
-    if (!key || value === undefined) {
-        status = "Rejected";
-    } else if (key === "MeterValueSampleInterval" && isNaN(value)) {
-        status = "Rejected";
-    }
+//     } else{
 
-    // Create response message
-    const response = [
-        3, // MessageTypeId for CallResult
-        messageId,
-        { status }
-    ];
+//     }
+//     // Example validation (you can add logic to check if key-value pairs are valid)
+//     // if (!key || value === undefined) {
+//     //     status = "Rejected";
+//     // } else if (key === "MeterValueSampleInterval" && isNaN(value)) {
+//     //     status = "Rejected";
+//     // }
 
-    ws.send(JSON.stringify(response));
-    console.log("Sent ChangeConfiguration response:", response);
-}
+//     // Create response message
+//     const response = [
+//         3, // MessageTypeId for CallResult
+//         messageId,
+//         { status }
+//     ];
+
+//     ws.send(JSON.stringify(response));
+//     console.log("Sent ChangeConfiguration response:", response);
+// }
 
 
 function handleReboot(ws, messageId, payload) {
