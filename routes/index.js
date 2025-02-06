@@ -9,6 +9,7 @@ router.get('/', (_req, res) => {
 
 router.use('/reports', require('../controllers/reportController'));
 router.use('/users', require('./userRoute'));
+router.use('/version', require('./versionRoute'));
 router.use('/user-service-and-maintenance', require('./userSandmRoute'));
 router.use('/notification-service-and-maintenance', require('./notificationSandmRoute'));
 router.use('/location', require('./locationRoute'));
