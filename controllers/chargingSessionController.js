@@ -293,7 +293,8 @@ const startStopChargingSession = async (req, res) => {
             // **Check for Active Session for User**
             const activeUserSession = await ChargingSession.findOne({
                 userPhone: payload?.idTag,
-                status: 'Started'
+                // status: 'Started'
+                status: { $in: ['Started', 'Stopped'] }
             });
             if (activeUserSession) {
                 return res.json({
