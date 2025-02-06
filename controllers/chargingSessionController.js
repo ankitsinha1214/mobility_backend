@@ -449,6 +449,55 @@ const resetChargingSession = async (req, res) => {
     }
 };
 
+const changeConfigurationSession = async (req, res) => {
+    if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+
+    const { chargerId, key, value } = req.body;
+    // Validate inputs
+    if (!chargerId || !key || !value || !['MeterValueSampleInterval'].includes(key)) {
+        return res.json({
+            status: false,
+            message: 'Invalid request. Ensure "chargerId", "key" and "value" (MeterValueSampleInterval) are provided.',
+        });
+    }
+
+    const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
+    if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
+        return res.status(500).json({
+            status: false,
+            message: `WebSocket connection not established for charger ID ${chargerId}`,
+        });
+    }
+
+    const messageId = generateUniqueId(); // Generate a unique ID for the message
+    const ocppMessage = [
+        2, // MessageTypeId for Call
+        messageId,
+        'ChangeConfiguration',
+        {
+            key, // Reset type (Soft/Hard)
+            value, // Reset type (Soft/Hard)
+        },
+    ];
+
+    try {
+        client.send(JSON.stringify(ocppMessage)); // Send the message to the specific charger
+        return res.json({
+            status: true,
+            message: `Meter Value configuration command (ChangeConfiguration) initiated for charger ID ${chargerId}`,
+            messageId,
+        });
+    } catch (error) {
+        console.error('Error sending WebSocket message:', error);
+        return res.status(500).json({
+            status: false,
+            message: 'Error sending meter value configuration command!',
+        });
+    }
+};
+
 const getSessionData = async (req, res) => {
     const { sessionId, timezone } = req.body;
 
@@ -768,4 +817,4 @@ const generateUniqueId = () => {
     return 'uuid-' + Math.random().toString(36).substring(2, 15); // Example UUID generator
 };
 
-module.exports = { startStopChargingSession, resetChargingSession, getSessionData, getSessionReceipt, getAllSessions };
+module.exports = { startStopChargingSession, resetChargingSession, changeConfigurationSession, getSessionData, getSessionReceipt, getAllSessions };

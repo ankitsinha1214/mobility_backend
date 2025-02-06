@@ -99,6 +99,9 @@ function handleOcppMessage(ws, message, chargerId) {
 
     if (messageType === 2) { // Call message
         switch (action) {
+            case "ChangeConfiguration":
+                handleChangeConfiguration(ws, messageId, payload);
+                break;
             case "Reboot":
                 handleReboot(ws, messageId, payload);
                 break;
@@ -154,6 +157,32 @@ function sendHeartbeat() {
     } else {
         console.log("WebSocket connection not open. Unable to send heartbeat.");
     }
+}
+
+function handleChangeConfiguration(ws, messageId, payload) {
+    console.log("ChangeConfiguration request received:", payload);
+
+    const { key, value } = payload;
+
+    // Validate the configuration key-value pair
+    let status = "Accepted"; // Possible values: "Accepted", "Rejected", "RebootRequired"
+
+    // Example validation (you can add logic to check if key-value pairs are valid)
+    if (!key || value === undefined) {
+        status = "Rejected";
+    } else if (key === "MeterValueSampleInterval" && isNaN(value)) {
+        status = "Rejected";
+    }
+
+    // Create response message
+    const response = [
+        3, // MessageTypeId for CallResult
+        messageId,
+        { status }
+    ];
+
+    ws.send(JSON.stringify(response));
+    console.log("Sent ChangeConfiguration response:", response);
 }
 
 
