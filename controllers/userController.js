@@ -429,6 +429,18 @@ const deleteUser = async (req, res) => {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     try {
+        // **Check for Active Session for User**
+        const activeUserSession = await ChargingSession.findOne({
+            userPhone: phoneNumber,
+            // status: 'Started'
+            status: { $in: ['Started', 'Stopped'] }
+        });
+        if (activeUserSession) {
+            return res.json({
+                status: false,
+                message: 'User cannot be deleted due to an ongoing transaction or session.'
+            });
+        }
         // Find the user by phoneNumber
         const user = await User.findOne({ phoneNumber });
 

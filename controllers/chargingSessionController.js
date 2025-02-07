@@ -246,7 +246,7 @@ const startStopChargingSession = async (req, res) => {
         if (action === 'start' && chargerInfo.status !== 'Preparing') {
             return res.json({
                 status: false,
-                message: `Cannot start, charger not in Preparing`,
+                message: `Oops! The charger isn’t connected. Try again!`,
                 // message: `Cannot start charging. Charger status is ${chargerInfo.status}, but it must be 'Preparing'.`,
             });
         }
