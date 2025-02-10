@@ -849,8 +849,52 @@ const getAllSessions = async (req, res) => {
     }
 };
 
+const getSessionById = async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+
+        const session = await ChargingSession.findById(sessionId);
+        if (!session) {
+            return res.json({ success: false, message: 'Session Not Found.' });
+        }
+
+        // Fetch location info based on chargerId
+        const chargerLocation = await ChargerLocation.findOne({
+            'chargerInfo.name': session.chargerId
+        }).select('locationName address city state status');
+
+        // Calculate Charging Duration using metadata timestamps
+        const metadata = session.metadata || [];
+        const startTime = metadata[0]?.timestamp || session.startTime;
+        const endTime = metadata[metadata.length - 1]?.timestamp || session.endTime;
+
+        const durationInMs = new Date(endTime) - new Date(startTime);
+        const durationInSeconds = Math.floor(durationInMs / 1000);
+        const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
+        const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
+        const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
+        const chargingDuration = `${hours}:${minutes}:${seconds}`;
+
+        // Construct response
+        const enrichedSession = {
+            ...session.toObject(),
+            chargerLocation: chargerLocation || null,
+            duration: chargingDuration || null,
+        };
+
+        return res.json({ success: true, data: enrichedSession, message: 'Session Retrieved Successfully!!!' });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Failed to retrieve session', error: error.message });
+    }
+};
+
 const generateUniqueId = () => {
     return 'uuid-' + Math.random().toString(36).substring(2, 15); // Example UUID generator
 };
 
-module.exports = { startStopChargingSession, resetChargingSession, changeConfigurationSession, getSessionData, getSessionReceipt, getAllSessions };
+module.exports = { startStopChargingSession, resetChargingSession, changeConfigurationSession, getSessionData, getSessionReceipt, getAllSessions, getSessionById };
