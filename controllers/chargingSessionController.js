@@ -4,6 +4,7 @@ const ChargingSession = require('../models/chargerSessionModel.js');
 const ChargerLocation = require('../models/chargerLocationModel');
 const moment = require('moment-timezone');
 const User = require('../models/userModel');
+const logger = require('../logger.js');
 
 // Helper function to calculate energy consumed
 const calculateEnergyConsumed = (startMeterValue, endMeterValue) => {
@@ -205,7 +206,9 @@ const startStopChargingSession = async (req, res) => {
 
     const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
     if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
-        return res.json({ status: false, message: `WebSocket not established for charger ID ${chargerId}` });
+        logger.error(`WebSocket not established for charger ID ${chargerId}`)
+        return res.json({ status: false, message: `Charger ID ${chargerId} is not connected to the Server.` });
+        // return res.json({ status: false, message: `WebSocket not established for charger ID ${chargerId}` });
     }
 
     let createdBy = '';
@@ -246,7 +249,7 @@ const startStopChargingSession = async (req, res) => {
         if (action === 'start' && chargerInfo.status !== 'Preparing') {
             return res.json({
                 status: false,
-                message: `Oops! The charger isn’t connected. Try again!`,
+                message: `Oops! The charger isn’t connected to your Vehicle. Try again!`,
                 // message: `Cannot start charging. Charger status is ${chargerInfo.status}, but it must be 'Preparing'.`,
             });
         }
@@ -524,13 +527,20 @@ const changeConfigurationSession = async (req, res) => {
 };
 
 const getSessionData = async (req, res) => {
-    const { sessionId, timezone } = req.body;
+    const { userPhone, timezone } = req.body;
+    // const { sessionId, timezone } = req.body;
 
     // Validate input
-    if (!sessionId) {
+    // if (!sessionId) {
+    //     return res.json({
+    //         status: false,
+    //         message: 'Session ID is required',
+    //     });
+    // }
+    if (!userPhone) {
         return res.json({
             status: false,
-            message: 'Session ID is required',
+            message: 'Phone Number is required',
         });
     }
     if (!timezone) {
@@ -542,7 +552,8 @@ const getSessionData = async (req, res) => {
 
     try {
         // Find the session by sessionId
-        const session = await ChargingSession.findById(sessionId);
+        const session = await ChargingSession.findOne({ userPhone, status: { $in: ["Started", "Stopped"]} });
+        // const session = await ChargingSession.findById(sessionId);
         if (!session) {
             return res.json({
                 status: false,
