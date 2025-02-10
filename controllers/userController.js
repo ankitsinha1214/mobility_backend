@@ -437,7 +437,7 @@ const deleteUser = async (req, res) => {
         });
         if (activeUserSession) {
             return res.json({
-                status: false,
+                success: false,
                 message: 'User cannot be deleted due to an ongoing transaction or session.'
             });
         }
