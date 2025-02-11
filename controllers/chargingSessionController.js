@@ -893,8 +893,102 @@ const getSessionById = async (req, res) => {
     }
 };
 
+const getSessionByChargerId = async (req, res) => {
+    try {
+        const { chargerId } = req.body;
+
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+
+        const sessions = await ChargingSession.find({ chargerId });
+
+        if (!sessions || sessions.length === 0) {
+            return res.json({ success: false, message: 'No Sessions Found for this Charger.' });
+        }
+
+        // Fetch location info based on chargerId
+        const chargerLocation = await ChargerLocation.findOne({
+            'chargerInfo.name': chargerId
+        }).select('locationName address city state status');
+
+        let totalEnergyDelivered = 0; // kWh
+        let totalActiveTime = 0; // milliseconds
+        const uptimeTracking = new Set(); // To track charger availability timestamps
+
+        const enrichedSessions = sessions.map(session => {
+            const metadata = session.metadata || [];
+            if (metadata.length < 2) return null; // Skip incomplete metadata
+
+            // Extract start and end times
+            const startTime = new Date(metadata[0].timestamp);
+            const endTime = new Date(metadata[metadata.length - 1].timestamp);
+            totalActiveTime += endTime - startTime;
+
+            // Calculate duration
+            const durationInSeconds = Math.floor((endTime - startTime) / 1000);
+            const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
+            const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
+            const chargingDuration = `${hours}:${minutes}:${seconds}`;
+
+            // Calculate total energy delivered (Convert Wh to kWh)
+            const startEnergy = parseFloat(metadata[0].values["Energy.Active.Import.Register"]) / 1000;
+            const endEnergy = parseFloat(metadata[metadata.length - 1].values["Energy.Active.Import.Register"]) / 1000;
+            const sessionEnergyDelivered = Math.max(0, endEnergy - startEnergy); // kWh
+            totalEnergyDelivered += sessionEnergyDelivered;
+
+            // Track uptime using timestamps (unique hour-wise tracking)
+            metadata.forEach(m => {
+                const hourKey = new Date(m.timestamp).toISOString().slice(0, 13); // Format: YYYY-MM-DDTHH
+                uptimeTracking.add(hourKey);
+            });
+
+            return {
+                ...session.toObject(),
+                chargerLocation: chargerLocation || null,
+                duration: chargingDuration || null,
+                energyDelivered: sessionEnergyDelivered.toFixed(2) + " kWh"
+            };
+        }).filter(Boolean);
+
+        // KMS Powered Calculation (Assuming 6 km/kWh efficiency)
+        const averageEfficiency = 6; // km per kWh
+        const kmsPowered = totalEnergyDelivered * averageEfficiency;
+
+        // CO2 Saved Calculation (Assuming 0.82 kg/kWh for India)
+        const CO2EmissionFactor = 0.82; // kg per kWh
+        const CO2Saved = totalEnergyDelivered * CO2EmissionFactor;
+
+        // Uptime Rate Calculation
+        const totalPossibleHours = 24 * 30; // Assuming 30 days in a month
+        const uptimeRate = (uptimeTracking.size / totalPossibleHours) * 100;
+
+        return res.json({
+            success: true,
+            data: {
+                sessions: enrichedSessions,
+                chargerLocation,
+                kmsPowered: kmsPowered.toFixed(2) + " km",
+                CO2Saved: CO2Saved.toFixed(2) + " kg",
+                uptimeRate: uptimeRate.toFixed(2) + " %"
+            },
+            message: 'Sessions Retrieved Successfully!!!'
+        });
+
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve sessions',
+            error: error.message
+        });
+    }
+};
+
+
 const generateUniqueId = () => {
     return 'uuid-' + Math.random().toString(36).substring(2, 15); // Example UUID generator
 };
 
-module.exports = { startStopChargingSession, resetChargingSession, changeConfigurationSession, getSessionData, getSessionReceipt, getAllSessions, getSessionById };
+module.exports = { startStopChargingSession, resetChargingSession, changeConfigurationSession, getSessionData, getSessionReceipt, getAllSessions, getSessionById, getSessionByChargerId };
