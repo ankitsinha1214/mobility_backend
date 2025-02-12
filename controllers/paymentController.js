@@ -79,13 +79,22 @@ exports.getPaymentById = async (req, res) => {
     }
 };
 
-// CHECK PAYMENT BY SESSION ID 
+// CHECK PAYMENT BY SESSION ID (Edit By phone Number for CMS & APP Interaction.)
 exports.checkPaymentBySessionId = async (req, res) => {
     try {
-        const { sessionId } = req.body;
+        // const { sessionId } = req.body;
         // Find the payment by sessionId
-        const sesID = sessionId.toString();
-        const activeSession = await ChargingSession.findOne({ _id : sesID, status: 'Started' });
+        // const sesID = sessionId.toString();
+
+        const { phoneNumber } = req.body;
+        if(!phoneNumber){
+            return res.json({
+                status: false,
+                message: 'Phone Number is Required.'
+            });
+        }
+
+        const activeSession = await ChargingSession.findOne({ userPhone : phoneNumber, status: 'Started' });
         // console.log(activeSession)
         if(activeSession){
             return res.json({
@@ -93,7 +102,7 @@ exports.checkPaymentBySessionId = async (req, res) => {
                 message: 'Session is Active'
             });
         }
-
+        const sessionId = activeSession._id;
         const payment = await Payment.findOne({ sessionId });
 
         if (!payment) {
