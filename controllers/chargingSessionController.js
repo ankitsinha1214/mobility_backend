@@ -329,8 +329,10 @@ const startStopChargingSession = async (req, res) => {
                     message: 'No active session found',
                 });
             }
-            if (req.phn !== sessionDetails?.userPhone) {
-                return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
+            if (req.phn) {
+                if (req.phn !== sessionDetails?.userPhone) {
+                    return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
+                }
             }
             if (!sessionDetails?.transactionId) {
                 return res.json({
