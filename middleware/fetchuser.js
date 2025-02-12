@@ -15,6 +15,7 @@ const fetchUser = async (req, res, next) => {
         const data = jwt.verify(token, JWT_SECRET);
         console.log(data);
         req.user = data.role;
+        req.username = data.username;
         req.userid = data._id;
         req.phn = data.phoneNumber;
         if (data.phoneNumber) {

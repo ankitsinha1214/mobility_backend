@@ -23,7 +23,7 @@ const getCurrencySymbol = (currencyCode) => {
 function convertTimestampToDate(timestamp) {
     const options = { timeZone: 'Asia/Kolkata' };
     const date = new Date(timestamp).toLocaleDateString('en-IN', options);
-    
+
     return date;
 }
 
@@ -199,45 +199,44 @@ const startStopChargingSession = async (req, res) => {
     // }
     // console.log('entered');
     // return;
-
-    if (!action || !['start', 'stop'].includes(action)) {
-        return res.status(400).json({ status: false, message: 'Invalid action specified' });
-    }
-
-    const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
-    if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
-        logger.error(`WebSocket not established for charger ID ${chargerId}`)
-        return res.json({ status: false, message: `Charger ID ${chargerId} is not connected to the Server.` });
-        // return res.json({ status: false, message: `WebSocket not established for charger ID ${chargerId}` });
-    }
-
-    let createdBy = '';
-
-    if (req.phn) {
-        // Remove special characters from both values
-        // const cleanPhn = req.phn.replace(/\D/g, "");
-        // const cleanIdTag = payload.idTag.replace(/\D/g, "");
-        // console.log(cleanPhn)
-        // console.log(cleanIdTag)
-        // console.log(cleanPhn === cleanIdTag)
-        // if (cleanPhn !== cleanIdTag) {
-        if(action === 'start'){
-            if (req.phn !== payload?.idTag) {
-                return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
-            }
-        }
-        createdBy = 'Consumer User';
-    }
-    if (req.user) {
-        if (req.user !== 'Admin' && req.user !== 'Manager') {
-            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
-        }
-        createdBy = req.user;
-    }
-
-    const messageId = generateUniqueId(); // Generate a unique ID for the message
-
     try {
+        if (!action || !['start', 'stop'].includes(action)) {
+            return res.status(400).json({ status: false, message: 'Invalid action specified' });
+        }
+
+        const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
+        if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
+            logger.error(`WebSocket not established for charger ID ${chargerId}`)
+            return res.json({ status: false, message: `Charger ID ${chargerId} is not connected to the Server.` });
+            // return res.json({ status: false, message: `WebSocket not established for charger ID ${chargerId}` });
+        }
+
+        let createdBy = '';
+
+        if (req.phn) {
+            // Remove special characters from both values
+            // const cleanPhn = req.phn.replace(/\D/g, "");
+            // const cleanIdTag = payload.idTag.replace(/\D/g, "");
+            // console.log(cleanPhn)
+            // console.log(cleanIdTag)
+            // console.log(cleanPhn === cleanIdTag)
+            // if (cleanPhn !== cleanIdTag) {
+            if (action === 'start') {
+                if (req.phn !== payload?.idTag) {
+                    return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
+                }
+            }
+            createdBy = 'Consumer User';
+        }
+        if (req.user) {
+            if (req.user !== 'Admin' && req.user !== 'Manager') {
+                return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+            }
+            createdBy = req.user + ' - ' + req.username;
+        }
+
+        const messageId = generateUniqueId(); // Generate a unique ID for the message
+
         // Fetch the current charger status
         const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': chargerId }).select('chargerInfo');
         const chargerInfo = chargerLocation?.chargerInfo.find(charger => charger.name === chargerId);
@@ -330,6 +329,9 @@ const startStopChargingSession = async (req, res) => {
                     message: 'No active session found',
                 });
             }
+            if (req.phn !== sessionDetails?.userPhone) {
+                return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
+            }
             if (!sessionDetails?.transactionId) {
                 return res.json({
                     status: false,
@@ -381,7 +383,7 @@ const startStopChargingSession = async (req, res) => {
                 const sessionId = payload?.sessionId;
                 const sessionDetails = await ChargingSession.findOneAndUpdate(
                     { _id: sessionId },
-                    { status: 'Stopped', endTime: new Date(), stopCreatedBy: createdBy, stopReason: sessionReason, },
+                    { status: 'Stopped', endTime: new Date(), stopCreatedBy: createdBy, stopReason: sessionReason || 'User Terminated', },
                     { new: true }
                 );
 
@@ -487,8 +489,8 @@ const changeConfigurationSession = async (req, res) => {
 
     try {
         client.send(JSON.stringify(ocppMessage)); // Send the message to the specific charger
-         // Handle WebSocket response
-         client.once('message', async (response) => {
+        // Handle WebSocket response
+        client.once('message', async (response) => {
             const parsedResponse = JSON.parse(response);
             const status = parsedResponse[2]?.status;
 
@@ -552,7 +554,7 @@ const getSessionData = async (req, res) => {
 
     try {
         // Find the session by sessionId
-        const session = await ChargingSession.findOne({ userPhone, status: { $in: ["Started", "Stopped"]} });
+        const session = await ChargingSession.findOne({ userPhone, status: { $in: ["Started", "Stopped"] } });
         // const session = await ChargingSession.findById(sessionId);
         if (!session) {
             return res.json({
@@ -732,7 +734,7 @@ const getSessionReceipt = async (req, res) => {
                 "header": [
                     { "type": chargerInfo.type },
                     { "powerOutput": chargerInfo.powerOutput },
-                    { "Charger location": chargerLocation.locationName + ', ' + chargerLocation.city},
+                    { "Charger location": chargerLocation.locationName + ', ' + chargerLocation.city },
                     { "createdAt": convertTimestampToDate(session.createdAt) },
                     { "Charger ID": session.chargerId },
                     // { "Charger duration": formattedDuration },  // Convert to minutes
