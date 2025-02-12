@@ -3,6 +3,7 @@ const User = require('../models/userModel');
 const SiteSurvey = require('../models/siteSurveyModel');
 const PreInstallation = require('../models/preInstallationModel');
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const ChargingSession = require('../models/chargerSessionModel');
 const s3 = new S3Client({
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -633,7 +634,7 @@ const getLocationsByStateCityStatusSitesurvey = async (req, res) => {
 //     }
 // };
 const getChargerLocationsInRange = async (req, res) => {
-    const { latitude, longitude, status, range } = req.body;
+    const { latitude, longitude, status, range, userPhone } = req.body;
 
     if (range === 0) {
         return res.json({ success: true, data: null, message: 'No charger found!' });
@@ -643,6 +644,14 @@ const getChargerLocationsInRange = async (req, res) => {
     }
 
     try {
+        // Find the session by sessionId
+        let sessionId = null;
+        let status1 = null;
+        const session = await ChargingSession.findOne({ userPhone, status: { $in: ["Started", "Stopped"]} });
+        if (session) {
+            sessionId = session._id;
+            status1 = session.status;
+        }
         // Convert range from kilometers to meters
         const rangeInMeters = range * 1000;
 
@@ -656,10 +665,10 @@ const getChargerLocationsInRange = async (req, res) => {
         });
 
         if (locationsInRange.length === 0) {
-            return res.json({ success: false, message: 'No charger locations found within the specified range' });
+            return res.json({ success: false, message: 'No charger locations found within the specified range', sessionInfo: { sessionId, status: status1 } });
         }
 
-        return res.json({ success: true, data: locationsInRange });
+        return res.json({ success: true, data: locationsInRange, sessionInfo: { sessionId, status: status1 } });
     } catch (error) {
         console.error('Error:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
