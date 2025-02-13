@@ -220,6 +220,15 @@ const addChargerToLocation = async (req, res) => {
             return res.json({ success: false, message: 'Location not found' });
         }
 
+        // Check if ChargerId already exists across all locations
+        const existingCharger = await ChargerLocation.findOne({
+            "chargerInfo.chargerId": parsedChargerInfo.chargerId,
+        });
+
+        if (existingCharger) {
+            return res.json({ success: false, message: 'ChargerId already exists in another location' });
+        }
+
         // Append the new charger info to the existing chargerInfo array
         chargerLocation.chargerInfo.push(parsedChargerInfo);
 
@@ -255,6 +264,17 @@ const updateChargerInLocation = async (req, res) => {
 
         if (chargerIndex === -1) {
             return res.json({ success: false, message: 'Charger not found' });
+        }
+
+        // Ensure updated ChargerId is not already in use across all locations (except current charger)
+        if (
+            updatedChargerInfo.chargerId &&
+            (await ChargerLocation.findOne({
+                "chargerInfo.chargerId": updatedChargerInfo.chargerId,
+                _id: { $ne: location_id }, // Exclude the current location
+            }))
+        ) {
+            return res.json({ success: false, message: 'ChargerId already exists in another location' });
         }
 
         // Update the charger info at the specific index
@@ -647,7 +667,7 @@ const getChargerLocationsInRange = async (req, res) => {
         // Find the session by sessionId
         let sessionId = null;
         let status1 = null;
-        const session = await ChargingSession.findOne({ userPhone, status: { $in: ["Started", "Stopped"]} });
+        const session = await ChargingSession.findOne({ userPhone, status: { $in: ["Started", "Stopped"] } });
         if (session) {
             sessionId = session._id;
             status1 = session.status;

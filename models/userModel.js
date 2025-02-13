@@ -91,7 +91,7 @@ const userSchema = new Schema({
   },
   lastName: {
     type: String,
-    required: true,
+    // required: true,
     validate: {
       validator: function(v) {
         return /\S+/.test(v); // Ensures it's not just whitespace
