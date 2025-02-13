@@ -355,7 +355,11 @@ const getUserById = async (req, res) => {
 // Update user by ID
 const updateUser = async (req, res) => {
     const { phoneNumber } = req.params;
-    const { gender, email, date_of_birth, ...updateFields } = req.body;
+    const { 
+        // gender, 
+        email,
+        //  date_of_birth,
+         ...updateFields } = req.body;
     if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
