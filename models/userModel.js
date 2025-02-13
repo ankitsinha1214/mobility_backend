@@ -117,7 +117,7 @@ const userSchema = new Schema({
   },
   state: {
     type: String,
-    required: true,
+    // required: true,
     validate: {
       validator: function(v) {
         return /\S+/.test(v); // Ensures it's not just whitespace
@@ -127,7 +127,7 @@ const userSchema = new Schema({
   },
   city: {
     type: String,
-    required: true,
+    // required: true,
     validate: {
       validator: function(v) {
         return /\S+/.test(v); // Ensures it's not just whitespace
@@ -137,7 +137,7 @@ const userSchema = new Schema({
   },
   dob: {
     type: String,
-    required: true,
+    // required: true,
     validate: {
       validator: function(v) {
         return /\S+/.test(v); // Ensures it's not just whitespace
@@ -147,7 +147,7 @@ const userSchema = new Schema({
   },
   gender: {
     type: String,
-    required: true,
+    // required: true,
     validate: {
       validator: function(v) {
         return /\S+/.test(v); // Ensures it's not just whitespace
