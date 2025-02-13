@@ -268,9 +268,9 @@ const updateChargerInLocation = async (req, res) => {
 
         // Ensure updated ChargerId is not already in use across all locations (except current charger)
         if (
-            updatedChargerInfo.chargerId &&
+            updatedChargerInfo.name &&
             (await ChargerLocation.findOne({
-                "chargerInfo.chargerId": updatedChargerInfo.chargerId,
+                "chargerInfo.chargerId": updatedChargerInfo.name,
                 _id: { $ne: location_id }, // Exclude the current location
             }))
         ) {

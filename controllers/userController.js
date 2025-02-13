@@ -363,10 +363,12 @@ const updateUser = async (req, res) => {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
     // Check if restricted fields are in the request body
-    if (gender || email || date_of_birth) {
+    // if (gender || email || date_of_birth) {
+    if ( email) {
         return res.json({
             success: false,
-            message: "Updating gender, email, or date of birth is not allowed"
+            message: "Updating Email is not allowed"
+            // message: "Updating gender, email, or date of birth is not allowed"
         });
     }
 
