@@ -92,12 +92,12 @@ const userSchema = new Schema({
   lastName: {
     type: String,
     // required: true,
-    validate: {
-      validator: function(v) {
-        return /\S+/.test(v); // Ensures it's not just whitespace
-      },
-      message: 'Last Name cannot be empty'
-    }
+    // validate: {
+    //   validator: function(v) {
+    //     return /\S+/.test(v); // Ensures it's not just whitespace
+    //   },
+    //   message: 'Last Name cannot be empty'
+    // }
   },
   status: {
     type: String,
@@ -118,42 +118,42 @@ const userSchema = new Schema({
   state: {
     type: String,
     // required: true,
-    validate: {
-      validator: function(v) {
-        return /\S+/.test(v); // Ensures it's not just whitespace
-      },
-      message: 'State cannot be empty'
-    }
+    // validate: {
+    //   validator: function(v) {
+    //     return /\S+/.test(v); // Ensures it's not just whitespace
+    //   },
+    //   message: 'State cannot be empty'
+    // }
   },
   city: {
     type: String,
     // required: true,
-    validate: {
-      validator: function(v) {
-        return /\S+/.test(v); // Ensures it's not just whitespace
-      },
-      message: 'City cannot be empty'
-    }
+    // validate: {
+    //   validator: function(v) {
+    //     return /\S+/.test(v); // Ensures it's not just whitespace
+    //   },
+    //   message: 'City cannot be empty'
+    // }
   },
   dob: {
     type: String,
     // required: true,
-    validate: {
-      validator: function(v) {
-        return /\S+/.test(v); // Ensures it's not just whitespace
-      },
-      message: 'Date Of Birth cannot be empty'
-    }
+    // validate: {
+    //   validator: function(v) {
+    //     return /\S+/.test(v); // Ensures it's not just whitespace
+    //   },
+    //   message: 'Date Of Birth cannot be empty'
+    // }
   },
   gender: {
     type: String,
     // required: true,
-    validate: {
-      validator: function(v) {
-        return /\S+/.test(v); // Ensures it's not just whitespace
-      },
-      message: 'Gender cannot be empty'
-    }
+    // validate: {
+    //   validator: function(v) {
+    //     return /\S+/.test(v); // Ensures it's not just whitespace
+    //   },
+    //   message: 'Gender cannot be empty'
+    // }
   },
   email: {
     type: String,
