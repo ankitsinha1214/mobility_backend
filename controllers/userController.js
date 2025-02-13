@@ -252,7 +252,7 @@ const getPaginatedUser = async (req, res) => {
         const search = req.query.search || '';
 
         // Define the fields to return in the response
-        const userFields = 'firstName lastName phoneNumber email state city gender user_vehicle status';
+        const userFields = 'firstName lastName phoneNumber email state city gender dob user_vehicle status';
 
         // Build filter condition for searching
         // Build filter condition for searching across multiple fields
