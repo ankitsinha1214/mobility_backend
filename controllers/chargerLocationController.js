@@ -222,8 +222,9 @@ const addChargerToLocation = async (req, res) => {
 
         // Check if ChargerId already exists across all locations
         const existingCharger = await ChargerLocation.findOne({
-            "chargerInfo.chargerId": parsedChargerInfo.chargerId,
+            "chargerInfo.name": parsedChargerInfo.name,
         });
+        // console.log(existingCharger)
 
         if (existingCharger) {
             return res.json({ success: false, message: 'ChargerId already exists in another location' });
@@ -270,7 +271,7 @@ const updateChargerInLocation = async (req, res) => {
         if (
             updatedChargerInfo.name &&
             (await ChargerLocation.findOne({
-                "chargerInfo.chargerId": updatedChargerInfo.name,
+                "chargerInfo.name": updatedChargerInfo.name,
                 _id: { $ne: location_id }, // Exclude the current location
             }))
         ) {
