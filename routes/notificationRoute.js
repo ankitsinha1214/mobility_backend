@@ -11,6 +11,6 @@ router.post("/register-token", registerToken);
 router.post("/send-notification", sendPushNotification);
 
 // Send Push Notification to All
-router.post("/send-notification", sendNotificationToAll);
+router.post("/send-notification-to-all", sendNotificationToAll);
 
 module.exports = router;
