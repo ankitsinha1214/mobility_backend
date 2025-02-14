@@ -9,47 +9,79 @@ const registerToken = async (req, res) => {
         const { phoneNumber, fcmToken } = req.body;
 
         if (!phoneNumber || !fcmToken) {
-            return res.status(400).json({ status: false, message: "phoneNumber and fcmToken are required" });
+            return res.json({ status: false, message: "phoneNumber and fcmToken are required" });
         }
 
-        // Find user by phoneNumber and update their FCM token
-        const user = await User.findOneAndUpdate(
-            { "phoneNumber": phoneNumber },  // Assuming phoneNumber is stored in User schema as phone.number
-            { fcmToken },
-            { new: true }
-        );
-
+        // Check if user exists
+        const user = await User.findOne({ phoneNumber });
         if (!user) return res.json({ status: false, message: "User not found" });
 
-        return res.json({ status: true, message: "FCM token updated successfully" });
-        // return res.json({ status: true, message: "FCM token updated successfully", user });
+        // Register the device token with AWS SNS
+        const endpointArn = await registerDeviceToken(fcmToken);
 
-        // const endpointArn = await registerDeviceToken(fcmToken);
-        // return res.json({ status: true, endpointArn });
+        // Store the EndpointArn instead of the FCM token
+        user.endpointArn = endpointArn;
+        await user.save();
+
+        return res.json({ status: true, message: "FCM token registered successfully" });
     } catch (error) {
+        console.error("❌ Error registering token:", error);
         return res.status(500).json({ status: false, message: "Internal Server Error" });
     }
 };
 
 /**
- * API to send push notification
+ * API to send push notification to a single user
  */
 const sendPushNotification = async (req, res) => {
     try {
-        const { endpointArn, title, message } = req.body;
+        const { phoneNumber, title, message } = req.body;
 
-        if (!endpointArn || !title || !message) {
+        if (!phoneNumber || !title || !message) {
             return res.json({ status: false, message: "All fields are required." });
         }
 
-        await sendNotification(endpointArn, title, message);
+        // Get user's EndpointArn
+        const user = await User.findOne({ phoneNumber }, "endpointArn");
+        if (!user || !user.endpointArn) {
+            return res.json({ status: false, message: "User not found or no registered device" });
+        }
+
+        await sendNotification(user.endpointArn, title, message);
         return res.json({ status: true, message: "Notification sent successfully." });
     } catch (error) {
+        console.error("❌ Error sending notification:", error);
         return res.status(500).json({ status: false, message: "Internal Server Error" });
+    }
+};
+
+/**
+ * API to send push notification to all users
+ */
+const sendNotificationToAll = async (req, res) => {
+    try {
+        const { title, message } = req.body;
+
+        // Fetch all registered users with an endpointArn
+        const users = await User.find({ endpointArn: { $exists: true, $ne: null } }, "endpointArn");
+
+        if (users.length === 0) {
+            return res.json({ status: false, message: "No users found with registered devices" });
+        }
+
+        // Send notifications to all users
+        const endpointArns = users.map(user => user.endpointArn);
+        await sendNotification(endpointArns, title, message);
+
+        return res.json({ status: true, message: "Notification sent to all users" });
+    } catch (error) {
+        console.error("❌ Error sending notification:", error);
+        return res.status(500).json({ status: false, message: "Error sending notification" });
     }
 };
 
 module.exports = {
     registerToken,
     sendPushNotification,
+    sendNotificationToAll
 };

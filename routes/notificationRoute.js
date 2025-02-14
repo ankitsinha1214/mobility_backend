@@ -1,6 +1,6 @@
 // routes/notificationRoutes.js
 const express = require("express");
-const { registerToken, sendPushNotification } = require("../controllers/notificationController");
+const { registerToken, sendPushNotification, sendNotificationToAll } = require("../controllers/notificationController");
 
 const router = express.Router();
 
@@ -9,5 +9,8 @@ router.post("/register-token", registerToken);
 
 // Send Push Notification
 router.post("/send-notification", sendPushNotification);
+
+// Send Push Notification to All
+router.post("/send-notification", sendNotificationToAll);
 
 module.exports = router;

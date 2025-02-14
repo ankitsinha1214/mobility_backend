@@ -180,7 +180,7 @@ const userSchema = new Schema({
     type: String,
     default: null
   },
-  fcmToken: {
+  endpointArn: {
     type: String,
     default: null
   },
