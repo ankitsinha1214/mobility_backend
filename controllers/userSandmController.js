@@ -70,7 +70,8 @@ const loginUser = async (req, res) => {
             // const userId = user._id;
             const userId = {
                 _id : user._id,
-                role : user.role
+                role : user.role,
+                username : user.username
             };
             // Remove the password field
             delete userData.password;
