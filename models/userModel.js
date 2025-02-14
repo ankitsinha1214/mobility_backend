@@ -158,7 +158,7 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
+    // unique: true,
     validate: {
       validator: function(v) {
         return /\S+/.test(v); // Ensures it's not just whitespace
@@ -177,6 +177,10 @@ const userSchema = new Schema({
   //   }
   // },
   profilePic: {
+    type: String,
+    default: null
+  },
+  fcmToken: {
     type: String,
     default: null
   },

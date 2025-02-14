@@ -24,5 +24,7 @@ router.use('/site-surveys', require('./siteSurveyRoutes'));
 router.use('/pre-delivery-chargebox-response', require('./preDeliveryChargeboxRoute'));
 router.use('/pre-installations', require('./preInstallationRoute'));
 router.use('/charger-dc-box', require('./chargerAndDcBoxRoute'));
+router.use('/notification', require('./notificationRoute'));
+
 
 module.exports = router;
