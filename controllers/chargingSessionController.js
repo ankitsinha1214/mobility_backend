@@ -232,6 +232,8 @@ const startStopChargingSession = async (req, res) => {
             if (req.user !== 'Admin' && req.user !== 'Manager') {
                 return res.status(401).json({ success: false, message: "You are Not a Valid User." });
             }
+            console.log('req -> ',req)
+            console.log(req.username)
             createdBy = req.user + ' - ' + req.username;
         }
 
