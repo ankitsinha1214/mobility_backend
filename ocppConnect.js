@@ -69,8 +69,8 @@ const isProduction = process.env.NODE_ENV === 'production';
 let server;
 if (isProduction) {
     // Load SSL certificates
-    const privateKey = fs.readFileSync('/etc/letsencrypt/live/cms.chrgup.in/fullchain.pem', 'utf8');
-    const certificate = fs.readFileSync('/etc/letsencrypt/live/cms.chrgup.in/privkey.pem', 'utf8');
+    const privateKey = fs.readFileSync('/etc/letsencrypt/live/cms.chrgup.in/privkey.pem', 'utf8');
+    const certificate = fs.readFileSync('/etc/letsencrypt/live/cms.chrgup.in/fullchain.pem', 'utf8');
     const credentials = {
         key: privateKey,
         cert: certificate
