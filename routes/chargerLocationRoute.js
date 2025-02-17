@@ -34,6 +34,7 @@ router.post('/:id',fetchUser, chargerLocationController.changeChargerStatus);
 router.post('/location/filter',fetchUser, chargerLocationController.getLocationsByStateCityStatus);
 router.post('/location/filter/:checkType', fetchUser, chargerLocationController.getLocationsByStateCityStatusSitesurvey);
 router.post('/location/range', fetchUser, chargerLocationController.getChargerLocationsInRange);
+router.post('/location/near/range', fetchUser, chargerLocationController.getChargerLocationsNearInRange);
 router.get('/location/search', fetchUser, chargerLocationController.searchChargerLocations);
 router.post('/dashboard/get-data', fetchUser, chargerLocationController.getDashboardData);
 

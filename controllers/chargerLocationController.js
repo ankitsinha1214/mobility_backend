@@ -706,6 +706,50 @@ const getChargerLocationsInRange = async (req, res) => {
     }
 };
 
+const getChargerLocationsNearInRange = async (req, res) => {
+    const { latitude, longitude, status, range, userPhone } = req.body;
+
+    if (range === 0) {
+        return res.json({ success: true, data: null, message: 'No charger found!' });
+    }
+    if (!latitude || !longitude || !range) {
+        return res.json({ success: false, message: 'Latitude, longitude, and range are required' });
+    }
+
+    try {
+        // Find the session by sessionId
+        let sessionId = null;
+        let status1 = null;
+        const session = await ChargingSession.findOne({ userPhone, status: { $in: ["Started", "Stopped"] } });
+        if (session) {
+            sessionId = session._id;
+            status1 = session.status;
+        }
+        // Convert range from kilometers to meters
+        const rangeInMeters = range * 1000;
+
+        // Get all charger locations
+        // const locations = await ChargerLocation.find(status ? { status } : {}).select('direction chargerInfo');
+        const locations = await ChargerLocation.find(status ? { status } : {});
+
+        // Filter locations within the specified range using Haversine formula
+        const locationsInRange = locations.filter(location => {
+            const distance = calculateDistance(latitude, longitude, location.direction.latitude, location.direction.longitude);
+            return distance <= rangeInMeters;
+        });
+
+        if (locationsInRange.length === 0) {
+            return res.json({ success: false, message: 'No charger locations found within the specified range', sessionInfo: { sessionId, status: status1 } });
+        }
+
+        // return res.json({ success: true, data: sanitizedLocations, sessionInfo: { sessionId, status: status1 } });
+        return res.json({ success: true, data: locationsInRange, sessionInfo: { sessionId, status: status1 } });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 // Haversine formula to calculate the distance between two points
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const toRadians = (degree) => degree * Math.PI / 180;
@@ -945,6 +989,7 @@ module.exports = {
     getLocationsByStateCityStatus,
     getLocationsByStateCityStatusSitesurvey,
     getChargerLocationsInRange,
+    getChargerLocationsNearInRange,
     searchChargerLocations,
     getChargerLocationsInfoByName,
     getChargerSessionsDetails,
