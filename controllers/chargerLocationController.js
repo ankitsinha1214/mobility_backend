@@ -678,7 +678,8 @@ const getChargerLocationsInRange = async (req, res) => {
         const rangeInMeters = range * 1000;
 
         // Get all charger locations
-        const locations = await ChargerLocation.find(status ? { status } : {});
+        const locations = await ChargerLocation.find(status ? { status } : {}).select('direction chargerInfo');
+        // const locations = await ChargerLocation.find(status ? { status } : {});
 
         // Filter locations within the specified range using Haversine formula
         const locationsInRange = locations.filter(location => {
