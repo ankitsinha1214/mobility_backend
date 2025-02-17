@@ -52,23 +52,23 @@ router.delete(
   userController.deleteUser
 );
 
-router.post(
-  "/login",
-  userController.loginUser
-);
+// router.post(
+//   "/login",
+//   userController.loginUser
+// );
 
-router.post(
-  "/updatepassword",
-  userController.updatepassword
-);
-router.post(
-  "/resetpassword",
-  userController.resetpassword
-);
-router.post(
-  "/checkuserforresetpassword",
-  userController.checkUserForResetPassword
-);
+// router.post(
+//   "/updatepassword",
+//   userController.updatepassword
+// );
+// router.post(
+//   "/resetpassword",
+//   userController.resetpassword
+// );
+// router.post(
+//   "/checkuserforresetpassword",
+//   userController.checkUserForResetPassword
+// );
 // POST - Add a new user vehicle
 router.post('/:phoneNumber/vehicles',
   fetchUser, userController.addUserVehicle);

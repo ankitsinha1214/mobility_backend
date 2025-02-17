@@ -9,129 +9,129 @@ const ChargingSession = require('../models/chargerSessionModel.js');
 const Payment = require('../models/paymentModel');
 
 // Update user password
-const updatepassword = async (req, res) => {
-    const { username, oldpassword, newpassword } = req.body;
+// const updatepassword = async (req, res) => {
+//     const { username, oldpassword, newpassword } = req.body;
 
-    if (!oldpassword || !newpassword) {
-        return res.json({ success: false, message: "Old password or new password cannot be empty" });
-    }
+//     if (!oldpassword || !newpassword) {
+//         return res.json({ success: false, message: "Old password or new password cannot be empty" });
+//     }
 
-    try {
-        const user = await User.findOne({ username });
+//     try {
+//         const user = await User.findOne({ username });
 
-        if (user) {
-            const passwordMatch = await bcrypt.compare(oldpassword, user.password);
+//         if (user) {
+//             const passwordMatch = await bcrypt.compare(oldpassword, user.password);
 
-            if (!passwordMatch) {
-                return res.status(401).json({ success: false, message: 'Old password is incorrect' });
-            }
+//             if (!passwordMatch) {
+//                 return res.status(401).json({ success: false, message: 'Old password is incorrect' });
+//             }
 
-            if (oldpassword === newpassword) {
-                return res.status(401).json({ success: false, message: 'Old and new password cannot be the same' });
-            }
+//             if (oldpassword === newpassword) {
+//                 return res.status(401).json({ success: false, message: 'Old and new password cannot be the same' });
+//             }
 
-            const hashedPassword = await bcrypt.hash(newpassword, 10);
-            user.password = hashedPassword;
-            await user.save();
+//             const hashedPassword = await bcrypt.hash(newpassword, 10);
+//             user.password = hashedPassword;
+//             await user.save();
 
-            return res.json({ success: true, message: "Password updated successfully" });
-        } else {
-            return res.json({ success: false, message: "User not found" });
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ success: false, message: 'An error occurred' });
-    }
-};
+//             return res.json({ success: true, message: "Password updated successfully" });
+//         } else {
+//             return res.json({ success: false, message: "User not found" });
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//         res.status(500).json({ success: false, message: 'An error occurred' });
+//     }
+// };
 
 // Check user for password reset
-const checkUserForResetPassword = async (req, res) => {
-    const { username, phoneNumberLast4Digits } = req.body;
+// const checkUserForResetPassword = async (req, res) => {
+//     const { username, phoneNumberLast4Digits } = req.body;
 
-    if (!username || !phoneNumberLast4Digits) {
-        return res.json({ success: false, message: "Username and last 4 digits of phone number are required" });
-    }
+//     if (!username || !phoneNumberLast4Digits) {
+//         return res.json({ success: false, message: "Username and last 4 digits of phone number are required" });
+//     }
 
-    try {
-        const user = await User.findOne({ username });
+//     try {
+//         const user = await User.findOne({ username });
 
-        if (user) {
-            const userPhoneNumberLast4Digits = user.phoneNumber.slice(-4);
+//         if (user) {
+//             const userPhoneNumberLast4Digits = user.phoneNumber.slice(-4);
 
-            if (userPhoneNumberLast4Digits === phoneNumberLast4Digits) {
-                return res.json({ success: true, message: "User exists and phone number digits match" });
-            } else {
-                return res.json({ success: false, message: "Last 4 digits of phone number do not match" });
-            }
-        } else {
-            return res.json({ success: false, message: "User not found" });
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ success: false, message: 'An error occurred' });
-    }
-};
+//             if (userPhoneNumberLast4Digits === phoneNumberLast4Digits) {
+//                 return res.json({ success: true, message: "User exists and phone number digits match" });
+//             } else {
+//                 return res.json({ success: false, message: "Last 4 digits of phone number do not match" });
+//             }
+//         } else {
+//             return res.json({ success: false, message: "User not found" });
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//         res.status(500).json({ success: false, message: 'An error occurred' });
+//     }
+// };
 
 // Reset user password
-const resetpassword = async (req, res) => {
-    const { username, newpassword } = req.body;
+// const resetpassword = async (req, res) => {
+//     const { username, newpassword } = req.body;
 
-    if (!username || !newpassword) {
-        return res.json({ success: false, message: "Username or new password cannot be empty" });
-    }
+//     if (!username || !newpassword) {
+//         return res.json({ success: false, message: "Username or new password cannot be empty" });
+//     }
 
-    try {
-        const user = await User.findOne({ username });
+//     try {
+//         const user = await User.findOne({ username });
 
-        if (user) {
-            const hashedPassword = await bcrypt.hash(newpassword, 10);
-            user.password = hashedPassword;
-            await user.save();
+//         if (user) {
+//             const hashedPassword = await bcrypt.hash(newpassword, 10);
+//             user.password = hashedPassword;
+//             await user.save();
 
-            return res.json({ success: true, message: "Password reset successfully" });
-        } else {
-            return res.json({ success: false, message: "User not found" });
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ success: false, message: 'An error occurred' });
-    }
-};
+//             return res.json({ success: true, message: "Password reset successfully" });
+//         } else {
+//             return res.json({ success: false, message: "User not found" });
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//         res.status(500).json({ success: false, message: 'An error occurred' });
+//     }
+// };
 
 // User login
-const loginUser = async (req, res) => {
-    const { username, password } = req.body;
+// const loginUser = async (req, res) => {
+//     const { username, password } = req.body;
 
-    try {
-        const user = await User.findOne({ username });
+//     try {
+//         const user = await User.findOne({ username });
 
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'Authentication failed' });
-        }
+//         if (!user) {
+//             return res.status(401).json({ success: false, message: 'Authentication failed' });
+//         }
 
-        const passwordMatch = await bcrypt.compare(password, user.password);
+//         const passwordMatch = await bcrypt.compare(password, user.password);
 
-        if (passwordMatch) {
-            const userDataToSend = {
-                id: user.id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                phoneNumber: user.phoneNumber,
-                username: user.username,
-                avatar: user.avatar,
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt,
-            };
+//         if (passwordMatch) {
+//             const userDataToSend = {
+//                 id: user.id,
+//                 firstName: user.firstName,
+//                 lastName: user.lastName,
+//                 phoneNumber: user.phoneNumber,
+//                 username: user.username,
+//                 avatar: user.avatar,
+//                 createdAt: user.createdAt,
+//                 updatedAt: user.updatedAt,
+//             };
 
-            return res.status(200).json({ success: true, data: userDataToSend });
-        } else {
-            return res.status(401).json({ success: false, message: 'Authentication failed' });
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ success: false, message: 'An error occurred' });
-    }
-};
+//             return res.status(200).json({ success: true, data: userDataToSend });
+//         } else {
+//             return res.status(401).json({ success: false, message: 'Authentication failed' });
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//         res.status(500).json({ success: false, message: 'An error occurred' });
+//     }
+// };
 
 // Add user
 const addUser = async (req, res) => {
@@ -1020,10 +1020,10 @@ module.exports = {
     getUserById,
     updateUser,
     deleteUser,
-    loginUser,
-    updatepassword,
-    resetpassword,
-    checkUserForResetPassword,
+    // loginUser,
+    // updatepassword,
+    // resetpassword,
+    // checkUserForResetPassword,
     addUserVehicle,
     getUserVehicles,
     getUserVehicleById,

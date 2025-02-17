@@ -691,7 +691,15 @@ const getChargerLocationsInRange = async (req, res) => {
             return res.json({ success: false, message: 'No charger locations found within the specified range', sessionInfo: { sessionId, status: status1 } });
         }
 
-        return res.json({ success: true, data: locationsInRange, sessionInfo: { sessionId, status: status1 } });
+        // Extract only `_id` and `chargerInfo.status`
+        const sanitizedLocations = locationsInRange.map(({ _id, direction, chargerInfo }) => ({
+            _id,
+            direction,
+            chargerInfo: chargerInfo.map(({ status }) => ({ status })) // Extract only `status` from each chargerInfo object
+        }));
+
+        return res.json({ success: true, data: sanitizedLocations, sessionInfo: { sessionId, status: status1 } });
+        // return res.json({ success: true, data: locationsInRange, sessionInfo: { sessionId, status: status1 } });
     } catch (error) {
         console.error('Error:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
