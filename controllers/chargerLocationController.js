@@ -972,7 +972,7 @@ const getChargerSessionsDetails = async (req, res) => {
 // };
 const getDashboardData = async (req, res) => {
     try {
-               if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
 
@@ -1065,11 +1065,11 @@ const getDashboardData = async (req, res) => {
             const chargerId = session.chargerId.toString();
             // console.log(vehicleId);
             // console.log(chargerId);
-            
+
             // Count vehicle usage
             if (!vehicleStats.has(vehicleId)) {
                 const vehicleOwner = await User.findOne({ "user_vehicle._id": vehicleId }, { "user_vehicle.$": 1 });
-                console.log(vehicleOwner);
+                // console.log(vehicleOwner);
                 if (vehicleOwner && vehicleOwner.user_vehicle.length > 0) {
                     const { type, make, model, variant } = vehicleOwner.user_vehicle[0];
                     vehicleStats.set(vehicleId, { type, make, model, variant, sessions: 0 });
@@ -1104,14 +1104,50 @@ const getDashboardData = async (req, res) => {
         }
 
         // Sort and get top 10 vehicles
+        // let topVehicles = Array.from(vehicleStats.values())
+        //     .sort((a, b) => b.sessions - a.sessions)
+        //     .slice(0, 10);
+        // Define color mapping based on type
+        const vehicleColorMap = {
+            "2w": "blue",
+            "3w": "orange",
+            "4w": "green"
+        };
+
+        // Sort and transform vehicle stats to required format
         let topVehicles = Array.from(vehicleStats.values())
             .sort((a, b) => b.sessions - a.sessions)
-            .slice(0, 10);
+            .slice(0, 10)
+            .map(vehicle => ({
+                name: `${vehicle.make} ${vehicle.model} ${vehicle.variant}`.trim(),
+                type: vehicle.type === "2-Wheeler" ? "2w"
+                    : vehicle.type === "3-Wheeler" ? "3w"
+                        : vehicle.type === "4-Wheeler" ? "4w"
+                            : "unknown",
+                visits: vehicle.sessions,
+                color: vehicleColorMap[
+                    vehicle.type === "2-Wheeler" ? "2w"
+                        : vehicle.type === "3-Wheeler" ? "3w"
+                            : "4w"
+                ] || "gray" // Default color if type is unknown
+            }));
 
         // Sort and get top 10 locations
+        // let topLocations = Array.from(locationStats.values())
+        //     .sort((a, b) => b.sessions - a.sessions)
+        //     .slice(0, 10);
+        // Sort and transform location stats to required format
+        // console.log(locationStats)
         let topLocations = Array.from(locationStats.values())
             .sort((a, b) => b.sessions - a.sessions)
-            .slice(0, 10);
+            .slice(0, 10)
+            .map(location => ({
+                name: location.locationName,
+                visits: location.sessions,
+                energy: `${location.energyConsumed} kWh`,
+                revenue: `₹ ${location.revenue.toLocaleString("en-IN")}`, // Format with commas
+                color: "purple"
+            }));
 
         res.json({
             success: true,
