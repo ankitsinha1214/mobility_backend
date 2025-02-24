@@ -883,17 +883,108 @@ const getChargerSessionsDetails = async (req, res) => {
     }
 };
 
+// const getDashboardData = async (req, res) => {
+//     try {
+//         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+//             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+//         }
+
+//         // Fetch only chargerInfo field from all documents
+//         const chargerLocations = await ChargerLocation.find({}, 'chargerInfo');
+
+//         // Fetch users data for vehicle type count
+//         const users = await User.find({}, 'user_vehicle');
+//         if (chargerLocations.length === 0) {
+//             return res.json({
+//                 success: false,
+//                 message: 'No chargers found',
+//                 data: {
+//                     totalChargers: 0,
+//                     availableChargers: 0,
+//                     inUseChargers: 0,
+//                     inactiveChargers: 0,
+//                     twoWheelerUsers: 0,
+//                     threeWheelerUsers: 0,
+//                     fourWheelerUsers: 0
+//                 }
+//             });
+//         }
+
+//         // Initialize counters
+//         let totalChargers = 0;
+//         let availableChargers = 0;
+//         let inUseChargers = 0;
+//         let inactiveChargers = 0;
+
+//         // Initialize counters for vehicle types
+//         let twoWheelerUsers = 0;
+//         let threeWheelerUsers = 0;
+//         let fourWheelerUsers = 0;
+
+//         // Loop through all locations and count chargers based on status
+//         chargerLocations.forEach(location => {
+//             location.chargerInfo.forEach(charger => {
+//                 totalChargers++;
+//                 if (charger.status === 'Available') {
+//                     availableChargers++;
+//                 } else if (charger.status === 'Inactive') {
+//                     inactiveChargers++;
+//                 }
+//                 // else if (charger.status === 'Charging' || charger.status === 'Preparing') {
+//                 else {
+//                     inUseChargers++;
+//                 }
+//             });
+//         });
+
+//         // Count users based on vehicle type
+//         users.forEach(user => {
+//             user.user_vehicle.forEach(vehicle => {
+//                 if (vehicle.type === '2-Wheeler') {
+//                     twoWheelerUsers++;
+//                 } else if (vehicle.type === '3-Wheeler') {
+//                     threeWheelerUsers++;
+//                 } else if (vehicle.type === '4-Wheeler') {
+//                     fourWheelerUsers++;
+//                 }
+//             });
+//         });
+
+//         res.json({
+//             success: true,
+//             data: {
+//                 totalChargers,
+//                 availableChargers,
+//                 inUseChargers,
+//                 inactiveChargers,
+//                 twoWheelerUsers,
+//                 threeWheelerUsers,
+//                 fourWheelerUsers
+//             }
+//         });
+//     } catch (error) {
+//         console.error('Error fetching dashboard data:', error);
+//         res.status(500).json({
+//             success: false,
+//             message: 'Internal server error'
+//         });
+//     }
+// };
 const getDashboardData = async (req, res) => {
     try {
-        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+               if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
 
-        // Fetch only chargerInfo field from all documents
-        const chargerLocations = await ChargerLocation.find({}, 'chargerInfo');
+        // Fetch charger locations
+        const chargerLocations = await ChargerLocation.find({}, 'chargerInfo locationName');
 
-        // Fetch users data for vehicle type count
+        // Fetch user vehicle data
         const users = await User.find({}, 'user_vehicle');
+
+        // Fetch charging sessions
+        const chargingSessions = await ChargingSession.find({}, 'status vehicleId chargerId startMeterValue endMeterValue');
+
         if (chargerLocations.length === 0) {
             return res.json({
                 success: false,
@@ -905,23 +996,33 @@ const getDashboardData = async (req, res) => {
                     inactiveChargers: 0,
                     twoWheelerUsers: 0,
                     threeWheelerUsers: 0,
-                    fourWheelerUsers: 0
+                    fourWheelerUsers: 0,
+                    activeSessions: 0,
+                    topVehicles: [],
+                    topLocations: []
                 }
             });
         }
 
-        // Initialize counters
+        // Charger count variables
         let totalChargers = 0;
         let availableChargers = 0;
         let inUseChargers = 0;
         let inactiveChargers = 0;
 
-        // Initialize counters for vehicle types
+        // Vehicle type counters
         let twoWheelerUsers = 0;
         let threeWheelerUsers = 0;
         let fourWheelerUsers = 0;
 
-        // Loop through all locations and count chargers based on status
+        // Active sessions count
+        let activeSessions = chargingSessions.filter(session => session.status === 'Started').length;
+
+        // Track vehicle session count
+        let vehicleStats = new Map();
+        let locationStats = new Map();
+
+        // Loop through all charger locations
         chargerLocations.forEach(location => {
             location.chargerInfo.forEach(charger => {
                 totalChargers++;
@@ -929,26 +1030,88 @@ const getDashboardData = async (req, res) => {
                     availableChargers++;
                 } else if (charger.status === 'Inactive') {
                     inactiveChargers++;
-                }
-                // else if (charger.status === 'Charging' || charger.status === 'Preparing') {
-                else {
+                } else {
                     inUseChargers++;
                 }
             });
-        });
 
-        // Count users based on vehicle type
-        users.forEach(user => {
-            user.user_vehicle.forEach(vehicle => {
-                if (vehicle.type === '2-Wheeler') {
-                    twoWheelerUsers++;
-                } else if (vehicle.type === '3-Wheeler') {
-                    threeWheelerUsers++;
-                } else if (vehicle.type === '4-Wheeler') {
-                    fourWheelerUsers++;
-                }
+            // Initialize location stats
+            locationStats.set(location._id.toString(), {
+                locationName: location.locationName,
+                sessions: 0,
+                energyConsumed: 0,
+                revenue: 0
             });
         });
+
+        // Count user vehicles by type
+        users.forEach(user => {
+            if (user.user_vehicle) {
+                user.user_vehicle.forEach(vehicle => {
+                    if (vehicle.type === 'Two Wheeler') {
+                        twoWheelerUsers++;
+                    } else if (vehicle.type === 'Three Wheeler') {
+                        threeWheelerUsers++;
+                    } else if (vehicle.type === 'Four Wheeler') {
+                        fourWheelerUsers++;
+                    }
+                });
+            }
+        });
+
+        // Count vehicle sessions and energy consumption
+        for (const session of chargingSessions) {
+            const vehicleId = session.vehicleId.toString();
+            const chargerId = session.chargerId.toString();
+            // console.log(vehicleId);
+            // console.log(chargerId);
+            
+            // Count vehicle usage
+            if (!vehicleStats.has(vehicleId)) {
+                const vehicleOwner = await User.findOne({ "user_vehicle._id": vehicleId }, { "user_vehicle.$": 1 });
+                console.log(vehicleOwner);
+                if (vehicleOwner && vehicleOwner.user_vehicle.length > 0) {
+                    const { type, make, model, variant } = vehicleOwner.user_vehicle[0];
+                    vehicleStats.set(vehicleId, { type, make, model, variant, sessions: 0 });
+                }
+                else {
+                    // Skip if no valid vehicle found
+                    continue;
+                }
+                // console.log(vehicleStats);
+            }
+            // console.log(vehicleStats);
+            vehicleStats.get(vehicleId).sessions++;
+
+            // Count location-based stats
+            const location = chargerLocations.find(loc => loc.chargerInfo.some(ch => ch.name.toString() === chargerId));
+            if (location) {
+                const locationId = location._id.toString();
+                let energyConsumed = session.endMeterValue - session.startMeterValue || 0;
+                let revenue = energyConsumed * 10; // Assuming ₹10 per kWh (modify as needed)
+
+                let locData = locationStats.get(locationId) || {
+                    locationName: location.locationName,
+                    sessions: 0,
+                    energyConsumed: 0,
+                    revenue: 0
+                };
+                locData.sessions++;
+                locData.energyConsumed += energyConsumed;
+                locData.revenue += revenue;
+                locationStats.set(locationId, locData);
+            }
+        }
+
+        // Sort and get top 10 vehicles
+        let topVehicles = Array.from(vehicleStats.values())
+            .sort((a, b) => b.sessions - a.sessions)
+            .slice(0, 10);
+
+        // Sort and get top 10 locations
+        let topLocations = Array.from(locationStats.values())
+            .sort((a, b) => b.sessions - a.sessions)
+            .slice(0, 10);
 
         res.json({
             success: true,
@@ -959,7 +1122,10 @@ const getDashboardData = async (req, res) => {
                 inactiveChargers,
                 twoWheelerUsers,
                 threeWheelerUsers,
-                fourWheelerUsers
+                fourWheelerUsers,
+                activeSessions,
+                topVehicles,
+                topLocations
             }
         });
     } catch (error) {
@@ -970,6 +1136,9 @@ const getDashboardData = async (req, res) => {
         });
     }
 };
+
+
+
 
 module.exports = {
     createChargerLocation,
