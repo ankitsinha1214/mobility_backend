@@ -1049,11 +1049,11 @@ const getDashboardData = async (req, res) => {
         users.forEach(user => {
             if (user.user_vehicle) {
                 user.user_vehicle.forEach(vehicle => {
-                    if (vehicle.type === 'Two Wheeler') {
+                    if (vehicle.type === '2-Wheeler') {
                         twoWheelerUsers++;
-                    } else if (vehicle.type === 'Three Wheeler') {
+                    } else if (vehicle.type === '3-Wheeler') {
                         threeWheelerUsers++;
-                    } else if (vehicle.type === 'Four Wheeler') {
+                    } else if (vehicle.type === '4-Wheeler') {
                         fourWheelerUsers++;
                     }
                 });
