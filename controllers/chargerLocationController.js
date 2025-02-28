@@ -362,6 +362,197 @@ const getAllChargers = async (req, res) => {
     }
 };
 
+const getFilteredChargers = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+
+        const { status = "all", search = "", sortField = "chargerInfo.name", sortOrder = "asc" } = req.query;
+
+        let query = {};
+
+        // Apply status filter using $elemMatch to only return documents where at least one charger has the specified status
+        if (status === "inactive") {
+            query["chargerInfo"] = { $elemMatch: { status: "Inactive" } };
+        } else if (status === "active") {
+            query["chargerInfo"] = { $elemMatch: { status: { $ne: "Inactive" } } }; // All chargers except inactive
+        } else if (status === "live") {
+            query["chargerInfo"] = { $elemMatch: { status: "Charging" } };
+        }
+
+        // Apply text search (charger name or location name)
+        if (search) {
+            query["$or"] = [
+                { "chargerInfo.name": { $regex: search, $options: "i" } },
+                { "locationName": { $regex: search, $options: "i" } }
+            ];
+        }
+
+        // Sorting logic
+        const sortQuery = {};
+        if (sortField) {
+            sortQuery[sortField] = sortOrder === "desc" ? -1 : 1;
+        }
+
+        // Fetch chargers with required fields
+        const chargers = await ChargerLocation.find(query, "locationName chargerInfo")
+            .sort(sortQuery)
+            .lean(); // Better performance
+
+        // Filter out only chargers with the correct status inside `chargerInfo`
+        const formattedData = chargers.flatMap(location =>
+            (location.chargerInfo || [])
+                .filter(charger => {
+                    if (status === "inactive") return charger.status === "Inactive";
+                    if (status === "active") return charger.status !== "Inactive";
+                    if (status === "live") return charger.status === "Charging";
+                    return true; // Default case, return all
+                })
+                .map(charger => ({
+                    locationName: location.locationName,
+                    "chargerInfo.name": charger.name || "N/A",
+                    "chargerInfo.status": charger.status || "Unknown",
+                    "chargerInfo.energyCons": charger.energyConsumed || 0,
+                    "chargerInfo.lastPing": charger.lastPing || null
+                }))
+        );
+
+        if (formattedData.length === 0) {
+            return res.json({
+                success: false,
+                message: "No chargers found",
+                data: [],
+            });
+        }
+
+        res.json({
+            success: true,
+            data: formattedData
+        });
+
+    } catch (error) {
+        console.error("Error fetching chargers:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
+    }
+};
+
+
+
+
+// const getFilteredChargers = async (req, res) => {
+//     try {
+//         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+//             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+//         }
+
+//         const {
+//             status = "all",
+//             page = 1,
+//             limit = 10,
+//             search = "",
+//             sortField = "chargerInfo.name",
+//             sortOrder = "asc"
+//         } = req.query;
+
+//         let query = {};
+
+//         // Filter by charger status
+//         if (status === "active") query["chargerInfo.status"] = "Active";
+//         if (status === "inactive") query["chargerInfo.status"] = "Inactive";
+//         if (status === "live") query["chargerInfo.status"] = "Charging";
+
+//         // Apply text search (charger name or location name)
+//         if (search) {
+//             query["$or"] = [
+//                 { "chargerInfo.name": { $regex: search, $options: "i" } },
+//                 { "locationName": { $regex: search, $options: "i" } }
+//             ];
+//         }
+
+//         // Convert pagination values
+//         const pageNumber = parseInt(page, 10) || 1;
+//         const limitNumber = parseInt(limit, 10) || 10;
+//         const skip = (pageNumber - 1) * limitNumber;
+
+//         // Sorting logic
+//         const sortQuery = {};
+//         if (sortField) {
+//             sortQuery[sortField] = sortOrder === "desc" ? -1 : 1;
+//         }
+
+//         // Fetch chargers with required fields
+//         const chargers = await ChargerLocation.find(query,
+//             "locationName chargerInfo.name chargerInfo.lastPing chargerInfo.energyConsumed"
+//         )
+//             .sort(sortQuery) // Sorting
+//             .skip(skip) // Pagination
+//             .limit(limitNumber)
+//             .lean(); // Better performance
+
+//         // Flatten `chargerInfo` and rename fields
+//         const formattedData = chargers.flatMap(location =>
+//             (location.chargerInfo || []).map(charger => ({
+//                 locationName: location.locationName,
+//                 "chargerInfo.name": charger.name || "N/A",
+//                 "chargerInfo.energyCons": charger.energyConsumed || 0,
+//                 "chargerInfo.lastPing": charger.lastPing || null
+//             }))
+//         );
+
+//         if (formattedData.length === 0) {
+//             return res.json({
+//                 success: false,
+//                 message: "No chargers found",
+//                 data: [],
+//             });
+//         }
+
+//         // Get total count for pagination
+//         // const totalCount = await ChargerLocation.countDocuments(query);
+//         // Get total count for pagination
+//         const totalCount = await ChargerLocation.aggregate([
+//             { $match: query },
+//             { $unwind: "$chargerInfo" },
+//             { $count: "total" }
+//         ]);
+
+//         const totalRecords = totalCount.length > 0 ? totalCount[0].total : 0;
+//         res.json({
+//             success: true,
+//             data: formattedData,
+//             pagination: {
+//                 totalRecords: totalRecords,  // <-- Updated this line
+//                 currentPage: pageNumber,
+//                 totalPages: Math.ceil(totalRecords / limitNumber), // <-- Updated this line
+//                 perPage: limitNumber,
+//             },
+//         });
+
+//         // res.json({
+//         //     success: true,
+//         //     data: formattedData,
+//         //     pagination: {
+//         //         totalRecords: totalCount,
+//         //         currentPage: pageNumber,
+//         //         totalPages: Math.ceil(totalCount / limitNumber),
+//         //         perPage: limitNumber,
+//         //     },
+//         // });
+
+//     } catch (error) {
+//         console.error("Error fetching chargers:", error);
+//         res.status(500).json({
+//             success: false,
+//             message: "Internal server error",
+//         });
+//     }
+// };
+
+
 // Get all charger locations
 const getChargerLocations = async (req, res) => {
     try {
@@ -1188,6 +1379,7 @@ module.exports = {
     updateChargerInLocation,
     deleteChargerFromLocation,
     getAllChargers,
+    getFilteredChargers,
     getChargerLocations,
     getLocationTypes,
     getLocationTypesCountPercentage,

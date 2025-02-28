@@ -36,6 +36,7 @@ router.post('/location/filter/:checkType', fetchUser, chargerLocationController.
 router.post('/location/range', fetchUser, chargerLocationController.getChargerLocationsInRange);
 router.post('/location/near/range', fetchUser, chargerLocationController.getChargerLocationsNearInRange);
 router.get('/location/search', fetchUser, chargerLocationController.searchChargerLocations);
+router.get('/dashboard/charger', fetchUser, chargerLocationController.getFilteredChargers);
 router.post('/dashboard/get-data', fetchUser, chargerLocationController.getDashboardData);
 
 module.exports = router;
