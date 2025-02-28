@@ -4,6 +4,7 @@ const SiteSurvey = require('../models/siteSurveyModel');
 const PreInstallation = require('../models/preInstallationModel');
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const ChargingSession = require('../models/chargerSessionModel');
+const Payment = require('../models/paymentModel');
 const s3 = new S3Client({
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -1088,7 +1089,11 @@ const getDashboardData = async (req, res) => {
             if (location) {
                 const locationId = location._id.toString();
                 let energyConsumed = session.endMeterValue - session.startMeterValue || 0;
-                let revenue = energyConsumed * 10; // Assuming ₹10 per kWh (modify as needed)
+                // let revenue = energyConsumed * 10; // Assuming ₹10 per kWh (modify as needed)
+                // Fetch the actual payment details using sessionId
+                const payment = await Payment.findOne({ sessionId: session._id, status: 'captured' }); // Only captured payments
+
+                let revenue = payment ? payment.amount / 100 : 0;
 
                 let locData = locationStats.get(locationId) || {
                     locationName: location.locationName,
@@ -1144,7 +1149,7 @@ const getDashboardData = async (req, res) => {
             .map(location => ({
                 name: location.locationName,
                 visits: location.sessions,
-                energy: `${location.energyConsumed} kWh`,
+                energy: `${location.energyConsumed} Wh`,
                 revenue: `₹ ${location.revenue.toLocaleString("en-IN")}`, // Format with commas
                 color: "purple"
             }));

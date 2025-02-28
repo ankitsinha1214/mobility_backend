@@ -511,12 +511,26 @@ const addUserVehicle = async (req, res) => {
         //   if (existingVehicle) {
         //     return res.status(400).json({ success: false, message: 'Vehicle registration already exists' });
         //   }
+
+        // const existingVehicle = await User.findOne({
+        //     phoneNumber,
+        //     'user_vehicle.make': make,
+        //     'user_vehicle.model': model,
+        //     'user_vehicle.variant': variant
+        // });
+
+        // Check if the vehicle with the same make, model, and variant already exists
         const existingVehicle = await User.findOne({
             phoneNumber,
-            'user_vehicle.make': make,
-            'user_vehicle.model': model,
-            'user_vehicle.variant': variant
+            'user_vehicle': {
+                $elemMatch: {
+                    make,
+                    model,
+                    variant
+                }
+            }
         });
+        // console.log(existingVehicle);
 
         if (existingVehicle) {
             return res.status(400).json({ success: false, message: 'Vehicle with the same make, model, and variant already exists for this user' });
