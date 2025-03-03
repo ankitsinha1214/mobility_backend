@@ -411,10 +411,10 @@ const getFilteredChargers = async (req, res) => {
                 })
                 .map(charger => ({
                     locationName: location.locationName,
-                    "chargerInfo.name": charger.name || "N/A",
-                    "chargerInfo.status": charger.status || "Unknown",
-                    "chargerInfo.energyCons": charger.energyConsumed || 0,
-                    "chargerInfo.lastPing": charger.lastPing || null
+                    "chargerId": charger.name || "N/A",
+                    "status": charger.status || "Unknown",
+                    "energyCons": charger.energyConsumed || 0,
+                    "lastPing": charger.lastPing || null
                 }))
         );
 
@@ -428,6 +428,7 @@ const getFilteredChargers = async (req, res) => {
 
         res.json({
             success: true,
+            message: "Chargers Retrieved Successfully!!",
             data: formattedData
         });
 
