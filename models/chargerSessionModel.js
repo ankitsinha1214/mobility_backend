@@ -77,13 +77,23 @@ chargingSessionSchema.pre('save', async function (next) {
     if (this.isModified('status') && this.status === 'Completed') {
         this.transactionId = undefined; // Remove transactionId
     }
-    if (this.isModified('status') && this.endMeterValue !== undefined && this.startMeterValue !== undefined) {
-        const energyConsumed = (this.endMeterValue - this.startMeterValue) / 1000;
-        console.log('end meter value',this.endMeterValue );
-        console.log('start meter value',this.startMeterValue );
-        console.log(energyConsumed);
-
+    // if (this.isModified('status') && this.endMeterValue !== undefined && this.startMeterValue !== undefined) {
+    if (this.metadata && this.metadata?.length > 1) {
         try {
+            const startEnergy = this.metadata[0]?.values?.["Energy.Active.Import.Register"];
+            const endEnergy = this.metadata[this.metadata.length - 1]?.values?.["Energy.Active.Import.Register"];
+
+            if (!startEnergy || !endEnergy) {
+                console.warn("Invalid energy values in metadata.");
+                return next();
+            }
+
+            const startEnergyValue = parseFloat(startEnergy.replace(' Wh', '')) || 0;
+            const endEnergyValue = parseFloat(endEnergy.replace(' Wh', '')) || 0;
+            // const energyConsumed = (this.endMeterValue - this.startMeterValue) / 1000;
+            const energyConsumed = (endEnergyValue - startEnergyValue) / 1000;
+            console.log('Energy consumed:', energyConsumed, 'kWh');
+
             // const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': this.chargerId });
             const chargerLocation = await ChargerLocation.findOne({
                 chargerInfo: { $elemMatch: { name: this.chargerId } }
@@ -94,7 +104,7 @@ chargingSessionSchema.pre('save', async function (next) {
 
                 if (charger) {
                     const currentEnergy = parseFloat(charger.energyConsumptions.replace(' kWh', '')) || 0;
-                    charger.energyConsumptions = `${(currentEnergy + energyConsumed).toFixed(2)} kWh`;
+                    charger.energyConsumptions = `${(currentEnergy + energyConsumed).toFixed(3)} kWh`;
 
                     await chargerLocation.save();
                 }
