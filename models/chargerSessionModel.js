@@ -78,7 +78,10 @@ chargingSessionSchema.pre('save', async function (next) {
         this.transactionId = undefined; // Remove transactionId
     }
     if (this.isModified('status') && this.endMeterValue !== undefined && this.startMeterValue !== undefined) {
-        const energyConsumed = (this.endMeterValue - this.startMeterValue)/1000;
+        const energyConsumed = (this.endMeterValue - this.startMeterValue) / 1000;
+        console.log('end meter value',this.endMeterValue );
+        console.log('start meter value',this.startMeterValue );
+        console.log(energyConsumed);
 
         try {
             // const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': this.chargerId });

@@ -413,7 +413,7 @@ const getFilteredChargers = async (req, res) => {
                     locationName: location.locationName,
                     "chargerId": charger.name || "N/A",
                     "status": charger.status || "Unknown",
-                    "energyCons": charger.energyConsumed || 0,
+                    "energyCons": charger.energyConsumptions || "0 kWh",
                     "lastPing": charger.lastPing || null
                 }))
         );
