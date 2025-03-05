@@ -8,27 +8,45 @@ const getGraphData = async (req, res) => {
         const { filter } = req.query;
         let startDate, groupBy, timeFormat, totalPoints;
 
-        if (filter === "hourly") {
-            startDate = moment().tz("UTC").subtract(24, "hours").startOf("hour"); // Last 24 hours
+        if (filter === "today") {
+            // startDate = moment().tz("UTC").startOf("day"); // Start of today
+            startDate =  moment().tz("Asia/Kolkata").startOf("day"); 
+            groupBy = "%Y-%m-%d %H:00";
+            timeFormat = "h A"; // Format as "8 AM", "7 PM"
+            totalPoints = moment().tz("UTC").diff(startDate, "hours") + 1; // Hours passed today
+        } else if (filter === "yesterday") {
+            startDate = moment().tz("Asia/Kolkata").subtract(1, "day").startOf("day"); // Start of yesterday
+            // startDate = moment().tz("UTC").subtract(1, "day").startOf("day"); // Start of yesterday
+            // const endDate = moment().tz("UTC").subtract(1, "day").endOf("day"); // End of yesterday
+            groupBy = "%Y-%m-%d %H:00";
+            timeFormat = "h A"; // Format as "8 AM", "7 PM"
+            totalPoints = 24; // Full 24 hours of yesterday
+        } else if (filter === "hourly") {
+            startDate = moment().tz("UTC").subtract(23, "hours").startOf("hour"); // Last 24 hours
             // console.log(moment().tz("UTC"))
             groupBy = "%Y-%m-%d %H:00";
             timeFormat = "h A"; // Format as "8 AM", "7 PM"
             totalPoints = 24;
         } else if (filter === "daily") {
-            startDate = moment().tz("UTC").subtract(7, "days").startOf("day"); // Last 7 days
+            startDate = moment().tz("UTC").subtract(6, "days").startOf("day"); // Last 7 days
             groupBy = "%Y-%m-%d";
             timeFormat = "MMM D"; // Format as "Mar 3", "Mar 4"
             totalPoints = 7;
+        } else if (filter === "last30") {
+            startDate = moment().tz("UTC").subtract(29, "days").startOf("day"); // Last 7 days
+            groupBy = "%Y-%m-%d";
+            timeFormat = "MMM D"; // Format as "Mar 3", "Mar 4"
+            totalPoints = 30;
         } else if (filter === "weekly") {
             startDate = moment().tz("UTC").subtract(4, "weeks").startOf("isoWeek"); // Last 4 weeks
             groupBy = "%Y-%V"; // ISO week number
             timeFormat = "[Week] W"; // Format as "Week 9"
             totalPoints = 4;
         } else if (filter === "monthly") {
-            startDate = moment().tz("UTC").subtract(6, "months").startOf("month"); // Last 6 months
+            startDate = moment().tz("UTC").subtract(11, "months").startOf("month"); // Last 12 months
             groupBy = "%Y-%m";
             timeFormat = "MMM YYYY"; // Format as "Mar 2025"
-            totalPoints = 6;
+            totalPoints = 12;
         } else {
             return res.status(400).json({ status: false, message: "Invalid filter" });
         }
@@ -42,7 +60,10 @@ const getGraphData = async (req, res) => {
         // Generate all required labels first (Converted to IST)
         const units = {
             hourly: "hours",
+            today: "hours",
+            yesterday: "hours",
             daily: "days",
+            last30: "days",
             weekly: "weeks",
             monthly: "months",
         };
@@ -164,7 +185,16 @@ const getGraphData = async (req, res) => {
             // Adjust parsing format based on filter
             if (filter === "hourly") {
                 utcDate = moment.utc(utcString, "YYYY-MM-DD HH:00").toDate();
-            } else if (filter === "daily") {
+            }
+            else if (filter === "today") {
+                utcDate = moment.utc(utcString, "YYYY-MM-DD HH:00").toDate();
+            }
+            else if (filter === "yesterday") {
+                utcDate = moment.utc(utcString, "YYYY-MM-DD HH:00").toDate();
+            }
+             else if (filter === "daily") {
+                utcDate = moment.utc(utcString, "YYYY-MM-DD").toDate();
+            } else if (filter === "last30") {
                 utcDate = moment.utc(utcString, "YYYY-MM-DD").toDate();
             } else if (filter === "weekly") {
                 utcDate = moment.utc(utcString, "YYYY-WW").startOf("isoWeek").toDate();
