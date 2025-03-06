@@ -5,10 +5,40 @@ const Payment = require("../models/paymentModel");
 
 const getGraphData = async (req, res) => {
     try {
-        const { filter } = req.query;
-        let startDate, groupBy, timeFormat, totalPoints;
+        const { filter, start, end } = req.query;
+        let startDate, endDate, groupBy, timeFormat, totalPoints, differenceDays;
 
-        if (filter === "today") {
+        if (filter === "custom") {
+            if (!start || !end) {
+                return res.status(400).json({ status: false, message: "Start and end dates are required for custom filter" });
+            }
+            const today = moment().tz("Asia/Kolkata").startOf("day");
+            startDate = moment.tz(start, "Asia/Kolkata").startOf("day");
+            endDate = moment.tz(end, "Asia/Kolkata").endOf("day");
+
+            // Validation 1: Start and End should be before today
+            if (startDate.isSameOrAfter(today) || endDate.isSameOrAfter(today)) {
+                return res.status(400).json({ status: false, message: "Start and end dates must be before today." });
+            }
+
+            // Validation 2: Start should be less than or equal to End
+            if (startDate.isAfter(endDate)) {
+                return res.status(400).json({ status: false, message: "Start date cannot be after end date." });
+            }
+        
+            const diffDays = endDate.diff(startDate, "days") + 1; // Number of days in range
+            differenceDays = diffDays;
+            // Define grouping based on range size
+            if (diffDays <= 1) {
+                groupBy = "%Y-%m-%d %H:00";
+                timeFormat = "h A"; // Hourly format
+                totalPoints = diffDays * 24; // Each day has 24 hours
+            } else {
+                groupBy = "%Y-%m-%d";
+                timeFormat = "MMM D"; // Daily format
+                totalPoints = diffDays;
+            }
+        } else if (filter === "today") {
             // startDate = moment().tz("UTC").startOf("day"); // Start of today
             startDate =  moment().tz("Asia/Kolkata").startOf("day"); 
             groupBy = "%Y-%m-%d %H:00";
@@ -62,6 +92,7 @@ const getGraphData = async (req, res) => {
             hourly: "hours",
             today: "hours",
             yesterday: "hours",
+            custom: differenceDays <=1 ? "hours" :"days",
             daily: "days",
             last30: "days",
             weekly: "weeks",
@@ -82,94 +113,184 @@ const getGraphData = async (req, res) => {
         //         .format(timeFormat);
         //     labels.push(time);
         // }
-
+        let userData, sessionData, energyData, revenueData;
         // Fetch Data
-        const userData = await User.aggregate([
-            { $match: { createdAt: { $gte: startDate.toDate() } } },
-            { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, count: { $sum: 1 } } }
-        ]);
-
-
-        const sessionData = await Session.aggregate([
-            { $match: { createdAt: { $gte: startDate.toDate() } } },
-            { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, count: { $sum: 1 } } }
-        ]);
-
-        // const energyData = await Session.aggregate([
-        //     { $match: { createdAt: { $gte: startDate.toDate() } } },
-        //     { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, total: { $sum: "$meta.energyConsumed" } } }
-        // ]);
-        const energyData = await Session.aggregate([
-            { $match: { createdAt: { $gte: startDate.toDate() } } },
-
-            // Extract Energy Values Properly
-            {
-                $project: {
-                    _id: 1,
-                    createdAt: 1,
-                    energyValues: {
-                        $map: {
-                            input: "$metadata",
-                            as: "data",
-                            in: {
-                                $let: {
-                                    vars: {
-                                        energyString: {
-                                            $getField: { field: "Energy.Active.Import.Register", input: "$$data.values" }
-                                        }
-                                    },
-                                    in: {
-                                        $toDouble: {
-                                            $arrayElemAt: [
-                                                { $split: ["$$energyString", " "] },
-                                                0
-                                            ]
+        if(filter === "custom"){
+            userData = await User.aggregate([
+                { $match: { createdAt: { $gte: startDate.toDate(), $lte: endDate.toDate() } } },
+                { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, count: { $sum: 1 } } }
+            ]);
+    
+    
+            sessionData = await Session.aggregate([
+                { $match: { createdAt: { $gte: startDate.toDate(), $lte: endDate.toDate() } } },
+                { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, count: { $sum: 1 } } }
+            ]);
+    
+            // const energyData = await Session.aggregate([
+            //     { $match: { createdAt: { $gte: startDate.toDate() } } },
+            //     { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, total: { $sum: "$meta.energyConsumed" } } }
+            // ]);
+            energyData = await Session.aggregate([
+                { $match: { createdAt: { $gte: startDate.toDate(), $lte: endDate.toDate() } } },
+    
+                // Extract Energy Values Properly
+                {
+                    $project: {
+                        _id: 1,
+                        createdAt: 1,
+                        energyValues: {
+                            $map: {
+                                input: "$metadata",
+                                as: "data",
+                                in: {
+                                    $let: {
+                                        vars: {
+                                            energyString: {
+                                                $getField: { field: "Energy.Active.Import.Register", input: "$$data.values" }
+                                            }
+                                        },
+                                        in: {
+                                            $toDouble: {
+                                                $arrayElemAt: [
+                                                    { $split: ["$$energyString", " "] },
+                                                    0
+                                                ]
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
-            },
-
-            // Extract First and Last Energy Values and Fix Precision
-            {
-                $project: {
-                    _id: 1,
-                    createdAt: 1,
-                    firstEnergy: { $arrayElemAt: ["$energyValues", 0] },
-                    lastEnergy: {
-                        $arrayElemAt: ["$energyValues", { $subtract: [{ $size: "$energyValues" }, 1] }]
-                    },
-                    energyConsumed: {
-                        $round: [
-                            {
-                                $subtract: [
-                                    { $arrayElemAt: ["$energyValues", { $subtract: [{ $size: "$energyValues" }, 1] }] },
-                                    { $arrayElemAt: ["$energyValues", 0] }
-                                ]
-                            },
-                            3  // ✅ Fixing to 3 decimal places
-                        ]
+                },
+    
+                // Extract First and Last Energy Values and Fix Precision
+                {
+                    $project: {
+                        _id: 1,
+                        createdAt: 1,
+                        firstEnergy: { $arrayElemAt: ["$energyValues", 0] },
+                        lastEnergy: {
+                            $arrayElemAt: ["$energyValues", { $subtract: [{ $size: "$energyValues" }, 1] }]
+                        },
+                        energyConsumed: {
+                            $round: [
+                                {
+                                    $subtract: [
+                                        { $arrayElemAt: ["$energyValues", { $subtract: [{ $size: "$energyValues" }, 1] }] },
+                                        { $arrayElemAt: ["$energyValues", 0] }
+                                    ]
+                                },
+                                3  // ✅ Fixing to 3 decimal places
+                            ]
+                        }
+                    }
+                },
+                // 🚀 **Group by time intervals (hourly, daily, etc.)**
+                {
+                    $group: {
+                        _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, // Fix: Group by formatted timestamp
+                        total: { $sum: "$energyConsumed" }
                     }
                 }
-            },
-            // 🚀 **Group by time intervals (hourly, daily, etc.)**
-            {
-                $group: {
-                    _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, // Fix: Group by formatted timestamp
-                    total: { $sum: "$energyConsumed" }
+            ]);
+            // ✅ Debug Output
+            // console.log("DEBUGGING ENERGY DATA:", JSON.stringify(energyData, null, 2));
+    
+             revenueData = await Payment.aggregate([
+                { $match: { createdAt: { $gte: startDate.toDate(), $lte: endDate.toDate() } } },
+                { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, total: { $sum: "$amount" } } }
+            ]);
+        }
+        else{
+        userData = await User.aggregate([
+                { $match: { createdAt: { $gte: startDate.toDate() } } },
+                { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, count: { $sum: 1 } } }
+            ]);
+    
+    
+        sessionData = await Session.aggregate([
+                { $match: { createdAt: { $gte: startDate.toDate() } } },
+                { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, count: { $sum: 1 } } }
+            ]);
+    
+            // const energyData = await Session.aggregate([
+            //     { $match: { createdAt: { $gte: startDate.toDate() } } },
+            //     { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, total: { $sum: "$meta.energyConsumed" } } }
+            // ]);
+        energyData = await Session.aggregate([
+                { $match: { createdAt: { $gte: startDate.toDate() } } },
+    
+                // Extract Energy Values Properly
+                {
+                    $project: {
+                        _id: 1,
+                        createdAt: 1,
+                        energyValues: {
+                            $map: {
+                                input: "$metadata",
+                                as: "data",
+                                in: {
+                                    $let: {
+                                        vars: {
+                                            energyString: {
+                                                $getField: { field: "Energy.Active.Import.Register", input: "$$data.values" }
+                                            }
+                                        },
+                                        in: {
+                                            $toDouble: {
+                                                $arrayElemAt: [
+                                                    { $split: ["$$energyString", " "] },
+                                                    0
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+    
+                // Extract First and Last Energy Values and Fix Precision
+                {
+                    $project: {
+                        _id: 1,
+                        createdAt: 1,
+                        firstEnergy: { $arrayElemAt: ["$energyValues", 0] },
+                        lastEnergy: {
+                            $arrayElemAt: ["$energyValues", { $subtract: [{ $size: "$energyValues" }, 1] }]
+                        },
+                        energyConsumed: {
+                            $round: [
+                                {
+                                    $subtract: [
+                                        { $arrayElemAt: ["$energyValues", { $subtract: [{ $size: "$energyValues" }, 1] }] },
+                                        { $arrayElemAt: ["$energyValues", 0] }
+                                    ]
+                                },
+                                3  // ✅ Fixing to 3 decimal places
+                            ]
+                        }
+                    }
+                },
+                // 🚀 **Group by time intervals (hourly, daily, etc.)**
+                {
+                    $group: {
+                        _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, // Fix: Group by formatted timestamp
+                        total: { $sum: "$energyConsumed" }
+                    }
                 }
-            }
-        ]);
-        // ✅ Debug Output
-        // console.log("DEBUGGING ENERGY DATA:", JSON.stringify(energyData, null, 2));
-
-        const revenueData = await Payment.aggregate([
-            { $match: { createdAt: { $gte: startDate.toDate() } } },
-            { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, total: { $sum: "$amount" } } }
-        ]);
+            ]);
+            // ✅ Debug Output
+            // console.log("DEBUGGING ENERGY DATA:", JSON.stringify(energyData, null, 2));
+    
+        revenueData = await Payment.aggregate([
+                { $match: { createdAt: { $gte: startDate.toDate() } } },
+                { $group: { _id: { $dateToString: { format: groupBy, date: "$createdAt" } }, total: { $sum: "$amount" } } }
+            ]);
+        }
 
         // console.log(revenueData)
         // **Fix: Convert Data to IST before Mapping**
@@ -190,6 +311,9 @@ const getGraphData = async (req, res) => {
                 utcDate = moment.utc(utcString, "YYYY-MM-DD HH:00").toDate();
             }
             else if (filter === "yesterday") {
+                utcDate = moment.utc(utcString, "YYYY-MM-DD HH:00").toDate();
+            }
+            else if (filter === "custom") {
                 utcDate = moment.utc(utcString, "YYYY-MM-DD HH:00").toDate();
             }
              else if (filter === "daily") {
