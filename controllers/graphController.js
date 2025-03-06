@@ -10,7 +10,7 @@ const getGraphData = async (req, res) => {
 
         if (filter === "custom") {
             if (!start || !end) {
-                return res.status(400).json({ status: false, message: "Start and end dates are required for custom filter" });
+                return res.json({ status: false, message: "Start and end dates are required for custom filter" });
             }
             const today = moment().tz("Asia/Kolkata").startOf("day");
             startDate = moment.tz(start, "Asia/Kolkata").startOf("day");
@@ -18,12 +18,12 @@ const getGraphData = async (req, res) => {
 
             // Validation 1: Start and End should be before today
             if (startDate.isSameOrAfter(today) || endDate.isSameOrAfter(today)) {
-                return res.status(400).json({ status: false, message: "Start and end dates must be before today." });
+                return res.json({ status: false, message: "Start and end dates must be before today." });
             }
 
             // Validation 2: Start should be less than or equal to End
             if (startDate.isAfter(endDate)) {
-                return res.status(400).json({ status: false, message: "Start date cannot be after end date." });
+                return res.json({ status: false, message: "Start date cannot be after end date." });
             }
         
             const diffDays = endDate.diff(startDate, "days") + 1; // Number of days in range
@@ -78,7 +78,7 @@ const getGraphData = async (req, res) => {
             timeFormat = "MMM YYYY"; // Format as "Mar 2025"
             totalPoints = 12;
         } else {
-            return res.status(400).json({ status: false, message: "Invalid filter" });
+            return res.json({ status: false, message: "Invalid filter" });
         }
 
         const labels = [];
