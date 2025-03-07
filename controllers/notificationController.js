@@ -1,6 +1,6 @@
 const { registerDeviceToken, sendNotification } = require("../services/notificationService");
 const User = require('../models/userModel');
-
+const cron = require("node-cron");
 /**
  * API to register device token
  */
@@ -80,8 +80,47 @@ const sendNotificationToAll = async (req, res) => {
     }
 };
 
+/**
+ * API to schedule a push notification
+ */
+const scheduleNotification = async (req, res) => {
+    try {
+        const { title, message, scheduleTime } = req.body;
+
+        if (!title || !message || !scheduleTime) {
+            return res.json({ status: false, message: "Title, message, and scheduleTime are required." });
+        }
+
+        // Validate scheduleTime (Expected format: "MM HH DD MM *" for cron)
+        const [minute, hour, day, month] = scheduleTime.split(" ");
+        if (isNaN(minute) || isNaN(hour) || isNaN(day) || isNaN(month)) {
+            return res.json({ status: false, message: "Invalid schedule format. Use 'MM HH DD MM *' (e.g., '30 14 10 8 *' for Aug 10, 14:30)." });
+        }
+
+        cron.schedule(scheduleTime, async () => {
+            console.log("📢 Sending scheduled notification...");
+            const users = await User.find({ endpointArn: { $exists: true, $ne: null } }, "endpointArn");
+
+            if (users.length === 0) {
+                console.log("❌ No users found with registered devices.");
+                return;
+            }
+
+            const endpointArns = users.map(user => user.endpointArn);
+            await sendNotification(endpointArns, title, message);
+            console.log("✅ Scheduled notification sent successfully.");
+        });
+
+        return res.json({ status: true, message: "Notification scheduled successfully." });
+    } catch (error) {
+        console.error("❌ Error scheduling notification:", error);
+        return res.status(500).json({ status: false, message: "Internal Server Error" });
+    }
+};
+
 module.exports = {
     registerToken,
     sendPushNotification,
-    sendNotificationToAll
+    sendNotificationToAll,
+    scheduleNotification
 };
