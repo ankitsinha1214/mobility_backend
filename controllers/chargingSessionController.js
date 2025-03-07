@@ -232,7 +232,7 @@ const startStopChargingSession = async (req, res) => {
             if (req.user !== 'Admin' && req.user !== 'Manager') {
                 return res.status(401).json({ success: false, message: "You are Not a Valid User." });
             }
-            console.log('req -> ',req)
+            console.log('req -> ', req)
             console.log(req.username)
             createdBy = req.user + ' - ' + req.username;
         }
@@ -667,6 +667,15 @@ const getSessionReceipt = async (req, res) => {
         }
         const metadata = session.metadata || [];
 
+        // Format the charger duration in HH:MM:SS
+        const durationInMs = session.endTime - session.startTime;
+        const durationInHours = durationInMs / (1000 * 60 * 60);
+        const durationInSeconds = Math.floor(durationInMs / 1000);
+        const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
+        const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
+        const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
+        const formattedDuration = `${hours}:${minutes}:${seconds}`;
+
         // Get the 0th index and the highest index
         const firstEntry = metadata[0].values;
         const lastEntry = metadata[metadata.length - 1]?.values;
@@ -686,8 +695,14 @@ const getSessionReceipt = async (req, res) => {
         const costPerUnit = chargerInfo.costPerUnit.amount;
         const totalEnergyCost = energyConsumed * costPerUnit;
 
+        // Calculate dynamic parking cost
+        let parkingCostAmount = 0;
+        if (!chargerLocation.freepaid.parking) {
+            parkingCostAmount = chargerLocation.parkingCost.amount * durationInHours;
+        }
+
         // Dummy values for now
-        const parkingTariff = chargerLocation.freepaid.parking ? 'FREE' : getCurrencySymbol(chargerLocation.parkingCost.currency) + ' ' + chargerLocation.parkingCost.amount;
+        const parkingTariff = chargerLocation.freepaid.parking ? 'FREE' : getCurrencySymbol(chargerLocation.parkingCost.currency) + ' ' + parkingCostAmount.toFixed(2);
         const platformFee = "FREE";
         // var convenienceFee = "FREE";
         let convenienceFee = "FREE";
@@ -717,20 +732,14 @@ const getSessionReceipt = async (req, res) => {
         // Calculate grand total
         let grandTotal = subtotal + gstAmount + convenienceFeeValue;
         if (!chargerLocation.freepaid.parking) {
-            grandTotal += chargerLocation.parkingCost.amount;
+            grandTotal += parkingCostAmount;
+            // grandTotal += chargerLocation.parkingCost.amount;
         }
         // var grandTotal = totalEnergyCost + gstAmount;
         // if (totalEnergyCost < 1) {
         //     grandTotal += 1;
         // }
 
-        // Format the charger duration in HH:MM:SS
-        const durationInMs = session.endTime - session.startTime;
-        const durationInSeconds = Math.floor(durationInMs / 1000);
-        const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, '0');
-        const minutes = Math.floor((durationInSeconds % 3600) / 60).toString().padStart(2, '0');
-        const seconds = (durationInSeconds % 60).toString().padStart(2, '0');
-        const formattedDuration = `${hours}:${minutes}:${seconds}`;
 
         // Format the response
         const receipt = [

@@ -12,7 +12,11 @@ const updateChargerStatus = async () => {
         const chargersToUpdate = await ChargerLocation.find({
             chargerInfo: {
                 $elemMatch: {
-                    lastPing: { $lte: thirtyMinutesAgo },
+                    // lastPing: { $lte: thirtyMinutesAgo },
+                    $or: [
+                        { lastPing: { $lte: thirtyMinutesAgo } }, // Last ping older than 30 mins
+                        { lastPing: null } // Last ping is null
+                    ],
                     status: { $ne: 'Inactive' },
                 },
             },
@@ -22,7 +26,10 @@ const updateChargerStatus = async () => {
         if (chargersToUpdate.length > 0) {
             for (let location of chargersToUpdate) {
                 location.chargerInfo.forEach(charger => {
-                    if (charger.lastPing && charger.lastPing <= thirtyMinutesAgo) {
+                    // if (charger.lastPing && charger.lastPing <= thirtyMinutesAgo) {
+                    //     charger.status = 'Inactive';
+                    // }
+                    if (charger.lastPing === null || charger.lastPing <= thirtyMinutesAgo) {
                         charger.status = 'Inactive';
                     }
                 });
