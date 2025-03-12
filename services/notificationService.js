@@ -77,6 +77,7 @@
 
 const { SNSClient, CreatePlatformEndpointCommand, PublishCommand } = require("@aws-sdk/client-sns");
 const snsClient = require("../configs/awsSnsConfigs"); // Ensure this exports SNSClient correctly
+// const Notification = require('../models/notificationConsumerModel');
 
 /**
  * Registers a new device token in AWS SNS and returns Endpoint ARN.
@@ -97,6 +98,31 @@ async function registerDeviceToken(fcmToken) {
     } catch (error) {
         console.error("❌ Error registering device:", error);
         throw error;
+    }
+}
+
+/**
+ * Saves the notification to the database.
+ * @param {string} title - Notification title.
+ * @param {string} message - Notification message.
+ * @param {string[]} endpointArns - Array of AWS SNS Endpoint ARNs.
+ * @param {string} type - "Single" or "All".
+ * @param {string} status - Notification status.
+ */
+async function saveNotificationToDB(title, message, endpointArns, type, status = "Pending") {
+    try {
+        const newNotification = new Notification({
+            title,
+            description: message,
+            endpointArns,
+            type,
+            status
+        });
+
+        await newNotification.save();
+        console.log("✅ Notification saved to DB");
+    } catch (error) {
+        console.error("❌ Error saving notification:", error);
     }
 }
 
@@ -132,6 +158,8 @@ async function sendNotification(endpointArns, title, message) {
                 const command = new PublishCommand(params);
                 return snsClient.send(command);
             }));
+            // Update notification status to Sent
+            // await saveNotificationToDB(title, message, endpointArns, "All", "Sent");
             console.log("✅ Notifications sent to multiple users");
         } else {
             // Send notification to a single user
@@ -142,10 +170,15 @@ async function sendNotification(endpointArns, title, message) {
             };
             const command = new PublishCommand(params);
             await snsClient.send(command);
+            // Update notification status to Sent
+            // await saveNotificationToDB(title, message, [endpointArns], "Single", "Sent");
             console.log("✅ Notification sent to a single user");
         }
     } catch (error) {
         console.error("❌ Error sending notification:", error);
+        // Save failed notification in DB
+        const type = Array.isArray(endpointArns) ? "All" : "Single";
+        await saveNotificationToDB(title, message, Array.isArray(endpointArns) ? endpointArns : [endpointArns], type, "Failed");
         throw error;
     }
 }
