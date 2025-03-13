@@ -36,6 +36,9 @@ const registerToken = async (req, res) => {
  */
 const sendPushNotification = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { phoneNumber, title, message } = req.body;
 
         if (!phoneNumber || !title || !message) {
@@ -47,7 +50,7 @@ const sendPushNotification = async (req, res) => {
         if (!user || !user.endpointArn) {
             return res.json({ status: false, message: "User not found or no registered device" });
         }
-        await sendNotification(user.endpointArn, title, message);
+        await sendNotification(user.endpointArn, title, message,req?.userid);
         // Store the notification in the database
         const newNotification = new Notification({
             title,
@@ -55,6 +58,7 @@ const sendPushNotification = async (req, res) => {
             endpointArns: [user.endpointArn],
             type: "Single",
             status: "Sent",
+            userId: req?.userid,
             scheduleTime: null,
         });
 
@@ -71,7 +75,11 @@ const sendPushNotification = async (req, res) => {
  */
 const sendNotificationToAll = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { title, message } = req.body;
+        // console.log(req.userid);
 
         // Fetch all registered users with an endpointArn
         const users = await User.find({ endpointArn: { $exists: true, $ne: null } }, "endpointArn");
@@ -82,7 +90,7 @@ const sendNotificationToAll = async (req, res) => {
 
         // Send notifications to all users
         const endpointArns = users.map(user => user.endpointArn);
-        await sendNotification(endpointArns, title, message);
+        await sendNotification(endpointArns, title, message,req?.userid);
         // Store the notification in the database
         const newNotification = new Notification({
             title,
@@ -91,6 +99,7 @@ const sendNotificationToAll = async (req, res) => {
             type: "All",
             status: "Sent",
             scheduleTime: null,
+            userId: req?.userid,
         });
 
         await newNotification.save();
@@ -107,6 +116,9 @@ const sendNotificationToAll = async (req, res) => {
  */
 const scheduleNotification = async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { title, message, scheduleTime } = req.body;
 
         if (!title || !message || !scheduleTime) {
@@ -125,7 +137,8 @@ const scheduleNotification = async (req, res) => {
             endpointArns: null, // Initially null, will be updated when sent
             type: "All",
             status: "Scheduled",
-            scheduleTime
+            scheduleTime,
+            userId: req?.userid,
         });
 
         await scheduledNotification.save();
@@ -140,7 +153,7 @@ const scheduleNotification = async (req, res) => {
             }
 
             const endpointArns = users.map(user => user.endpointArn);
-            await sendNotification(endpointArns, title, message);
+            await sendNotification(endpointArns, title, message,req?.userid);
             // Update the notification status in DB
             await Notification.findByIdAndUpdate(scheduledNotification._id, {
                 endpointArns,
@@ -161,7 +174,12 @@ const scheduleNotification = async (req, res) => {
  */
 const getSentOrFailedNotifications = async (req, res) => {
     try {
-        const notifications = await Notification.find({ status: { $in: ["Sent", "Failed"] } }).sort({ createdAt: -1 });
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+        const notifications = await Notification.find({ status: { $in: ["Sent", "Failed"] } })
+        .populate('userId', 'username')  
+        .sort({ createdAt: -1 });
 
         return res.json({ status: true, data: notifications });
     } catch (error) {
@@ -175,7 +193,12 @@ const getSentOrFailedNotifications = async (req, res) => {
  */
 const getScheduledNotifications = async (req, res) => {
     try {
-        const notifications = await Notification.find({ status: "Scheduled" }).sort({ scheduleTime: 1 });
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+        const notifications = await Notification.find({ status: "Scheduled" })
+        .populate('userId', 'username')  
+        .sort({ scheduleTime: 1 });
 
         return res.json({ status: true, data: notifications });
     } catch (error) {

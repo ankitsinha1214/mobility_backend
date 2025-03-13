@@ -11,6 +11,11 @@ const notificationSchema = new Schema({
         type: String,
         required: true
     },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Service-and-maintenance-user',
+        required: true,
+    },
     endpointArns: {
         type: [String], // Array to store multiple Endpoint ARNs
         required: false

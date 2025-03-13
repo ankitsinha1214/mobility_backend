@@ -109,13 +109,14 @@ async function registerDeviceToken(fcmToken) {
  * @param {string} type - "Single" or "All".
  * @param {string} status - Notification status.
  */
-async function saveNotificationToDB(title, message, endpointArns, type, status = "Pending") {
+async function saveNotificationToDB(title, message, endpointArns, type, status = "Pending", userId) {
     try {
         const newNotification = new Notification({
             title,
             description: message,
             endpointArns,
             type,
+            userId,
             status
         });
 
@@ -134,7 +135,7 @@ async function saveNotificationToDB(title, message, endpointArns, type, status =
  * @param {string} message - Notification message
  * @returns {Promise<void>}
  */
-async function sendNotification(endpointArns, title, message) {
+async function sendNotification(endpointArns, title, message, userId) {
     const payload = {
         default: message,
         GCM: JSON.stringify({
@@ -178,7 +179,7 @@ async function sendNotification(endpointArns, title, message) {
         console.error("❌ Error sending notification:", error);
         // Save failed notification in DB
         const type = Array.isArray(endpointArns) ? "All" : "Single";
-        await saveNotificationToDB(title, message, Array.isArray(endpointArns) ? endpointArns : [endpointArns], type, "Failed");
+        await saveNotificationToDB(title, message, Array.isArray(endpointArns) ? endpointArns : [endpointArns], type, "Failed", userId);
         throw error;
     }
 }
