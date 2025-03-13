@@ -23,8 +23,8 @@ router.get("/sent-or-failed", fetchUser, getSentOrFailedNotifications);
 // Get all Notification of scheduled
 router.get("/scheduled", fetchUser, getScheduledNotifications);
 
-router.put("/notification/:id", editScheduledNotification);
+// router.put("/:id", editScheduledNotification);
 
-router.delete("/notification/:id", deleteScheduledNotification);
+router.delete("/:id", deleteScheduledNotification);
 
 module.exports = router;
