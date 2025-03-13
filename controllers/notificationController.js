@@ -56,7 +56,8 @@ const sendPushNotification = async (req, res) => {
             title,
             description: message,
             endpointArns: [user.endpointArn],
-            type: "Single",
+            type: phoneNumber,
+            // type: "Single",
             status: "Sent",
             userId: req?.userid,
             scheduleTime: null,
@@ -142,7 +143,8 @@ const scheduleNotification = async (req, res) => {
                 return res.json({ status: false, message: "User not found or no registered device" });
             }
             endpointArns = [user.endpointArn];
-            type = "Single";
+            type = phoneNumber;
+            // type = "Single";
         }
 
         // Save the scheduled notification in the database
