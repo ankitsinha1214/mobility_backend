@@ -22,7 +22,7 @@ const notificationSchema = new Schema({
     },
     type: {
         type: String,
-        enum: ["Single", "All"], // Single: One user, All: Multiple users
+        // enum: ["Single", "All"], // Single: One user, All: Multiple users
         required: true
     },
     status: {
