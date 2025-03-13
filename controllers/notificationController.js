@@ -289,11 +289,79 @@ const getScheduledNotifications = async (req, res) => {
     }
 };
 
+const editScheduledNotification = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+
+        const { id } = req.params;
+        const { title, message, scheduleTime } = req.body;
+
+        if (!id || !title || !message || !scheduleTime) {
+            return res.json({ status: false, message: "ID, title, message, and scheduleTime are required." });
+        }
+
+        // Validate scheduleTime format
+        const [minute, hour, day, month] = scheduleTime.split(" ");
+        if (isNaN(minute) || isNaN(hour) || isNaN(day) || isNaN(month)) {
+            return res.json({ status: false, message: "Invalid schedule format. Use 'MM HH DD MM *' (e.g., '30 14 10 8 *' for Aug 10, 14:30)." });
+        }
+
+        // Update the notification
+        const updatedNotification = await Notification.findByIdAndUpdate(id, { 
+            title, 
+            description: message, 
+            scheduleTime, 
+            status: "Scheduled" 
+        }, { new: true });
+
+        if (!updatedNotification) {
+            return res.json({ status: false, message: "Notification not found or update failed." });
+        }
+
+        return res.json({ status: true, message: "Notification updated successfully.", data: updatedNotification });
+
+    } catch (error) {
+        console.error("❌ Error updating notification:", error);
+        return res.status(500).json({ status: false, message: "Internal Server Error" });
+    }
+};
+
+const deleteScheduledNotification = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+
+        const { id } = req.params;
+
+        if (!id) {
+            return res.json({ status: false, message: "Notification ID is required." });
+        }
+
+        const deletedNotification = await Notification.findByIdAndDelete(id);
+
+        if (!deletedNotification) {
+            return res.json({ status: false, message: "Notification not found or already deleted." });
+        }
+
+        return res.json({ status: true, message: "Notification deleted successfully." });
+
+    } catch (error) {
+        console.error("❌ Error deleting notification:", error);
+        return res.status(500).json({ status: false, message: "Internal Server Error" });
+    }
+};
+
+
 module.exports = {
     registerToken,
     sendPushNotification,
     sendNotificationToAll,
     scheduleNotification,
     getSentOrFailedNotifications,
-    getScheduledNotifications
+    getScheduledNotifications,
+    editScheduledNotification,
+    deleteScheduledNotification
 };

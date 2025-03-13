@@ -1,6 +1,6 @@
 // routes/notificationRoutes.js
 const express = require("express");
-const { registerToken, sendPushNotification, sendNotificationToAll, scheduleNotification, getSentOrFailedNotifications, getScheduledNotifications } = require("../controllers/notificationController");
+const { registerToken, sendPushNotification, sendNotificationToAll, scheduleNotification, getSentOrFailedNotifications, getScheduledNotifications, editScheduledNotification, deleteScheduledNotification } = require("../controllers/notificationController");
 
 const fetchUser = require('../middleware/fetchuser');
 const router = express.Router();
@@ -22,5 +22,9 @@ router.get("/sent-or-failed", fetchUser, getSentOrFailedNotifications);
 
 // Get all Notification of scheduled
 router.get("/scheduled", fetchUser, getScheduledNotifications);
+
+router.put("/notification/:id", editScheduledNotification);
+
+router.delete("/notification/:id", deleteScheduledNotification);
 
 module.exports = router;

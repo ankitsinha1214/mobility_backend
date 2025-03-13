@@ -25,6 +25,11 @@ const notificationSchema = new Schema({
         // enum: ["Single", "All"], // Single: One user, All: Multiple users
         required: true
     },
+    scheduleTime: {
+        type: String,
+        // enum: ["Single", "All"], // Single: One user, All: Multiple users
+        required: false
+    },
     status: {
         type: String,
         enum: ["Pending", "Scheduled", "Sent", "Failed"], // Tracking notification status
