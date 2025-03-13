@@ -119,23 +119,38 @@ const scheduleNotification = async (req, res) => {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
-        const { title, message, scheduleTime } = req.body;
+
+        const { title, message, scheduleTime, phoneNumber } = req.body;
 
         if (!title || !message || !scheduleTime) {
             return res.json({ status: false, message: "Title, message, and scheduleTime are required." });
         }
 
-        // Validate scheduleTime (Expected format: "MM HH DD MM *" for cron)
+        // Validate scheduleTime format
         const [minute, hour, day, month] = scheduleTime.split(" ");
         if (isNaN(minute) || isNaN(hour) || isNaN(day) || isNaN(month)) {
             return res.json({ status: false, message: "Invalid schedule format. Use 'MM HH DD MM *' (e.g., '30 14 10 8 *' for Aug 10, 14:30)." });
         }
+
+        let endpointArns = null;
+        let type = "All";
+
+        if (phoneNumber) {
+            // Fetch the specific user's endpointArn
+            const user = await User.findOne({ phoneNumber }, "endpointArn");
+            if (!user || !user.endpointArn) {
+                return res.json({ status: false, message: "User not found or no registered device" });
+            }
+            endpointArns = [user.endpointArn];
+            type = "Single";
+        }
+
         // Save the scheduled notification in the database
         const scheduledNotification = new Notification({
             title,
             description: message,
-            endpointArns: null, // Initially null, will be updated when sent
-            type: "All",
+            endpointArns, // Will be updated when sent
+            type,
             status: "Scheduled",
             scheduleTime,
             userId: req?.userid,
@@ -145,29 +160,94 @@ const scheduleNotification = async (req, res) => {
 
         cron.schedule(scheduleTime, async () => {
             console.log("📢 Sending scheduled notification...");
-            const users = await User.find({ endpointArn: { $exists: true, $ne: null } }, "endpointArn");
 
-            if (users.length === 0) {
-                console.log("❌ No users found with registered devices.");
-                return;
+            if (phoneNumber) {
+                // If phoneNumber is provided, send to a single user
+                await sendNotification(endpointArns, title, message, req?.userid);
+            } else {
+                // Otherwise, send to all users
+                const users = await User.find({ endpointArn: { $exists: true, $ne: null } }, "endpointArn");
+
+                if (users.length === 0) {
+                    console.log("❌ No users found with registered devices.");
+                    return;
+                }
+
+                endpointArns = users.map(user => user.endpointArn);
+                await sendNotification(endpointArns, title, message, req?.userid);
             }
 
-            const endpointArns = users.map(user => user.endpointArn);
-            await sendNotification(endpointArns, title, message,req?.userid);
             // Update the notification status in DB
             await Notification.findByIdAndUpdate(scheduledNotification._id, {
                 endpointArns,
                 status: "Sent"
             });
+
             console.log("✅ Scheduled notification sent successfully.");
         });
 
         return res.json({ status: true, message: "Notification scheduled successfully." });
+
     } catch (error) {
         console.error("❌ Error scheduling notification:", error);
         return res.status(500).json({ status: false, message: "Internal Server Error" });
     }
 };
+
+// const scheduleNotification = async (req, res) => {
+//     try {
+//         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+//             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+//         }
+//         const { title, message, scheduleTime } = req.body;
+
+//         if (!title || !message || !scheduleTime) {
+//             return res.json({ status: false, message: "Title, message, and scheduleTime are required." });
+//         }
+
+//         // Validate scheduleTime (Expected format: "MM HH DD MM *" for cron)
+//         const [minute, hour, day, month] = scheduleTime.split(" ");
+//         if (isNaN(minute) || isNaN(hour) || isNaN(day) || isNaN(month)) {
+//             return res.json({ status: false, message: "Invalid schedule format. Use 'MM HH DD MM *' (e.g., '30 14 10 8 *' for Aug 10, 14:30)." });
+//         }
+//         // Save the scheduled notification in the database
+//         const scheduledNotification = new Notification({
+//             title,
+//             description: message,
+//             endpointArns: null, // Initially null, will be updated when sent
+//             type: "All",
+//             status: "Scheduled",
+//             scheduleTime,
+//             userId: req?.userid,
+//         });
+
+//         await scheduledNotification.save();
+
+//         cron.schedule(scheduleTime, async () => {
+//             console.log("📢 Sending scheduled notification...");
+//             const users = await User.find({ endpointArn: { $exists: true, $ne: null } }, "endpointArn");
+
+//             if (users.length === 0) {
+//                 console.log("❌ No users found with registered devices.");
+//                 return;
+//             }
+
+//             const endpointArns = users.map(user => user.endpointArn);
+//             await sendNotification(endpointArns, title, message,req?.userid);
+//             // Update the notification status in DB
+//             await Notification.findByIdAndUpdate(scheduledNotification._id, {
+//                 endpointArns,
+//                 status: "Sent"
+//             });
+//             console.log("✅ Scheduled notification sent successfully.");
+//         });
+
+//         return res.json({ status: true, message: "Notification scheduled successfully." });
+//     } catch (error) {
+//         console.error("❌ Error scheduling notification:", error);
+//         return res.status(500).json({ status: false, message: "Internal Server Error" });
+//     }
+// };
 
 /**
  * API to get all notifications that are Sent or Failed
