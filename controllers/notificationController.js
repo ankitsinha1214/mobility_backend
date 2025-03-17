@@ -2,6 +2,8 @@ const { registerDeviceToken, sendNotification } = require("../services/notificat
 const User = require('../models/userModel');
 const Notification = require('../models/notificationConsumerModel');
 const cron = require("node-cron");
+const scheduledJobs = {}; // Store scheduled jobs with notification ID
+
 /**
  * API to register device token
  */
@@ -50,7 +52,7 @@ const sendPushNotification = async (req, res) => {
         if (!user || !user.endpointArn) {
             return res.json({ status: false, message: "User not found or no registered device" });
         }
-        await sendNotification(user.endpointArn, title, message,req?.userid);
+        await sendNotification(user.endpointArn, title, message, req?.userid);
         // Store the notification in the database
         const newNotification = new Notification({
             title,
@@ -91,7 +93,7 @@ const sendNotificationToAll = async (req, res) => {
 
         // Send notifications to all users
         const endpointArns = users.map(user => user.endpointArn);
-        await sendNotification(endpointArns, title, message,req?.userid);
+        await sendNotification(endpointArns, title, message, req?.userid);
         // Store the notification in the database
         const newNotification = new Notification({
             title,
@@ -159,8 +161,8 @@ const scheduleNotification = async (req, res) => {
         });
 
         await scheduledNotification.save();
-
-        cron.schedule(scheduleTime, async () => {
+        // Schedule the cron job
+        const job = cron.schedule(scheduleTime, async () => {
             console.log("📢 Sending scheduled notification...");
 
             if (phoneNumber) {
@@ -187,6 +189,8 @@ const scheduleNotification = async (req, res) => {
 
             console.log("✅ Scheduled notification sent successfully.");
         });
+        // Store the job reference
+        scheduledJobs[scheduledNotification._id] = job;
 
         return res.json({ status: true, message: "Notification scheduled successfully." });
 
@@ -260,8 +264,8 @@ const getSentOrFailedNotifications = async (req, res) => {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
         const notifications = await Notification.find({ status: { $in: ["Sent", "Failed"] } })
-        .populate('userId', 'username')  
-        .sort({ createdAt: -1 });
+            .populate('userId', 'username')
+            .sort({ createdAt: -1 });
 
         return res.json({ status: true, data: notifications });
     } catch (error) {
@@ -279,8 +283,8 @@ const getScheduledNotifications = async (req, res) => {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
         const notifications = await Notification.find({ status: "Scheduled" })
-        .populate('userId', 'username')  
-        .sort({ scheduleTime: 1 });
+            .populate('userId', 'username')
+            .sort({ scheduleTime: 1 });
 
         return res.json({ status: true, data: notifications });
     } catch (error) {
@@ -309,11 +313,11 @@ const editScheduledNotification = async (req, res) => {
         }
 
         // Update the notification
-        const updatedNotification = await Notification.findByIdAndUpdate(id, { 
-            title, 
-            description: message, 
-            scheduleTime, 
-            status: "Scheduled" 
+        const updatedNotification = await Notification.findByIdAndUpdate(id, {
+            title,
+            description: message,
+            scheduleTime,
+            status: "Scheduled"
         }, { new: true });
 
         if (!updatedNotification) {
@@ -338,6 +342,12 @@ const deleteScheduledNotification = async (req, res) => {
 
         if (!id) {
             return res.json({ status: false, message: "Notification ID is required." });
+        }
+
+        // Stop the scheduled job if it exists
+        if (scheduledJobs[id]) {
+            scheduledJobs[id].stop();
+            delete scheduledJobs[id];
         }
 
         const deletedNotification = await Notification.findByIdAndDelete(id);
