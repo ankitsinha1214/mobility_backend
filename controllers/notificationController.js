@@ -135,6 +135,14 @@ const scheduleNotification = async (req, res) => {
             return res.json({ status: false, message: "Invalid schedule format. Use 'MM HH DD MM *' (e.g., '30 14 10 8 *' for Aug 10, 14:30)." });
         }
 
+         // Convert scheduleTime to a Date object
+         const now = new Date();
+         const scheduledDate = new Date(now.getFullYear(), month - 1, day, hour, minute);
+ 
+         if (scheduledDate <= now) {
+             return res.json({ status: false, message: "Scheduled time must be in the future." });
+         }
+
         let endpointArns = null;
         let type = "All";
 
