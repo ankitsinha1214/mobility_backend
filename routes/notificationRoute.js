@@ -25,6 +25,6 @@ router.get("/scheduled", fetchUser, getScheduledNotifications);
 
 // router.put("/:id", editScheduledNotification);
 
-router.delete("/:id", deleteScheduledNotification);
+router.delete("/:id", fetchUser, deleteScheduledNotification);
 
 module.exports = router;
