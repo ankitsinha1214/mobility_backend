@@ -223,6 +223,33 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+const getUserById = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+
+        const { userId } = req.params; // Extract userId from request parameters
+
+        if (!userId) {
+            return res.json({ success: false, message: "User ID is required." });
+        }
+
+        // Retrieve a single user by ID, excluding the password field
+        const user = await User.findById(userId).select('-password');
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found." });
+        }
+
+        res.json({ success: true, data: user, message: "User retrieved successfully." });
+
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
+    }
+};
+
 const updateUserStatus = async (req, res) => {
     const { userId, status } = req.body;
 
@@ -343,6 +370,7 @@ module.exports = {
     deleteUser,
     getAllUserRecords,
     getAllUsers,
+    getUserById,
     createManager,
     updateUserStatus,
     getAdminsAndManagers
