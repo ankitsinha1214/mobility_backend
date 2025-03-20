@@ -321,7 +321,7 @@ router.post('/generate-report-new', async (req, res) => {
             //         { header: 'City', key: 'city' },
             //         { header: 'Avg Rating', key: 'avgRating' },
             //     ];
-            case 'locations':
+            case 'Locations':
                 // Fetch all charger locations
                 let chargerLocations = await Location.find({
                     createdAt: { $gte: from, $lte: to }
