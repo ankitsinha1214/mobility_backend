@@ -274,10 +274,11 @@ router.post('/generate-report-new', async (req, res) => {
                     let totalEnergyConsumed = 0;
                     let totalDuration = 0;
                     let totalChargingDuration = 0;
-                    let stationUsage = {};
-                    let paymentMethods = {};
+                    // let stationUsage = {};
+                    // let paymentMethods = {};
                     let totalFeePaid = 0;
                     let totalFeeUnpaid = 0;
+                    let currency = "INR"; 
             
                     for (let session of userSessions) {
                         if (session.startMeterValue && session.endMeterValue) {
@@ -292,61 +293,69 @@ router.post('/generate-report-new', async (req, res) => {
                             }
                         }
             
-                        if (session.locationId) {
-                            stationUsage[session.locationId] = (stationUsage[session.locationId] || 0) + 1;
-                        }
+                        // if (session.locationId) {
+                        //     stationUsage[session.locationId] = (stationUsage[session.locationId] || 0) + 1;
+                        // }
             
                         let payment = paymentMap[session._id];
                         if (payment) {
                             totalFeePaid += payment.amount / 100;
-                            paymentMethods[payment.method] = (paymentMethods[payment.method] || 0) + 1;
+                            currency = payment.currency || "INR"; 
+                            // paymentMethods[payment.method] = (paymentMethods[payment.method] || 0) + 1;
                         } else {
                             totalFeeUnpaid += (session.estimatedCost || 0);
                         }
                     }
             
-                    let preferredStation = Object.keys(stationUsage).reduce((a, b) => stationUsage[a] > stationUsage[b] ? a : b, "N/A");
-                    let preferredPaymentMethod = Object.keys(paymentMethods).reduce((a, b) => paymentMethods[a] > paymentMethods[b] ? a : b, "N/A");
+                    // let preferredStation = Object.keys(stationUsage).reduce((a, b) => stationUsage[a] > stationUsage[b] ? a : b, "N/A");
+                    // let preferredPaymentMethod = Object.keys(paymentMethods).reduce((a, b) => paymentMethods[a] > paymentMethods[b] ? a : b, "N/A");
             
                     let avgDuration = totalSessions ? (totalDuration / totalSessions).toFixed(2) + " sec" : "N/A";
                     let totalVehicleCount = user.user_vehicle ? user.user_vehicle.length : 0;
             
                     return {
-                        userId: user._id,
+                        // userId: user._id,
+                        phoneNumber: user.phoneNumber,
                         firstName: user.firstName,
                         lastName: user.lastName,
-                        status: user.status,
-                        phoneNumber: user.phoneNumber,
-                        state: user.state,
-                        city: user.city,
-                        createdDate: user.createdAt,
+                        gender: user.gender,
+                        email: user.email,
+                        dob: user.dob,
+                        // state: user.state,
+                        // city: user.city,
+                        // createdDate: user.createdAt,
                         totalSessions,
                         energyConsumed: totalEnergyConsumed.toFixed(3) + " Wh",
                         avgDuration,
                         chargingDuration: totalChargingDuration + " sec",
-                        preferredStation,
-                        paymentMethod: preferredPaymentMethod,
-                        feePaid: `$${totalFeePaid.toFixed(2)}`,
-                        feeUnpaid: `$${totalFeeUnpaid.toFixed(2)}`,
+                        // preferredStation,
+                        // paymentMethod: preferredPaymentMethod,
+                        feePaid: `${getCurrencySymbol(currency)} ${(totalFeePaid).toFixed(2)}` || "N/A",
+                        feeUnpaid: `${getCurrencySymbol(currency)} ${(totalFeeUnpaid).toFixed(2)}` || "N/A",
+                        // feePaid: `$${totalFeePaid.toFixed(2)}`,
+                        // feeUnpaid: `$${totalFeeUnpaid.toFixed(2)}`,
                         totalVehicle: totalVehicleCount
                     };
                 });
             
                 columns = [
-                    { header: 'User ID', key: 'userId' },
+                    // { header: 'User ID', key: 'userId' },
+                    { header: 'Phone Number', key: 'phoneNumber' },
                     { header: 'First Name', key: 'firstName' },
                     { header: 'Last Name', key: 'lastName' },
-                    { header: 'Status', key: 'status' },
-                    { header: 'Phone Number', key: 'phoneNumber' },
-                    { header: 'State', key: 'state' },
-                    { header: 'City', key: 'city' },
-                    { header: 'Created Date', key: 'createdDate' },
+                    // { header: 'Status', key: 'status' },
+                    // { header: 'State', key: 'state' },
+                    // { header: 'City', key: 'city' },
+                    { header: 'Gender', key: 'gender' },
+                    { header: 'Email', key: 'email' },
+                    { header: 'Date of Birth', key: 'dob' },
+                    // { header: 'Created Date', key: 'createdDate' },
                     { header: 'Total Sessions', key: 'totalSessions' },
                     { header: 'Energy Consumed', key: 'energyConsumed' },
                     { header: 'Avg Duration', key: 'avgDuration' },
                     { header: 'Charging Duration', key: 'chargingDuration' },
-                    { header: 'Preferred Station', key: 'preferredStation' },
-                    { header: 'Payment Method', key: 'paymentMethod' },
+                    // { header: 'Preferred Station', key: 'preferredStation' },
+                    // { header: 'Payment Method', key: 'paymentMethod' },
                     { header: 'Fee Paid', key: 'feePaid' },
                     { header: 'Fee Unpaid', key: 'feeUnpaid' },
                     { header: 'Total Vehicles', key: 'totalVehicle' },
@@ -552,7 +561,7 @@ router.post('/generate-report-new', async (req, res) => {
                     { header: 'Captured', key: 'captured' },
                     // { header: 'Description', key: 'description' },
                     { header: 'Email', key: 'email' },
-                    { header: 'User ID', key: 'userId' },
+                    { header: 'Phone Number', key: 'userPhone' },
                     { header: 'Fee', key: 'fee' },
                     { header: 'Tax', key: 'tax' },
                 ];
