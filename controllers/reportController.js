@@ -4,6 +4,7 @@ const Charger = require('../models/chargerLocationModel'); // Charger model
 const Location = require('../models/chargerLocationModel'); // Location model
 const User = require('../models/userModel'); // User model
 const ChargingSession = require('../models/chargerSessionModel');
+const Review = require('../models/ratingUserLocationModel');
 const Payment = require('../models/paymentModel');
 const ExcelJS = require('exceljs'); // ExcelJS library
 
@@ -200,77 +201,314 @@ router.post('/generate-report-new', async (req, res) => {
                 ];
                 break;
 
-            case 'locations':
-                data = await Location.find({
-                    createdAt: { $gte: from, $lte: to }
-                });
-
-                columns = [
-                    { header: 'Location ID', key: '_id' },
-                    { header: 'Location Name', key: 'locationName' },
-                    { header: 'Location Status', key: 'status' },
-                    { header: 'Location Type', key: 'locationType' },
-                    { header: 'Address', key: 'address' },
-                    { header: 'State', key: 'state' },
-                    { header: 'City', key: 'city' },
-                    { header: 'Working Hours', key: 'workingHours' },
-                    { header: 'Working Days', key: 'workingDays' },
-                    { header: 'Direction Latitude', key: 'direction.latitude' },
-                    { header: 'Direction Longitude', key: 'direction.longitude' },
-                    { header: 'Created Date', key: 'createdAt' },
-                ];
-                break;
-
-            // case 'users':
-            //     data = await User.find({
+            // case 'locations':
+            //     let locations = await Location.find({
             //         createdAt: { $gte: from, $lte: to }
+            //     }).lean();
+
+            //     let locationIds = locations.map(location => location._id);
+
+            //     // Fetch all charging sessions related to these locations
+            //     let sessions3 = await ChargingSession.find({ locationId: { $in: locationIds } }).lean();
+
+            //     // Map sessions to their locations
+            //     let locationSessionMap = {};
+            //     sessions3.forEach(session => {
+            //         if (!locationSessionMap[session.locationId]) locationSessionMap[session.locationId] = [];
+            //         locationSessionMap[session.locationId].push(session);
+            //     });
+
+            //     // Get all payments related to these sessions
+            //     let sessionIds3 = sessions3.map(session => session._id);
+            //     let payments3 = await Payment.find({ sessionId: { $in: sessionIds3 } }).lean();
+
+            //     // Map payments to their sessions
+            //     let sessionPaymentMap = {};
+            //     payments3.forEach(payment => {
+            //         sessionPaymentMap[payment.sessionId] = payment;
+            //     });
+
+            //     // Process data
+            //     data = locations.map(location => {
+            //         let locationSessions = locationSessionMap[location._id] || [];
+            //         let totalSessions = locationSessions.length;
+            //         let totalPaidSessions = 0;
+            //         let totalUnpaidSessions = 0;
+            //         let totalEnergyConsumed = 0;
+            //         let peakHoursCount = {};
+            //         let peakDayCount = {};
+            //         let peakChargingDuration = 0;
+            //         let totalChargingDuration = 0;
+            //         let ratings = [];
+
+            //         locationSessions.forEach(session => {
+            //             // Energy Calculation
+            //             if (session.startMeterValue && session.endMeterValue) {
+            //                 totalEnergyConsumed += (session.endMeterValue - session.startMeterValue);
+            //             }
+
+            //             // Charging Duration Calculation
+            //             if (session.startTime && session.endTime) {
+            //                 let duration = Math.floor((new Date(session.endTime) - new Date(session.startTime)) / 1000);
+            //                 totalChargingDuration += duration;
+
+            //                 let hour = new Date(session.startTime).getHours();
+            //                 peakHoursCount[hour] = (peakHoursCount[hour] || 0) + 1;
+
+            //                 let day = new Date(session.startTime).getDay();
+            //                 peakDayCount[day] = (peakDayCount[day] || 0) + 1;
+
+            //                 if (duration > peakChargingDuration) {
+            //                     peakChargingDuration = duration;
+            //                 }
+            //             }
+
+            //             // Check if session was paid or unpaid
+            //             let payment = sessionPaymentMap[session._id];
+            //             if (payment) {
+            //                 totalPaidSessions++;
+            //             } else {
+            //                 totalUnpaidSessions++;
+            //             }
+
+            //             // Collect Ratings
+            //             if (session.rating) {
+            //                 ratings.push(session.rating);
+            //             }
+            //         });
+
+            //         // Peak Revenue Hour Calculation
+            //         let peakRevenueHours = Object.entries(peakHoursCount)
+            //             .sort((a, b) => b[1] - a[1])
+            //             .slice(0, 2)
+            //             .map(([hour]) => `${hour}:00 - ${hour}:59`);
+
+            //         // Peak Revenue Day Calculation
+            //         let peakRevenueDay = Object.entries(peakDayCount)
+            //             .sort((a, b) => b[1] - a[1])
+            //             .map(([day]) => ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][day])[0];
+
+            //         // Avg Rating Calculation
+            //         let avgRating = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(2) : "N/A";
+
+            //         return {
+            //             locationId: location._id,
+            //             locationName: location.locationName,
+            //             totalChargers: location?.chargerInfo?.length || 0,
+            //             energyDispersed: totalEnergyConsumed.toFixed(3) + " kWh",
+            //             totalPaidSessions,
+            //             totalUnpaidSessions,
+            //             peakRevenueHours: peakRevenueHours.length ? peakRevenueHours.join(", ") : "N/A",
+            //             peakRevenueDay: peakRevenueDay || "N/A",
+            //             peakChargingTime: peakChargingDuration > 0 ? `${(peakChargingDuration / 60).toFixed(2)} min` : "N/A",
+            //             state: location.state,
+            //             city: location.city,
+            //             avgRating,
+            //         };
             //     });
 
             //     columns = [
-            //         { header: 'User ID', key: '_id' },
-            //         { header: 'First Name', key: 'firstName' },
-            //         { header: 'Last Name', key: 'lastName' },
-            //         { header: 'Status', key: 'status' },
-            //         { header: 'Phone Number', key: 'phoneNumber' },
+            //         { header: 'Location ID', key: 'locationId' },
+            //         { header: 'Location Name', key: 'locationName' },
+            //         { header: 'Total Chargers', key: 'totalChargers' },
+            //         { header: 'Energy Dispersed', key: 'energyDispersed' },
+            //         { header: 'Total Paid Sessions', key: 'totalPaidSessions' },
+            //         { header: 'Total UnPaid Sessions', key: 'totalUnpaidSessions' },
+            //         { header: 'Peak Revenue Hours', key: 'peakRevenueHours' },
+            //         { header: 'Peak Revenue Day', key: 'peakRevenueDay' },
+            //         { header: 'Peak Charging Time', key: 'peakChargingTime' },
             //         { header: 'State', key: 'state' },
             //         { header: 'City', key: 'city' },
-            //         { header: 'Created Date', key: 'createdAt' },
+            //         { header: 'Avg Rating', key: 'avgRating' },
             //     ];
-            //     break;
+            case 'locations':
+                // Fetch all charger locations
+                let chargerLocations = await Location.find({
+                    createdAt: { $gte: from, $lte: to }
+                }).lean();
+                // Fetch ratings from the Review model once for all locations
+                let locationRatings = await Review.aggregate([
+                    { $match: { location: { $in: chargerLocations.map(loc => loc._id) } } },
+                    {
+                        $group: {
+                            _id: "$location",
+                            avgRating: { $avg: { $avg: ["$charging_exp", "$charging_location"] } }
+                        }
+                    }
+                ]).exec();  // ✅ Move aggregation outside the map function
+
+                // Map ratings to locations
+                let ratingMap = {};
+                locationRatings.forEach(rating => {
+                    ratingMap[rating._id.toString()] = rating.avgRating.toFixed(2);  // Store in map
+                });
+
+                let chargerMap3 = {};
+                chargerLocations.forEach(location => {
+                    location.chargerInfo.forEach(charger => {
+                        chargerMap3[charger.name] = location._id; // Map chargerId to locationId
+                    });
+                });
+
+                let chargerIds = Object.keys(chargerMap3);
+
+                // Fetch all charging sessions related to these chargers
+                let sessions3 = await ChargingSession.find({ chargerId: { $in: chargerIds } }).lean();
+
+                // Map sessions to their locations
+                let locationSessionMap = {};
+                sessions3.forEach(session => {
+                    let locationId = chargerMap3[session.chargerId];
+                    if (!locationSessionMap[locationId]) locationSessionMap[locationId] = [];
+                    locationSessionMap[locationId].push(session);
+                });
+
+                // Get all payments related to these sessions
+                let sessionIds3 = sessions3.map(session => session._id);
+                let payments3 = await Payment.find({ sessionId: { $in: sessionIds3 } }).lean();
+
+                // Map payments to their sessions
+                let sessionPaymentMap = {};
+                payments3.forEach(payment => {
+                    sessionPaymentMap[payment.sessionId] = payment;
+                });
+
+                // Process data
+                data = chargerLocations.map(location => {
+                    let locationSessions = locationSessionMap[location._id] || [];
+                    // let totalSessions = locationSessions.length;
+                    let totalPaidSessions = 0;
+                    let totalUnpaidSessions = 0;
+                    let totalEnergyConsumed = 0;
+                    let peakHoursCount = {};
+                    let peakDayCount = {};
+                    let peakChargingDuration = 0;
+                    let totalChargingDuration = 0;
+                    let ratings = [];
+                    let totalRevenue = 0;
+                    let currency = "INR";
+
+                    locationSessions.forEach(session => {
+                        // Energy Calculation
+                        if (session.startMeterValue && session.endMeterValue) {
+                            totalEnergyConsumed += (session.endMeterValue - session.startMeterValue);
+                        }
+
+                        // Charging Duration Calculation
+                        if (session.startTime && session.endTime) {
+                            let duration = Math.floor((new Date(session.endTime) - new Date(session.startTime)) / 1000);
+                            totalChargingDuration += duration;
+
+                            let hour = new Date(session.startTime).getHours();
+                            peakHoursCount[hour] = (peakHoursCount[hour] || 0) + 1;
+
+                            let day = new Date(session.startTime).getDay();
+                            peakDayCount[day] = (peakDayCount[day] || 0) + 1;
+
+                            if (duration > peakChargingDuration) {
+                                peakChargingDuration = duration;
+                            }
+                        }
+
+                        // Check if session was paid or unpaid
+                        let payment = sessionPaymentMap[session._id];
+                        currency = payment.currency || "INR";
+                        if (payment) {
+                            totalPaidSessions++;
+                            totalRevenue += payment.amount / 100;
+                        } else {
+                            totalUnpaidSessions++;
+                        }
+
+                        // Collect Ratings
+                        // if (location.rating) {
+                        //     ratings.push(session.rating);
+                        // }
+                    });
+
+                    // Peak Revenue Hour Calculation
+                    let peakRevenueHours = Object.entries(peakHoursCount)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 2)
+                        .map(([hour]) => `${hour}:00 - ${hour}:59`);
+
+                    // Peak Revenue Day Calculation
+                    let peakRevenueDay = Object.entries(peakDayCount)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([day]) => ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][day])[0];
+
+                    // Avg Rating Calculation
+                    // let avgRating = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(2) : "N/A";
+
+                    return {
+                        locationId: location._id,
+                        locationName: location.locationName,
+                        totalChargers: location?.chargerInfo?.length || 0,
+                        energyDispersed: totalEnergyConsumed.toFixed(3) + " Wh",
+                        totalRevenue: `${getCurrencySymbol(currency)} ${(totalRevenue).toFixed(2)}` || "N/A",
+                        totalPaidSessions,
+                        totalUnpaidSessions,
+                        peakRevenueHours: peakRevenueHours.length ? peakRevenueHours.join(", ") : "N/A",
+                        peakRevenueDay: peakRevenueDay || "N/A",
+                        peakChargingTime: peakChargingDuration > 0 ? `${(peakChargingDuration / 60).toFixed(2)} min` : "N/A",
+                        state: location.state,
+                        city: location.city,
+                        // avgRating: ratingMap[location._id] || "N/A",
+                        avgRating: ratingMap[location._id.toString()] || "N/A",
+                    };
+                });
+
+                columns = [
+                    { header: 'Location ID', key: 'locationId' },
+                    { header: 'Location Name', key: 'locationName' },
+                    { header: 'Total Chargers', key: 'totalChargers' },
+                    { header: 'Energy Dispersed', key: 'energyDispersed' },
+                    { header: 'Total Revenue', key: 'totalRevenue' },
+                    { header: 'Total Paid Sessions', key: 'totalPaidSessions' },
+                    { header: 'Total UnPaid Sessions', key: 'totalUnpaidSessions' },
+                    { header: 'Peak Revenue Hours', key: 'peakRevenueHours' },
+                    { header: 'Peak Revenue Day', key: 'peakRevenueDay' },
+                    { header: 'Peak Charging Time', key: 'peakChargingTime' },
+                    { header: 'State', key: 'state' },
+                    { header: 'City', key: 'city' },
+                    { header: 'Avg Rating', key: 'avgRating' },
+                ];
+                break;
+
             case 'Users':
                 // Fetch all users within the date range
                 let users = await User.find({ createdAt: { $gte: from, $lte: to } }).lean();
-            
+
                 // Extract all user phone numbers
                 let userPhones2 = users.map(user => user.phoneNumber);
-            
+
                 // Fetch all charging sessions for these users in one go
                 let sessions2 = await ChargingSession.find({ userPhone: { $in: userPhones2 } }).lean();
-                
+
                 // Create a session map grouped by userPhone
                 let sessionMap1 = {};
                 for (let session of sessions2) {
                     if (!sessionMap1[session.userPhone]) sessionMap1[session.userPhone] = [];
                     sessionMap1[session.userPhone].push(session);
                 }
-            
+
                 // Extract all session IDs for fetching payments
                 let sessionIds1 = sessions2.map(session => session._id);
-            
+
                 // Fetch all payments in one go
                 let payments2 = await Payment.find({ sessionId: { $in: sessionIds1 } }).lean();
-            
+
                 // Create a payment map grouped by sessionId
                 let paymentMap = {};
                 for (let payment of payments2) {
                     paymentMap[payment.sessionId] = payment;
                 }
-            
+
                 // Process data efficiently
                 data = users.map(user => {
                     let userSessions = sessionMap1[user.phoneNumber] || [];
                     let totalSessions = userSessions.length;
-            
+
                     let totalEnergyConsumed = 0;
                     let totalDuration = 0;
                     let totalChargingDuration = 0;
@@ -278,13 +516,13 @@ router.post('/generate-report-new', async (req, res) => {
                     // let paymentMethods = {};
                     let totalFeePaid = 0;
                     let totalFeeUnpaid = 0;
-                    let currency = "INR"; 
-            
+                    let currency = "INR";
+
                     for (let session of userSessions) {
                         if (session.startMeterValue && session.endMeterValue) {
                             totalEnergyConsumed += (session.endMeterValue - session.startMeterValue);
                         }
-            
+
                         if (session.startTime && session.endTime) {
                             let duration = Math.floor((new Date(session.endTime) - new Date(session.startTime)) / 1000);
                             totalDuration += duration;
@@ -292,27 +530,27 @@ router.post('/generate-report-new', async (req, res) => {
                                 totalChargingDuration += duration;
                             }
                         }
-            
+
                         // if (session.locationId) {
                         //     stationUsage[session.locationId] = (stationUsage[session.locationId] || 0) + 1;
                         // }
-            
+
                         let payment = paymentMap[session._id];
                         if (payment) {
                             totalFeePaid += payment.amount / 100;
-                            currency = payment.currency || "INR"; 
+                            currency = payment.currency || "INR";
                             // paymentMethods[payment.method] = (paymentMethods[payment.method] || 0) + 1;
                         } else {
                             totalFeeUnpaid += (session.estimatedCost || 0);
                         }
                     }
-            
+
                     // let preferredStation = Object.keys(stationUsage).reduce((a, b) => stationUsage[a] > stationUsage[b] ? a : b, "N/A");
                     // let preferredPaymentMethod = Object.keys(paymentMethods).reduce((a, b) => paymentMethods[a] > paymentMethods[b] ? a : b, "N/A");
-            
+
                     let avgDuration = totalSessions ? (totalDuration / totalSessions).toFixed(2) + " sec" : "N/A";
                     let totalVehicleCount = user.user_vehicle ? user.user_vehicle.length : 0;
-            
+
                     return {
                         // userId: user._id,
                         phoneNumber: user.phoneNumber,
@@ -337,7 +575,7 @@ router.post('/generate-report-new', async (req, res) => {
                         totalVehicle: totalVehicleCount
                     };
                 });
-            
+
                 columns = [
                     // { header: 'User ID', key: 'userId' },
                     { header: 'Phone Number', key: 'phoneNumber' },
@@ -361,7 +599,7 @@ router.post('/generate-report-new', async (req, res) => {
                     { header: 'Total Vehicles', key: 'totalVehicle' },
                 ];
                 break;
-            
+
 
             case 'Sessions':
                 let sessions = await ChargingSession.find({ createdAt: { $gte: from, $lte: to } });
@@ -503,30 +741,36 @@ router.post('/generate-report-new', async (req, res) => {
             case 'Payments':
                 // Fetch all payments within the date range
                 let payments = await Payment.find({ createdAt: { $gte: from, $lte: to } }).lean();
-            
+
                 // Extract all session IDs
                 let sessionIds = payments.map(payment => payment.sessionId);
-            
+
                 // Fetch all charging sessions in one go
                 let sessions1 = await ChargingSession.find({ _id: { $in: sessionIds } }).lean();
                 let sessionMap = Object.fromEntries(sessions1.map(session => [session._id.toString(), session]));
-            
+
                 // Extract all user phone numbers from sessions
                 let userPhones = sessions1.map(session => session.userPhone);
                 let users1 = await User.find({ phoneNumber: { $in: userPhones } }).lean();
                 let userMap = Object.fromEntries(users1.map(user => [user.phoneNumber, user]));
-            
+
                 // Extract all charger IDs from sessions
-                let chargerIds = sessions1.map(session => session.chargerId);
-                let chargers1 = await Charger.find({ "chargerInfo.name": { $in: chargerIds } }).lean();
-                let chargerMap = Object.fromEntries(chargers1.map(charger => [charger.chargerInfo.name, charger]));
-            
+                let chargerIds3 = sessions1.map(session => session.chargerId);
+                let chargers1 = await Location.find({ "chargerInfo.name": { $in: chargerIds3 } }).lean();
+                // let chargerMap = Object.fromEntries(chargers1.map(charger => [charger.chargerInfo.name, charger]));
+                let chargerMap = {};
+                chargers1.forEach(location => {
+                    location.chargerInfo.forEach(info => {
+                        chargerMap[info.name] = location._id; // Store location ID instead of full object
+                    });
+                });
+                // console.log(chargerMap)
                 // Map data efficiently
                 data = payments.map(payment => {
                     let session = sessionMap[payment.sessionId] || {};
                     let user = userMap[session?.userPhone] || {};
                     let charger = chargerMap[session?.chargerId] || {};
-            
+
                     return {
                         // status: payment.status || "N/A",
                         paymentId: payment.id,
@@ -546,7 +790,7 @@ router.post('/generate-report-new', async (req, res) => {
                         tax: `${getCurrencySymbol(payment.currency)} ${(payment.tax / 100).toFixed(2)}` || "N/A",
                     };
                 });
-            
+
                 columns = [
                     // { header: 'Status', key: 'status' },
                     { header: 'Payment ID', key: 'paymentId' },
