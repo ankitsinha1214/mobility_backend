@@ -16,7 +16,7 @@ router.post('/get-history', fetchUser, UserController.getAllUserRecords);
 router.get('/', fetchUser, UserController.getAllUsers);
 
 // Get a user by id
-router.get('/:userId', fetchUser, UserController.getUserById);
+router.get('/user/:userId', fetchUser, UserController.getUserById);
 
 // Create a manager
 router.post('/create-manager', fetchUser, UserController.createManager);
