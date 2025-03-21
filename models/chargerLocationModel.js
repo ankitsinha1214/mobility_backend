@@ -108,7 +108,7 @@ const chargerInfoSchema = new Schema({
         type: Date, 
         default: null // Not required, defaults to null if not provided
     }
-});
+}, { timestamps: true });
 
 const validateFacilities = function (value) {
     return Array.isArray(value) && value.length > 0;

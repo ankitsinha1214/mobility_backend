@@ -180,26 +180,136 @@ router.post('/generate-report-new', async (req, res) => {
 
         // Switch case for filtering data
         switch (filter) {
-            case 'chargers':
-                let chargers = await Charger.find({
+            case 'Chargers':
+                // Fetch all charger locations
+                let chargerLocations4 = await Location.find({
                     createdAt: { $gte: from, $lte: to }
-                }, 'chargerInfo');
+                }).lean();
 
-                chargers.forEach(element => {
-                    data = data.concat(element.chargerInfo);
+                // Extract chargers
+                let allChargers = [];
+                let chargerLocationMap = {}; // Map charger ID to location ID
+                chargerLocations4.forEach(location => {
+                    location.chargerInfo.forEach(charger => {
+                        chargerLocationMap[charger.name] = location._id;
+                        allChargers.push({
+                            ...charger,
+                            locationId: location._id,
+                            state: location.state,
+                            city: location.city,
+                        });
+                    });
+                });
+
+                let chargerIds4 = allChargers.map(charger => charger.name);
+
+                // Fetch all charging sessions related to these chargers
+                let sessions4 = await ChargingSession.find({ chargerId: { $in: chargerIds4 } }).lean();
+
+                // Map sessions to chargers
+                let chargerSessionMap = {};
+                sessions4.forEach(session => {
+                    if (!chargerSessionMap[session.chargerId]) chargerSessionMap[session.chargerId] = [];
+                    chargerSessionMap[session.chargerId].push(session);
+                });
+
+                // Get all payments related to these sessions
+                let sessionIds4 = sessions4.map(session => session._id);
+                let payments4 = await Payment.find({ sessionId: { $in: sessionIds4 } }).lean();
+
+                // Map payments to their sessions
+                let sessionPaymentMap4 = {};
+                payments4.forEach(payment => {
+                    sessionPaymentMap4[payment.sessionId] = payment;
+                });
+
+                // Process data
+                data = allChargers.map(charger => {
+                    let chargerSessions = chargerSessionMap[charger.name] || [];
+                    let totalSessions = chargerSessions.length;
+                    let totalChargingDuration = 0;
+                    let totalEnergyConsumed = 0;
+                    let totalRevenue = 0;
+                    // let totalPower = 0;
+                    let currency = "INR";
+                    let upTime = 0;
+                    let downTime = 0;
+
+                    chargerSessions.forEach(session => {
+                        // Energy Calculation
+                        if (session.startMeterValue && session.endMeterValue) {
+                            totalEnergyConsumed += (session.endMeterValue - session.startMeterValue);
+                        }
+
+                        // Charging Duration Calculation
+                        if (session.startTime && session.endTime) {
+                            let duration = Math.floor((new Date(session.endTime) - new Date(session.startTime)) / 1000);
+                            totalChargingDuration += duration;
+                        }
+
+                        // Power Calculation (Assuming power is calculated based on session data)
+                        // if (session.power) {
+                        //     totalPower += session.power;
+                        // }
+
+                        // Check if session was paid
+                        let payment = sessionPaymentMap4[session._id];
+                        if (payment) {
+                            totalRevenue += payment.amount / 100;
+                            currency = payment.currency || "INR";
+                        }
+
+                        // Uptime & Downtime Calculation (Assuming session status contains uptime/downtime information)
+                        // if (session.status === "UP") {
+                        //     upTime += 1;
+                        // } else {
+                        //     downTime += 1;
+                        // }
+                    });
+
+                    let avgChargingDuration = totalSessions ? (totalChargingDuration / totalSessions / 60).toFixed(2) : "N/A";
+                    // let avgPower = totalSessions ? (totalPower / totalSessions).toFixed(2) : "N/A";
+                    // let costPerKwh = totalEnergyConsumed ? (totalRevenue / totalEnergyConsumed).toFixed(2) : "N/A";
+
+                    return {
+                        chargerId: charger.name,
+                        locationId: charger.locationId,
+                        powerOutput: charger.powerOutput 
+                        // + " kW"
+                        ,
+                        chargerType: charger.type || "N/A",
+                        connectorType: charger.subtype || "N/A",
+                        // numberOfConnectors: charger.numberOfConnectors || "N/A",
+                        totalSessions,
+                        chargingDuration: (totalChargingDuration / 60).toFixed(2) + " min",
+                        avgChargingDuration: avgChargingDuration + " min",
+                        revenue: `${getCurrencySymbol(currency)} ${(totalRevenue).toFixed(2)}`,
+                        // avgPower: avgPower + " kW",
+                        // costPerKwh: `${getCurrencySymbol(currency)} ${(costPerKwh).toFixed(2)}`,
+                        costPerKwh: `${getCurrencySymbol(charger?.costPerUnit?.currency)} ${(charger?.costPerUnit?.amount).toFixed(3)}`,
+                        // upTime,
+                        // downTime,
+                    };
                 });
 
                 columns = [
-                    { header: 'Charger ID', key: '_id' },
-                    { header: 'Charger Name', key: 'name' },
-                    { header: 'Charger Status', key: 'status' },
-                    { header: 'Charger Type', key: 'type' },
-                    { header: 'Charger SubType', key: 'subtype' },
-                    { header: 'Charger Power Output', key: 'powerOutput' },
-                    { header: 'Charger Energy Consumptions', key: 'energyConsumptions' },
-                    { header: 'Created Date', key: 'createdAt' },
+                    { header: 'Charger ID', key: 'chargerId' },
+                    { header: 'Location ID', key: 'locationId' },
+                    { header: 'Power Output', key: 'powerOutput' },
+                    { header: 'Charger Type', key: 'chargerType' },
+                    { header: 'Connector Type', key: 'connectorType' },
+                    // { header: 'Number of Connectors', key: 'numberOfConnectors' },
+                    { header: 'Total Sessions', key: 'totalSessions' },
+                    { header: 'Charging Duration', key: 'chargingDuration' },
+                    { header: 'Avg Charging Duration', key: 'avgChargingDuration' },
+                    { header: 'Revenue', key: 'revenue' },
+                    // { header: 'Average Power', key: 'avgPower' },
+                    { header: 'Cost per kWh', key: 'costPerKwh' },
+                    // { header: 'Up Time', key: 'upTime' },
+                    // { header: 'Down Time', key: 'downTime' },
                 ];
                 break;
+
 
             // case 'locations':
             //     let locations = await Location.find({
