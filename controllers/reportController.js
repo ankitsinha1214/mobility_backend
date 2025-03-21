@@ -182,22 +182,44 @@ router.post('/generate-report-new', async (req, res) => {
         switch (filter) {
             case 'Chargers':
                 // Fetch all charger locations
-                let chargerLocations4 = await Location.find({
-                    createdAt: { $gte: from, $lte: to }
-                }).lean();
+                // let chargerLocations4 = await Location.find({
+                //     createdAt: { $gte: from, $lte: to }
+                // }).lean();
 
-                // Extract chargers
+                // // Extract chargers
+                // let allChargers = [];
+                // let chargerLocationMap = {}; // Map charger ID to location ID
+                // chargerLocations4.forEach(location => {
+                //     location.chargerInfo.forEach(charger => {
+                //         chargerLocationMap[charger.name] = location._id;
+                //         allChargers.push({
+                //             ...charger,
+                //             locationId: location._id,
+                //             state: location.state,
+                //             city: location.city,
+                //         });
+                //     });
+                // });
+                // Fetch all charger locations
+                let chargerLocations4 = await Location.find().lean();
+
+                // Extract chargers with createdAt filter
                 let allChargers = [];
                 let chargerLocationMap = {}; // Map charger ID to location ID
+
                 chargerLocations4.forEach(location => {
                     location.chargerInfo.forEach(charger => {
-                        chargerLocationMap[charger.name] = location._id;
-                        allChargers.push({
-                            ...charger,
-                            locationId: location._id,
-                            state: location.state,
-                            city: location.city,
-                        });
+                        // Ensure charger follows createdAt date range
+                        if (charger.createdAt >= from && charger.createdAt <= to) {
+                            chargerLocationMap[charger.name] = location._id;
+                            allChargers.push({
+                                ...charger,
+                                locationId: location._id,
+                                state: location.state,
+                                city: location.city,
+                                createdAt: charger.createdAt, // Ensure createdAt is carried forward
+                            });
+                        }
                     });
                 });
 
@@ -274,7 +296,7 @@ router.post('/generate-report-new', async (req, res) => {
                     return {
                         chargerId: charger.name,
                         locationId: charger.locationId,
-                        powerOutput: charger.powerOutput 
+                        powerOutput: charger.powerOutput
                         // + " kW"
                         ,
                         chargerType: charger.type || "N/A",
