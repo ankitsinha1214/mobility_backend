@@ -9,6 +9,7 @@ router.get('/', (_req, res) => {
 
 router.use('/reports', require('../controllers/reportController'));
 router.use('/graph', require('./graphRoute'));
+router.use('/ticket', require('./ticketRoute'));
 router.use('/users', require('./userRoute'));
 router.use('/version', require('./versionRoute'));
 router.use('/user-service-and-maintenance', require('./userSandmRoute'));
