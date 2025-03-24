@@ -1,4 +1,5 @@
 const ticketCategory = require('../models/ticketCategory');
+const Ticket = require("../models/ticket");
 
 // Create an FAQ
 // const createFAQ = async (req, res) => {
@@ -45,8 +46,40 @@ const getCategory = async (req, res) => {
     }
 };
 
+const createTicket = async (req, res) => {
+    try {
+        const { title, description, category, priority, assignedTo, screenshots, sessionId } = req.body;
+        // console.log(req.userid)
+        createdBy = req.userid;
+        // Validate required fields
+        if (!title || !description || !category || !createdBy) {
+            return res.status(400).json({ status: false, message: "Title, description, category, and createdBy are required" });
+        }
+
+        // Create new ticket
+        const newTicket = new Ticket({
+            title,
+            description,
+            category,
+            sessionId,
+            priority: priority || "Medium", // Default priority if not provided
+            assignedTo,
+            createdBy,
+            screenshots: Array.isArray(screenshots) ? screenshots : [], // Ensure screenshots is an array
+        });
+
+        await newTicket.save();
+
+        res.status(201).json({ status: true, message: "Ticket created successfully", ticket: newTicket });
+    } catch (error) {
+        console.error("Error creating ticket:", error);
+        res.status(500).json({ status: false, message: "Server error", error });
+    }
+};
+
 module.exports = {
     // createFAQ,
     getCategory,
+    createTicket
     // faqByCategory
 };

@@ -22,5 +22,10 @@ router.get(
   fetchUser,
   ticketController.getCategory
 );
+router.post(
+  "/",
+  fetchUser,
+  ticketController.createTicket
+);
 
 module.exports = router;
