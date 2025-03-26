@@ -22,10 +22,23 @@ router.get(
   fetchUser,
   ticketController.getCategory
 );
+
 router.post(
   "/",
   fetchUser,
   ticketController.createTicket
+);
+
+router.get(
+  "/",
+  fetchUser,
+  ticketController.getAllTickets
+);
+
+router.get(
+  "/user",
+  fetchUser,
+  ticketController.getUserTickets
 );
 
 module.exports = router;

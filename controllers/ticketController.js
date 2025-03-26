@@ -77,9 +77,51 @@ const createTicket = async (req, res) => {
     }
 };
 
+// Get all tickets (for Admin & Manager only)
+const getAllTickets = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "Unauthorized access. Only Admin and Manager can view all tickets." });
+        }
+
+        const tickets = await Ticket.find().populate('createdBy', 'firstName lastName phoneNumber'); // Populating user details
+
+        if (!tickets.length) {
+            return res.json({ success: false, message: 'No tickets found in the system.' });
+        }
+
+        return res.json({ success: true, message: "All tickets retrieved successfully.", data: tickets });
+    } catch (error) {
+        console.error("Error fetching tickets:", error);
+        res.status(500).json({ success: false, message: "Server error while fetching tickets.", error });
+    }
+};
+
+// Get tickets for a specific user
+const getUserTickets = async (req, res) => {
+    try {
+        if (!req.userid) {
+            return res.status(401).json({ success: false, message: "Unauthorized access. Please log in to view your tickets." });
+        }
+
+        const tickets = await Ticket.find({ createdBy: req.userid });
+
+        if (!tickets.length) {
+            return res.json({ success: false, message: 'No tickets found for your account.' });
+        }
+
+        return res.json({ success: true, message: "Your tickets retrieved successfully.", data: tickets });
+    } catch (error) {
+        console.error("Error fetching user tickets:", error);
+        res.status(500).json({ success: false, message: "Server error while fetching user tickets.", error });
+    }
+};
+
 module.exports = {
     // createFAQ,
     getCategory,
-    createTicket
+    createTicket,
+    getAllTickets,
+    getUserTickets
     // faqByCategory
 };
