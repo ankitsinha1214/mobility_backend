@@ -75,9 +75,10 @@
 //     sendNotification,
 // };
 
-const { SNSClient, CreatePlatformEndpointCommand, PublishCommand } = require("@aws-sdk/client-sns");
+// const { SNSClient, CreatePlatformEndpointCommand, PublishCommand } = require("@aws-sdk/client-sns");
+const { SNSClient, CreatePlatformEndpointCommand, PublishCommand, GetEndpointAttributesCommand, SetEndpointAttributesCommand } = require("@aws-sdk/client-sns");
 const snsClient = require("../configs/awsSnsConfigs"); // Ensure this exports SNSClient correctly
-// const Notification = require('../models/notificationConsumerModel');
+const Notification = require('../models/notificationConsumerModel');
 
 /**
  * Registers a new device token in AWS SNS and returns Endpoint ARN.
@@ -98,6 +99,21 @@ async function registerDeviceToken(fcmToken) {
     } catch (error) {
         console.error("❌ Error registering device:", error);
         throw error;
+    }
+}
+/**
+ * Checks if an endpoint ARN is enabled.
+ * @param {string} endpointArn - AWS SNS Endpoint ARN
+ * @returns {Promise<boolean>} - Returns true if enabled, false if disabled
+ */
+async function isEndpointEnabled(endpointArn) {
+    try {
+        const command = new GetEndpointAttributesCommand({ EndpointArn: endpointArn });
+        const response = await snsClient.send(command);
+        return response.Attributes.Enabled === "true";  // AWS returns "true" as a string
+    } catch (error) {
+        console.error(`❌ Error checking endpoint status (${endpointArn}):`, error);
+        return false;
     }
 }
 
@@ -149,8 +165,28 @@ async function sendNotification(endpointArns, title, message, userId) {
 
     try {
         if (Array.isArray(endpointArns)) {
+            const validEndpoints = [];
+
+            // Check endpoint status before sending
+            for (const endpointArn of endpointArns) {
+                const isEnabled = await isEndpointEnabled(endpointArn);
+                if (isEnabled) {
+                    validEndpoints.push(endpointArn);
+                } else {
+                    console.warn(`⚠️ Skipping disabled endpoint: ${endpointArn}`);
+                    // You can also re-enable the endpoint if needed
+                    // await enableEndpoint(endpointArn);
+                }
+            }
+    
+            if (validEndpoints.length === 0) {
+                console.warn("⚠️ No valid endpoints found. Aborting notification.");
+                return;
+            }
+
             // Send notification to multiple users
-            await Promise.all(endpointArns.map(async (endpointArn) => {
+            await Promise.all(validEndpoints.map(async (endpointArn) => {
+            // await Promise.all(endpointArns.map(async (endpointArn) => {
                 const params = {
                     TargetArn: endpointArn,
                     Message: JSON.stringify(payload),
@@ -163,6 +199,11 @@ async function sendNotification(endpointArns, title, message, userId) {
             // await saveNotificationToDB(title, message, endpointArns, "All", "Sent");
             console.log("✅ Notifications sent to multiple users");
         } else {
+            const isEnabled = await isEndpointEnabled(endpointArns);
+                if (!isEnabled) {
+                    console.warn(`⚠️ Endpoint is disabled: ${endpointArns}`);
+                    return;
+                } 
             // Send notification to a single user
             const params = {
                 TargetArn: endpointArns,
