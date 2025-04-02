@@ -1,6 +1,13 @@
 const ticketCategory = require('../models/ticketCategory');
 const Ticket = require("../models/ticket");
-
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const s3 = new S3Client({
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+    region: process.env.AWS_BUCKET_REGION
+})
 // Create an FAQ
 // const createFAQ = async (req, res) => {
 //     try {
