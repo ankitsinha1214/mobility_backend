@@ -8,7 +8,11 @@ const fetchUser = require("../middleware/fetchuser");
 const router = require("express").Router();
 const multer = require('multer');
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage,
+    // limits: { fileSize: 100 * 1024 * 1024 }, 
+ });
+
 
 // user router
 // router.post(

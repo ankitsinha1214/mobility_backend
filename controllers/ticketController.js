@@ -76,7 +76,8 @@ const createTicket = async (req, res) => {
         }
 
         const imageKeys = [];
-        // console.log(req.files.locationImage)
+        // console.log(req.files)
+        if (req.files && Array.isArray(req.files?.screenshots)) {
         for (const file of req.files.screenshots) {
             const arr1 = file.mimetype.split("/");
             const awsImgKey = `ticketImg/ticketImg-${Date.now()}.${arr1[1]}`;
@@ -90,6 +91,9 @@ const createTicket = async (req, res) => {
             await s3.send(command4);
             imageKeys.push(awsImgKey);
         }
+    } else {
+        console.log("No valid files found in request.");
+    }
 
         // Create new ticket
         const newTicket = new Ticket({
@@ -105,7 +109,7 @@ const createTicket = async (req, res) => {
 
         await newTicket.save();
 
-        res.status(201).json({ status: true, message: "Ticket created successfully", ticket: newTicket });
+        res.json({ status: true, message: "Ticket created successfully", ticket: newTicket });
     } catch (error) {
         console.error("Error creating ticket:", error);
         res.status(500).json({ status: false, message: "Server error", error });
