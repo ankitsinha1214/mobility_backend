@@ -820,6 +820,7 @@ const getHistory = async (req, res) => {
                 //     return res.json({ status: false, message: 'Vehicle not associated with the user' });
                 // }
                 return {
+                    sessionId: session._id,
                     locationName: location.locationName,
                     address: location.address,
                     createdAt: session.createdAt,
