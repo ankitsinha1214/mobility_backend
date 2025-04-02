@@ -48,12 +48,40 @@ const getCategory = async (req, res) => {
 
 const createTicket = async (req, res) => {
     try {
-        const { title, description, category, priority, assignedTo, screenshots, sessionId } = req.body;
+        const { title, description, category, priority, assignedTo, sessionId } = req.body;
         // console.log(req.userid)
+        // if (!req.files || !req.files.screenshots || req.files.screenshots.length === 0) {
+        //     return res.json({ success: false, message: 'No image file uploaded' });
+        // }
         createdBy = req.userid;
         // Validate required fields
-        if (!title || !description || !category || !createdBy) {
-            return res.status(400).json({ status: false, message: "Title, description, category, and createdBy are required" });
+        if (!title) {
+            return res.status(400).json({ status: false, message: "Title is required" });
+        }
+        if (!description) {
+            return res.status(400).json({ status: false, message: "Description is required" });
+        }
+        if (!category) {
+            return res.status(400).json({ status: false, message: "Category is required" });
+        }
+        if (!createdBy) {
+            return res.status(400).json({ status: false, message: "CreatedBy is required" });
+        }
+
+        const imageKeys = [];
+        // console.log(req.files.locationImage)
+        for (const file of req.files.screenshots) {
+            const arr1 = file.mimetype.split("/");
+            const awsImgKey = `ticketImg/ticketImg-${Date.now()}.${arr1[1]}`;
+            const params4 = {
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Key: awsImgKey,
+                Body: file.buffer,
+                ContentType: file.mimetype
+            };
+            const command4 = new PutObjectCommand(params4);
+            await s3.send(command4);
+            imageKeys.push(awsImgKey);
         }
 
         // Create new ticket
@@ -65,7 +93,7 @@ const createTicket = async (req, res) => {
             priority: priority || "Medium", // Default priority if not provided
             assignedTo,
             createdBy,
-            screenshots: Array.isArray(screenshots) ? screenshots : [], // Ensure screenshots is an array
+            screenshots: imageKeys, // Ensure screenshots is an array
         });
 
         await newTicket.save();

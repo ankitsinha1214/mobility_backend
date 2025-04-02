@@ -6,6 +6,9 @@ const fetchUser = require("../middleware/fetchuser");
 
 // router
 const router = require("express").Router();
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // user router
 // router.post(
@@ -26,6 +29,10 @@ router.get(
 router.post(
   "/",
   fetchUser,
+  upload.fields([{
+      name: 'screenshots', maxCount: 4
+  }
+  ]),
   ticketController.createTicket
 );
 
