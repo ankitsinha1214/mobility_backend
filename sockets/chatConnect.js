@@ -3,15 +3,13 @@ require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
-const mongoose = require("mongoose");
-const Ticket = require("../models/ticket"); // adjust path as needed
 const cors = require("cors");
+const Ticket = require("../models/ticket");
+const TicketMessage = require("../models/TicketMessage");
 
-// Optional: Setup Express App for this socket server
 const app = express();
 app.use(cors());
 
-// Use a different port for chat socket
 const CHAT_PORT = process.env.CHAT_SOCKET_PORT || 8007;
 const server = http.createServer(app);
 
@@ -19,47 +17,72 @@ const io = new Server(server, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
-    }
+    },
+    allowEIO3: true // 👈 this allows Postman (v2) to connect
 });
 
 const startChatSocket = () => {
     io.on("connection", (socket) => {
         console.log(`[ChatSocket] New connection: ${socket.id}`);
 
-        // Join a room using ticket ID
-        socket.on("joinTicket", ({ ticketId, userId }) => {
+        // 🔗 Join Room
+        socket.on("joinTicket", (ticketId, userId,callback) => {
+            console.log("👉 joinTicket event triggered");
             socket.join(ticketId);
-            console.log(`[ChatSocket] User ${userId} joined room: ${ticketId}`);
+            console.log(`[ChatSocket] User ${userId} joined ticket room: ${ticketId}`);
+            // ✅ Emit response back to this client to confirm
+            // socket.emit("joinedTicket", {
+            //     success: true,
+            //     message: `Joined room for ticket ${ticketId}`,
+            //     ticketId,
+            //     userId
+            // });
+            callback({
+                status: "ok"
+              });
         });
 
-        // Handle new message sent
-        socket.on("sendMessage", async ({ ticketId, senderId, message }) => {
-            if (!ticketId || !senderId || !message) return;
+        // ✉️ Send Message
+        socket.on("sendMessage", async (ticketId, senderId, senderModel, message, callback) => {
+            if (!ticketId || !senderId || !message || !senderModel) {
+                console.log("no")
+                callback({
+                    status: "no"
+                });
+                // return;
+            }
 
             try {
                 const ticket = await Ticket.findById(ticketId);
                 if (!ticket) {
-                    socket.emit("error", { message: "Ticket not found" });
-                    return;
+                    return socket.emit("error", { message: "Ticket not found" });
                 }
 
-                const newMessage = {
-                    sender: senderId,
+                const newMessage = await TicketMessage.create({
+                    ticketId,
+                    senderId,
+                    senderModel,
+                    message
+                });
+
+                const messageToEmit = {
+                    _id: newMessage._id,
+                    ticketId,
+                    senderId,
+                    senderModel,
                     message,
-                    timestamp: new Date()
+                    createdAt: newMessage.createdAt
                 };
 
-                ticket.messages.push(newMessage);
-                await ticket.save();
-
-                // Broadcast message to everyone in room
-                io.to(ticketId).emit("receiveMessage", newMessage);
+                // 🟢 Emit message to all clients in ticket room
+                io.to(ticketId).emit("receiveMessage", messageToEmit);
             } catch (err) {
-                console.error(`[ChatSocket] Error sending message:`, err);
+                console.error(`[ChatSocket] Error:`, err);
                 socket.emit("error", { message: "Internal Server Error" });
             }
         });
 
+        // 🚪 Handle Disconnect
         socket.on("disconnect", () => {
             console.log(`[ChatSocket] Disconnected: ${socket.id}`);
         });

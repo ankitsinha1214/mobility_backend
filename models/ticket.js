@@ -40,13 +40,7 @@ const ticketSchema = new mongoose.Schema({
     screenshots: {
         type: [String], // Array of image URLs
         default: []
-    },
-     // New field for storing messages
-     messages: [{
-        sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, 
-        message: String,
-        timestamp: { type: Date, default: Date.now }
-    }]
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Ticket", ticketSchema);
