@@ -31,6 +31,7 @@
     "multer-s3": "^3.0.1",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.13",
+    "socket.io": "^4.8.1",
     "uuid": "^11.0.5",
     "winston": "^3.15.0",
     "ws": "^8.18.0"

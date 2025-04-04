@@ -141,6 +141,10 @@ startChargerStatusUpdater();
 // app.use('/pre-installations', require('./routes/preInstallationRoute'));
 // app.use('/charger-dc-box', require('./routes/chargerAndDcBoxRoute'));
 
+// Chat socket on different port
+const startChatSocket = require("./sockets/chatConnect");
+startChatSocket(); // ✅ starts on different port cleanly
+
 // Start the server
 app.listen(port, () => {
   console.log(`My app listening at http://localhost:${port}`);
