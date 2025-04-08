@@ -156,11 +156,37 @@ const getUserTickets = async (req, res) => {
     }
 };
 
+// Get all tickets assigned to a specific user
+const getTicketsAssignedToUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "User ID is required in params." });
+        }
+
+        const tickets = await Ticket.find({ assignedTo: userId })
+            .populate('createdBy', 'firstName lastName phoneNumber')
+            .populate('assignedTo', 'firstName lastName phoneNumber');
+
+        if (!tickets.length) {
+            return res.json({ success: false, message: 'No tickets assigned to this user.' });
+        }
+
+        return res.json({ success: true, message: "Tickets assigned to user retrieved successfully.", data: tickets });
+    } catch (error) {
+        console.error("Error fetching assigned tickets:", error);
+        res.status(500).json({ success: false, message: "Server error while fetching assigned tickets.", error });
+    }
+};
+
+
 module.exports = {
     // createFAQ,
     getCategory,
     createTicket,
     getAllTickets,
-    getUserTickets
+    getUserTickets,
+    getTicketsAssignedToUser
     // faqByCategory
 };

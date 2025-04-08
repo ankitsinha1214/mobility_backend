@@ -51,5 +51,10 @@ router.get(
   fetchUser,
   ticketController.getUserTickets
 );
+router.get(
+  '/assigned-to/:userId',
+  fetchUser,
+  ticketController.getTicketsAssignedToUser
+);
 
 module.exports = router;
