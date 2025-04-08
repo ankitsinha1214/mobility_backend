@@ -167,7 +167,7 @@ const getTicketsAssignedToUser = async (req, res) => {
 
         const tickets = await Ticket.find({ assignedTo: userId })
             .populate('createdBy', 'firstName lastName phoneNumber')
-            .populate('assignedTo', 'firstName lastName phoneNumber');
+            .populate('assignedTo', 'username email');
 
         if (!tickets.length) {
             return res.json({ success: false, message: 'No tickets assigned to this user.' });

@@ -31,7 +31,7 @@ const ticketSchema = new mongoose.Schema({
     },
     assignedTo: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "SandmUser"
+        ref: "Service-and-maintenance-user"
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId, 

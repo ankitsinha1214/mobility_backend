@@ -26,7 +26,7 @@ const startChatSocket = () => {
         console.log(`[ChatSocket] New connection: ${socket.id}`);
 
         // 🔗 Join Room
-        socket.on("joinTicket", (ticketId, userId,callback) => {
+        socket.on("joinTicket", (ticketId, userId, callback) => {
             console.log("👉 joinTicket event triggered");
             socket.join(ticketId);
             console.log(`[ChatSocket] User ${userId} joined ticket room: ${ticketId}`);
@@ -37,18 +37,22 @@ const startChatSocket = () => {
             //     ticketId,
             //     userId
             // });
-            callback({
-                status: "ok"
-              });
+            if (typeof callback === "function") {
+                callback({
+                    status: "ok"
+                });
+            }
         });
 
         // ✉️ Send Message
         socket.on("sendMessage", async (ticketId, senderId, senderModel, message, callback) => {
             if (!ticketId || !senderId || !message || !senderModel) {
                 console.log("no")
-                callback({
-                    status: "no"
-                });
+                if (typeof callback === "function") {
+                    callback({
+                        status: "no"
+                    });
+                }
                 // return;
             }
 
