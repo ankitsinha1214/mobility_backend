@@ -80,8 +80,10 @@ const createTicket = async (req, res) => {
         // console.log(req.files)
         if (req.files && Array.isArray(req.files?.screenshots)) {
             for (const file of req.files.screenshots) {
-                const arr1 = file.mimetype.split("/");
-                const awsImgKey = `ticketImg/ticketImg-${Date.now()}.${arr1[1]}`;
+                // const arr1 = file.mimetype.split("/");
+                // const awsImgKey = `ticketImg/ticketImg-${Date.now()}.${arr1[1]}`;
+                const extension = file.originalname.split(".").pop();
+                const awsImgKey = `ticketImg/ticketImg-${Date.now()}-${Math.random().toString(36).substr(2, 5)}.${extension}`;
                 const params4 = {
                     Bucket: process.env.AWS_BUCKET_NAME,
                     Key: awsImgKey,
