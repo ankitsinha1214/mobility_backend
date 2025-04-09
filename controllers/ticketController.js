@@ -1,6 +1,7 @@
 const ticketCategory = require('../models/ticketCategory');
 const Ticket = require("../models/ticket");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const TicketMessage = require('../models/TicketMessage');
 const s3 = new S3Client({
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -108,6 +109,16 @@ const createTicket = async (req, res) => {
         });
 
         await newTicket.save();
+        // 💬 Add one TicketMessage entry from user
+        const ticketMessage = new TicketMessage({
+            ticketId: newTicket._id,
+            senderId: createdBy,
+            senderModel: "User", // must be either "User" or "SandmUser"
+            // message: title
+            message: `Title: ${title}\nDescription: ${description}`
+        });
+
+        await ticketMessage.save();
 
         res.json({ status: true, message: "Ticket created successfully", ticket: newTicket });
     } catch (error) {
