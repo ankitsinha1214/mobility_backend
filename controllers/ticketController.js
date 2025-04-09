@@ -79,22 +79,22 @@ const createTicket = async (req, res) => {
         const imageKeys = [];
         // console.log(req.files)
         if (req.files && Array.isArray(req.files?.screenshots)) {
-        for (const file of req.files.screenshots) {
-            const arr1 = file.mimetype.split("/");
-            const awsImgKey = `ticketImg/ticketImg-${Date.now()}.${arr1[1]}`;
-            const params4 = {
-                Bucket: process.env.AWS_BUCKET_NAME,
-                Key: awsImgKey,
-                Body: file.buffer,
-                ContentType: file.mimetype
-            };
-            const command4 = new PutObjectCommand(params4);
-            await s3.send(command4);
-            imageKeys.push(awsImgKey);
+            for (const file of req.files.screenshots) {
+                const arr1 = file.mimetype.split("/");
+                const awsImgKey = `ticketImg/ticketImg-${Date.now()}.${arr1[1]}`;
+                const params4 = {
+                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Key: awsImgKey,
+                    Body: file.buffer,
+                    ContentType: file.mimetype
+                };
+                const command4 = new PutObjectCommand(params4);
+                await s3.send(command4);
+                imageKeys.push(awsImgKey);
+            }
+        } else {
+            console.log("No valid files found in request.");
         }
-    } else {
-        console.log("No valid files found in request.");
-    }
 
         // Create new ticket
         const newTicket = new Ticket({
@@ -109,13 +109,17 @@ const createTicket = async (req, res) => {
         });
 
         await newTicket.save();
+        let messageText = `Title: ${title}\nDescription: ${description}`;
+        if (imageKeys.length > 0) {
+            messageText += `\nScreenshot: https://chrgup.s3.ap-south-1.amazonaws.com/${imageKeys[0]}`;
+        }
         // 💬 Add one TicketMessage entry from user
         const ticketMessage = new TicketMessage({
             ticketId: newTicket._id,
             senderId: createdBy,
             senderModel: "User", // must be either "User" or "SandmUser"
             // message: title
-            message: `Title: ${title}\nDescription: ${description}`
+            message: messageText
         });
 
         await ticketMessage.save();
