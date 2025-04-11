@@ -40,6 +40,25 @@ const s3 = new S3Client({
 //         res.status(500).json({ error: error.message });
 //     }
 // };
+const getLeastLoadedUser = async (role, extraFilter = {}) => {
+    const users = await SandmUser.find({
+      role: { $regex: new RegExp(`^${role}$`, 'i') }, // Case-insensitive match
+      status: "Active",
+      ...extraFilter,
+    });
+  
+    if (!users.length) return null;
+  
+    const userTicketCounts = await Promise.all(
+      users.map(async (user) => {
+        const count = await Ticket.countDocuments({ assignedTo: user._id });
+        return { user, count };
+      })
+    );
+  
+    userTicketCounts.sort((a, b) => a.count - b.count);
+    return userTicketCounts[0].user;
+  };
 
 // Get all unique categories
 const getCategory = async (req, res) => {
@@ -56,7 +75,9 @@ const getCategory = async (req, res) => {
 
 const createTicket = async (req, res) => {
     try {
-        const { title, description, category, priority, assignedTo, sessionId } = req.body;
+        const { title, description, category, priority,
+            assignedTo,
+            sessionId } = req.body;
         // console.log(req.userid)
         // if (!req.files || !req.files.screenshots || req.files.screenshots.length === 0) {
         //     return res.json({ success: false, message: 'No image file uploaded' });
@@ -74,6 +95,22 @@ const createTicket = async (req, res) => {
         }
         if (!createdBy) {
             return res.status(400).json({ status: false, message: "CreatedBy is required" });
+        }
+
+        let finalAssignedTo = assignedTo;
+        if (!finalAssignedTo) {
+            // const manager = await getLeastLoadedUser("manager");
+            // Try to get a Manager with serviceID "4"
+            const managerWithService4 = await getLeastLoadedUser("Manager", { serviceID: "6" });
+            if (managerWithService4) {
+                finalAssignedTo = managerWithService4._id;
+            } else {
+                // Fallback to any Admin
+                const fallbackAdmin = await getLeastLoadedUser("Admin");
+                if (fallbackAdmin) {
+                    finalAssignedTo = fallbackAdmin._id;
+                }
+            }
         }
 
         const imageKeys = [];
@@ -105,7 +142,8 @@ const createTicket = async (req, res) => {
             category,
             sessionId,
             priority: priority || "Medium", // Default priority if not provided
-            assignedTo,
+            assignedTo: finalAssignedTo,
+            // assignedTo,
             createdBy,
             screenshots: imageKeys, // Ensure screenshots is an array
         });
