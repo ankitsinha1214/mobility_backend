@@ -2,6 +2,7 @@ const ticketCategory = require('../models/ticketCategory');
 const Ticket = require("../models/ticket");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const TicketMessage = require('../models/TicketMessage');
+const SandmUser = require("../models/userSandmModel");
 const s3 = new S3Client({
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY,
