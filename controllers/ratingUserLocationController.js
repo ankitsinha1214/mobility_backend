@@ -18,6 +18,9 @@ exports.createReview = async (req, res) => {
         if (!locationExists) {
             return res.json({ success: false, message: 'Location not found' });
         }
+        if (!charging_exp || !charging_location) {
+            return res.json({ success: false, message: 'Please enter the required fields.' });
+        }
         // console.log(user)
         // Check if the user has already reviewed this location
         const existingReview = await Review.findOne({ user: user._id, location });
