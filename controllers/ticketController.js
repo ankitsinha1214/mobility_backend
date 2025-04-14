@@ -74,6 +74,40 @@ const getCategory = async (req, res) => {
     }
 };
 
+// Resolve a ticket
+const resolveTicket = async (req, res) => {
+    try {
+        const { ticketId } = req.body;
+
+        if (!ticketId) {
+            return res.json({ status: false, message: "Ticket ID is required." });
+        }
+
+        const ticket = await Ticket.findById(ticketId);
+        if (!ticket) {
+            return res.json({ status: false, message: "Ticket not found." });
+        }
+
+        // Update the ticket status to 'Closed'
+        // ticket.status = "Resolved";
+        // await ticket.save();
+        if (ticket.status === "Resolved") {
+            ticket.status = "In Progress";
+            await ticket.save();
+            return res.json({ status: true, message: "Ticket status changed to Open.", data: ticket });
+        } else {
+            ticket.status = "Resolved";
+            await ticket.save();
+            return res.json({ status: true, message: "Ticket has been resolved.", data: ticket });
+        }
+
+        // return res.json({ status: true, message: "Ticket has been resolved and marked as closed.", data: ticket });
+    } catch (error) {
+        console.error("Error resolving ticket:", error);
+        return res.status(500).json({ status: false, message: "Internal server error", error });
+    }
+};
+
 const createTicket = async (req, res) => {
     try {
         const { title, description, category, priority,
@@ -142,6 +176,7 @@ const createTicket = async (req, res) => {
             description,
             category,
             sessionId,
+            status: finalAssignedTo ? "In Progress" : "Open",  
             priority: priority || "Medium", // Default priority if not provided
             assignedTo: finalAssignedTo,
             // assignedTo,
@@ -241,6 +276,7 @@ module.exports = {
     // createFAQ,
     getCategory,
     createTicket,
+    resolveTicket,
     getAllTickets,
     getUserTickets,
     getTicketsAssignedToUser

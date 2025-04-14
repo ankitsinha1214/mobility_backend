@@ -51,6 +51,13 @@ router.get(
   fetchUser,
   ticketController.getUserTickets
 );
+
+router.patch(
+  "/",
+  fetchUser,
+  ticketController.resolveTicket
+);
+
 router.get(
   '/assigned-to/:userId',
   fetchUser,
