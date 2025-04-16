@@ -356,6 +356,8 @@ const startStopChargingSession = async (req, res) => {
             const parsedResponse = JSON.parse(response);
             const status = parsedResponse[2]?.status;
 
+            console.log('status - ',status);
+            console.log('action - ',action);
             if (status === 'Rejected') {
                 return res.json({
                     status: false,
