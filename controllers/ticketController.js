@@ -78,6 +78,7 @@ const getCategory = async (req, res) => {
 const resolveTicket = async (req, res) => {
     try {
         const { ticketId } = req.body;
+        const createdBy = req.userid;
 
         if (!ticketId) {
             return res.json({ status: false, message: "Ticket ID is required." });
@@ -93,11 +94,33 @@ const resolveTicket = async (req, res) => {
         // await ticket.save();
         if (ticket.status === "Resolved") {
             ticket.status = "In Progress";
+            let messageText = `Ticket has been reopened.`;
+            
+            // 💬 Add one TicketMessage entry from user
+            const ticketMessage = new TicketMessage({
+                ticketId: ticketId,
+                senderId: createdBy,
+                senderModel: "SandmUser", // must be either "User" or "SandmUser"
+                // message: title
+                message: messageText
+            });
             await ticket.save();
+            await ticketMessage.save();
             return res.json({ status: true, message: "Ticket status changed to Open.", data: ticket });
         } else {
             ticket.status = "Resolved";
+            let messageText = `Ticket has been resolved.`;
+            
+            // 💬 Add one TicketMessage entry from user
+            const ticketMessage = new TicketMessage({
+                ticketId: ticketId,
+                senderId: createdBy,
+                senderModel: "SandmUser", // must be either "User" or "SandmUser"
+                // message: title
+                message: messageText
+            });
             await ticket.save();
+            await ticketMessage.save();
             return res.json({ status: true, message: "Ticket has been resolved.", data: ticket });
         }
 
@@ -117,7 +140,7 @@ const createTicket = async (req, res) => {
         // if (!req.files || !req.files.screenshots || req.files.screenshots.length === 0) {
         //     return res.json({ success: false, message: 'No image file uploaded' });
         // }
-        createdBy = req.userid;
+        let createdBy = req.userid;
         // Validate required fields
         if (!title) {
             return res.status(400).json({ status: false, message: "Title is required" });
