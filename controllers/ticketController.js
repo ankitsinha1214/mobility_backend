@@ -4,7 +4,7 @@ const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const TicketMessage = require('../models/TicketMessage');
 const SandmUser = require("../models/userSandmModel");
 // Assuming you have `io` imported here
-const { io } = require("../sockets/chatConnect");
+const { getIo }  = require("../sockets/chatConnect");
 const s3 = new S3Client({
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY,
