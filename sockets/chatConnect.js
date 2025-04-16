@@ -6,6 +6,7 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 const Ticket = require("../models/ticket");
 const TicketMessage = require("../models/TicketMessage");
+let ioInstance = null;
 
 const app = express();
 app.use(cors());
@@ -91,10 +92,17 @@ const startChatSocket = () => {
             console.log(`[ChatSocket] Disconnected: ${socket.id}`);
         });
     });
+    
+    ioInstance = io;
 
     server.listen(CHAT_PORT, () => {
         console.log(`[ChatSocket] Listening on port ${CHAT_PORT}`);
     });
 };
 
-module.exports = startChatSocket;
+// module.exports = startChatSocket;
+// 👇 Export both the starter and the io accessor
+module.exports = {
+    startChatSocket,
+    getIo: () => ioInstance
+};

@@ -3,6 +3,8 @@ const Ticket = require("../models/ticket");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const TicketMessage = require('../models/TicketMessage');
 const SandmUser = require("../models/userSandmModel");
+// Assuming you have `io` imported here
+const { io } = require("../sockets/chatConnect");
 const s3 = new S3Client({
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -43,23 +45,23 @@ const s3 = new S3Client({
 // };
 const getLeastLoadedUser = async (role, extraFilter = {}) => {
     const users = await SandmUser.find({
-      role: { $regex: new RegExp(`^${role}$`, 'i') }, // Case-insensitive match
-      status: "Active",
-      ...extraFilter,
+        role: { $regex: new RegExp(`^${role}$`, 'i') }, // Case-insensitive match
+        status: "Active",
+        ...extraFilter,
     });
-  
+
     if (!users.length) return null;
-  
+
     const userTicketCounts = await Promise.all(
-      users.map(async (user) => {
-        const count = await Ticket.countDocuments({ assignedTo: user._id });
-        return { user, count };
-      })
+        users.map(async (user) => {
+            const count = await Ticket.countDocuments({ assignedTo: user._id });
+            return { user, count };
+        })
     );
-  
+
     userTicketCounts.sort((a, b) => a.count - b.count);
     return userTicketCounts[0].user;
-  };
+};
 
 // Get all unique categories
 const getCategory = async (req, res) => {
@@ -95,7 +97,7 @@ const resolveTicket = async (req, res) => {
         if (ticket.status === "Resolved") {
             ticket.status = "In Progress";
             let messageText = `Ticket has been reopened.`;
-            
+
             // 💬 Add one TicketMessage entry from user
             const ticketMessage = new TicketMessage({
                 ticketId: ticketId,
@@ -105,12 +107,24 @@ const resolveTicket = async (req, res) => {
                 message: messageText
             });
             await ticket.save();
-            await ticketMessage.save();
+            const savedMessage = await ticketMessage.save();
+            // 👉 Emit socket message to all users in that ticket room
+            const io = getIo();
+            if (io) {
+                io.to(ticketId.toString()).emit("receiveMessage", {
+                    _id: savedMessage._id,
+                    ticketId,
+                    senderId: createdBy,
+                    senderModel: "SandmUser",
+                    message: messageText,
+                    createdAt: savedMessage.createdAt
+                });
+            }
             return res.json({ status: true, message: "Ticket status changed to Open.", data: ticket });
         } else {
             ticket.status = "Resolved";
             let messageText = `Ticket has been resolved.`;
-            
+
             // 💬 Add one TicketMessage entry from user
             const ticketMessage = new TicketMessage({
                 ticketId: ticketId,
@@ -120,7 +134,19 @@ const resolveTicket = async (req, res) => {
                 message: messageText
             });
             await ticket.save();
-            await ticketMessage.save();
+            const savedMessage = await ticketMessage.save();
+
+            const io = getIo();
+            if (io) {
+                io.to(ticketId.toString()).emit("receiveMessage", {
+                    _id: savedMessage._id,
+                    ticketId,
+                    senderId: createdBy,
+                    senderModel: "SandmUser",
+                    message: messageText,
+                    createdAt: savedMessage.createdAt
+                });
+            }
             return res.json({ status: true, message: "Ticket has been resolved.", data: ticket });
         }
 
@@ -199,7 +225,7 @@ const createTicket = async (req, res) => {
             description,
             category,
             sessionId,
-            status: finalAssignedTo ? "In Progress" : "Open",  
+            status: finalAssignedTo ? "In Progress" : "Open",
             priority: priority || "Medium", // Default priority if not provided
             assignedTo: finalAssignedTo,
             // assignedTo,

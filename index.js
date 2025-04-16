@@ -142,7 +142,7 @@ startChargerStatusUpdater();
 // app.use('/charger-dc-box', require('./routes/chargerAndDcBoxRoute'));
 
 // Chat socket on different port
-const startChatSocket = require("./sockets/chatConnect");
+const { startChatSocket } = require("./sockets/chatConnect");
 startChatSocket(); // ✅ starts on different port cleanly
 
 // Start the server
