@@ -355,6 +355,7 @@ const startStopChargingSession = async (req, res) => {
         client.once('message', async (response) => {
             console.log('response - ', response);
             const parsedResponse = JSON.parse(response);
+            console.log('parsedResponse - ', parsedResponse);
             const status = parsedResponse[2]?.status;
 
             console.log('status - ',status);
