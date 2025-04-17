@@ -353,6 +353,7 @@ const startStopChargingSession = async (req, res) => {
 
         // Handle WebSocket response
         client.once('message', async (response) => {
+            console.log('response - ', response);
             const parsedResponse = JSON.parse(response);
             const status = parsedResponse[2]?.status;
 
