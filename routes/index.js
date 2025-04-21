@@ -29,6 +29,7 @@ router.use('/pre-delivery-chargebox-response', require('./preDeliveryChargeboxRo
 router.use('/pre-installations', require('./preInstallationRoute'));
 router.use('/charger-dc-box', require('./chargerAndDcBoxRoute'));
 router.use('/notification', require('./notificationRoute'));
+router.use('/sms', require('./smsRoute'));
 
 
 module.exports = router;

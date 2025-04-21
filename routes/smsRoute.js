@@ -1,0 +1,30 @@
+// routes/smsRoutes.js
+const express = require("express");
+const { registerToken, sendPushNotification, sendNotificationToAll, scheduleNotification, getSentOrFailedNotifications, getScheduledNotifications, editScheduledNotification, deleteScheduledNotification } = require("../controllers/smsController");
+
+const fetchUser = require('../middleware/fetchuser');
+const router = express.Router();
+
+// Register FCM Token in AWS SNS
+// router.post("/register-token",fetchUser, registerToken);
+
+// Send Push Notification
+// router.post("/send-notification",fetchUser, sendPushNotification);
+
+// Send Push Notification to All
+// router.post("/send-notification-to-all", fetchUser, sendNotificationToAll);
+
+// Send Push Notification to All
+// router.post("/schedule-notification-to-all", fetchUser, scheduleNotification);
+
+// Get all Notification of scheduled
+router.get("/", fetchUser, getSentOrFailedNotifications);
+
+// Get all Notification of scheduled
+router.get("/scheduled", fetchUser, getScheduledNotifications);
+
+// router.put("/:id", editScheduledNotification);
+
+// router.delete("/:id", fetchUser, deleteScheduledNotification);
+
+module.exports = router;
