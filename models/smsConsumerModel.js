@@ -24,7 +24,7 @@ const smsSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ["Pending", "Scheduled", "Sent", "Failed"], // Tracking notification status
+        enum: ["Pending", "Scheduled", "Sent", "Failed", "Partially Sent"], // Tracking sms status
         default: "Pending"
     }
 }, { timestamps: true });

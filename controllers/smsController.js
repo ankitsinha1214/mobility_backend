@@ -1,209 +1,189 @@
 // const { registerDeviceToken, sendNotification } = require("../services/notificationService");
 const User = require('../models/userModel');
 const Sms = require('../models/smsConsumerModel');
-const cron = require("node-cron");
-const scheduledJobs = {}; // Store scheduled jobs with notification ID
+const twilioClient = require('../configs/twilioClient');
+const cron = require('node-cron');
+const scheduledJobs = {};
 
-/**
- * API to register device token
- */
-const registerToken = async (req, res) => {
+const sendSMS = async (phoneNumber, message) => {
     try {
-        const { phoneNumber, fcmToken } = req.body;
+        const response = await twilioClient.messages.create({
+            body: message,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: phoneNumber
+        });
+        return response;
+    } catch (error) {
+        console.error('❌ Twilio SMS Error:', error);
+        throw error;
+    }
+};
 
-        if (!phoneNumber || !fcmToken) {
-            return res.json({ status: false, message: "phoneNumber and fcmToken are required" });
+// ✅ Send SMS to a single user
+const sendSMSToUser = async (req, res) => {
+    try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ status: false, message: "Unauthorized" });
         }
 
-        // Check if user exists
+        const { phoneNumber, message } = req.body;
+
+        if (!phoneNumber || !message) {
+            return res.json({ status: false, message: "Phone number and message are required" });
+        }
+
         const user = await User.findOne({ phoneNumber });
         if (!user) return res.json({ status: false, message: "User not found" });
 
-        // Register the device token with AWS SNS
-        const endpointArn = await registerDeviceToken(fcmToken);
+        await sendSMS(phoneNumber, message);
 
-        // Store the EndpointArn instead of the FCM token
-        user.endpointArn = endpointArn;
-        await user.save();
-
-        return res.json({ status: true, message: "FCM token registered successfully" });
-    } catch (error) {
-        console.error("❌ Error registering token:", error);
-        return res.status(500).json({ status: false, message: "Internal Server Error" });
-    }
-};
-
-/**
- * API to send push notification to a single user
- */
-const sendPushNotification = async (req, res) => {
-    try {
-        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
-            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
-        }
-        const { phoneNumber, title, message } = req.body;
-
-        if (!phoneNumber || !title || !message) {
-            return res.json({ status: false, message: "All fields are required." });
-        }
-
-        // Get user's EndpointArn
-        const user = await User.findOne({ phoneNumber }, "endpointArn");
-        if (!user || !user.endpointArn) {
-            return res.json({ status: false, message: "User not found or no registered device" });
-        }
-        await sendNotification(user.endpointArn, title, message, req?.userid);
-        // Store the notification in the database
-        const newNotification = new Sms({
-            title,
-            description: message,
-            // endpointArns: [user.endpointArn],
+        const smsRecord = new Sms({
+            message,
             type: phoneNumber,
-            // type: "Single",
             status: "Sent",
             userId: req?.userid,
-            scheduleTime: null,
+            scheduleTime: null
         });
 
-        await newNotification.save();
-        return res.json({ status: true, message: "Notification sent successfully." });
+        await smsRecord.save();
+        return res.json({ status: true, message: "SMS sent successfully" });
+
     } catch (error) {
-        console.error("❌ Error sending notification:", error);
-        return res.status(500).json({ status: false, message: "Internal Server Error" });
+        return res.status(500).json({ status: false, message: "SMS sending failed" });
     }
 };
 
-/**
- * API to send push notification to all users
- */
-const sendNotificationToAll = async (req, res) => {
+// ✅ Send SMS to all users (skip on failure)
+const sendSMSToAll = async (req, res) => {
     try {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
-            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
-        }
-        const { title, message } = req.body;
-        // console.log(req.userid);
-
-        // Fetch all registered users with an endpointArn
-        const users = await User.find({ endpointArn: { $exists: true, $ne: null } }, "endpointArn");
-
-        if (users.length === 0) {
-            return res.json({ status: false, message: "No users found with registered devices" });
+            return res.status(401).json({ status: false, message: "Unauthorized" });
         }
 
-        // Send notifications to all users
-        const endpointArns = users.map(user => user.endpointArn);
-        await sendNotification(endpointArns, title, message, req?.userid);
-        // Store the notification in the database
-        const newNotification = new Notification({
-            title,
-            description: message,
-            endpointArns,
+        const { message } = req.body;
+        if (!message) return res.json({ status: false, message: "Message is required" });
+
+        // const users = await User.find({ phoneNumber: { $exists: true }, status: "active" });
+        const users = await User.find({ phoneNumber: { $exists: true }, status: "active" });
+
+
+        const results = await Promise.allSettled(
+            users.map(async (user) => {
+                try {
+                    await sendSMS(user.phoneNumber, message);
+                    return { user: user.phoneNumber, success: true };
+                } catch (err) {
+                    console.error(`Failed to send SMS to ${user.phoneNumber}:`, err.message);
+                    return { user: user.phoneNumber, success: false };
+                }
+            })
+        );
+
+        const failedUsers = results.filter(r => r.value && !r.value.success).map(r => r.value.user);
+
+        const smsRecord = new Sms({
+            message,
             type: "All",
-            status: "Sent",
+            status: failedUsers.length ? "Partially Sent" : "Sent",
             scheduleTime: null,
-            userId: req?.userid,
+            userId: req?.userid
         });
 
-        await newNotification.save();
+        await smsRecord.save();
 
-        return res.json({ status: true, message: "Notification sent to all users" });
+        return res.json({
+            status: true,
+            message: failedUsers.length
+                ? `SMS sent to all users except: ${failedUsers.join(', ')}`
+                : "SMS sent to all users"
+        });
+
     } catch (error) {
-        console.error("❌ Error sending notification:", error);
-        return res.status(500).json({ status: false, message: "Error sending notification" });
+        console.error("Bulk SMS error:", error);
+        return res.status(500).json({ status: false, message: "Failed to send SMS to all" });
     }
 };
 
-/**
- * API to schedule a push notification
- */
-const scheduleNotification = async (req, res) => {
+// // ✅ Send SMS to all users
+// const sendSMSToAll = async (req, res) => {
+//     try {
+//         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+//             return res.status(401).json({ status: false, message: "Unauthorized" });
+//         }
+
+//         const { message } = req.body;
+//         if (!message) return res.json({ status: false, message: "Message is required" });
+
+//         const users = await User.find({ phoneNumber: { $exists: true } });
+
+//         const promises = users.map(user => sendSMS(user.phoneNumber, message));
+//         await Promise.all(promises);
+
+//         const smsRecord = new Sms({
+//             // title: "Bulk SMS",
+//             message,
+//             type: "All",
+//             status: "Sent",
+//             scheduleTime: null,
+//             userId: req?.userid
+//         });
+
+//         await smsRecord.save();
+//         return res.json({ status: true, message: "SMS sent to all users" });
+
+//     } catch (error) {
+//         return res.status(500).json({ status: false, message: "Failed to send SMS to all" });
+//     }
+// };
+
+// ✅ Schedule SMS
+const scheduleSMS = async (req, res) => {
     try {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
-            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+            return res.status(401).json({ status: false, message: "Unauthorized" });
         }
 
-        const { title, message, scheduleTime, phoneNumber } = req.body;
-
-        if (!title || !message || !scheduleTime) {
-            return res.json({ status: false, message: "Title, message, and scheduleTime are required." });
-        }
-
-        // Validate scheduleTime format
+        const { message, scheduleTime, phoneNumber } = req.body;
         const [minute, hour, day, month] = scheduleTime.split(" ");
-        if (isNaN(minute) || isNaN(hour) || isNaN(day) || isNaN(month)) {
-            return res.json({ status: false, message: "Invalid schedule format. Use 'MM HH DD MM *' (e.g., '30 14 10 8 *' for Aug 10, 14:30)." });
+        const now = new Date();
+        const scheduledDate = new Date(now.getFullYear(), month - 1, day, hour, minute);
+
+        if (!message || !scheduleTime || scheduledDate <= now) {
+            return res.json({ status: false, message: "Invalid scheduling data" });
         }
 
-         // Convert scheduleTime to a Date object
-         const now = new Date();
-         const scheduledDate = new Date(now.getFullYear(), month - 1, day, hour, minute);
- 
-         if (scheduledDate <= now) {
-             return res.json({ status: false, message: "Scheduled time must be in the future." });
-         }
-
-        let endpointArns = null;
         let type = "All";
 
-        if (phoneNumber) {
-            // Fetch the specific user's endpointArn
-            const user = await User.findOne({ phoneNumber }, "endpointArn");
-            if (!user || !user.endpointArn) {
-                return res.json({ status: false, message: "User not found or no registered device" });
-            }
-            endpointArns = [user.endpointArn];
-            type = phoneNumber;
-            // type = "Single";
-        }
-
-        // Save the scheduled notification in the database
-        const scheduledNotification = new Notification({
-            title,
+        const smsRecord = new Sms({
+            title: "Scheduled SMS",
             description: message,
-            endpointArns, // Will be updated when sent
-            type,
+            type: phoneNumber || "All",
             status: "Scheduled",
             scheduleTime,
-            userId: req?.userid,
+            userId: req?.userid
         });
 
-        await scheduledNotification.save();
-        // Schedule the cron job
+        await smsRecord.save();
+
         const job = cron.schedule(scheduleTime, async () => {
-            console.log("📢 Sending scheduled notification...");
-
             if (phoneNumber) {
-                // If phoneNumber is provided, send to a single user
-                await sendNotification(endpointArns, title, message, req?.userid);
+                await sendSMS(phoneNumber, message);
             } else {
-                // Otherwise, send to all users
-                const users = await User.find({ endpointArn: { $exists: true, $ne: null } }, "endpointArn");
-
-                if (users.length === 0) {
-                    console.log("❌ No users found with registered devices.");
-                    return;
-                }
-
-                endpointArns = users.map(user => user.endpointArn);
-                await sendNotification(endpointArns, title, message, req?.userid);
+                const users = await User.find({ phoneNumber: { $exists: true } });
+                const promises = users.map(user => sendSMS(user.phoneNumber, message));
+                await Promise.all(promises);
             }
 
-            // Update the notification status in DB
-            await Notification.findByIdAndUpdate(scheduledNotification._id, {
-                endpointArns,
-                status: "Sent"
-            });
-
-            console.log("✅ Scheduled notification sent successfully.");
+            await Sms.findByIdAndUpdate(smsRecord._id, { status: "Sent" });
+            console.log("✅ Scheduled SMS sent.");
         });
-        // Store the job reference
-        scheduledJobs[scheduledNotification._id] = job;
 
-        return res.json({ status: true, message: "Notification scheduled successfully." });
+        scheduledJobs[smsRecord._id] = job;
+
+        return res.json({ status: true, message: "SMS scheduled successfully." });
 
     } catch (error) {
-        console.error("❌ Error scheduling notification:", error);
+        console.error("❌ Error scheduling SMS:", error);
         return res.status(500).json({ status: false, message: "Internal Server Error" });
     }
 };
@@ -374,10 +354,9 @@ const deleteScheduledNotification = async (req, res) => {
 
 
 module.exports = {
-    registerToken,
-    sendPushNotification,
-    sendNotificationToAll,
-    scheduleNotification,
+    sendSMSToUser,
+    sendSMSToAll,
+    scheduleSMS,
     getSentOrFailedNotifications,
     getScheduledNotifications,
     editScheduledNotification,
