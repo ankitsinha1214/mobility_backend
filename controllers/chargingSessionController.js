@@ -352,59 +352,128 @@ const startStopChargingSession = async (req, res) => {
         }
 
         // Handle WebSocket response
-        client.once('message', async (response) => {
-            console.log('response - ', response);
-            const parsedResponse = JSON.parse(response);
-            console.log('parsedResponse - ', parsedResponse);
-            const status = parsedResponse[2]?.status;
+        // client.once('message', async (response) => {
+        //     console.log('response - ', response);
+        //     const parsedResponse = JSON.parse(response);
+        //     console.log('parsedResponse - ', parsedResponse);
+        //     const status = parsedResponse[2]?.status;
 
-            console.log('status - ',status);
-            console.log('action - ',action);
-            if (status === 'Rejected') {
-                return res.json({
-                    status: false,
-                    message: 'Transaction was rejected by the charger.',
-                });
-            } else if (status === 'Accepted' && action === 'start') {
-                // Save the new charging session to the database
-                const sessionData = {
-                    chargerId,
-                    vehicleId,
-                    userPhone: payload?.idTag,
-                    startCreatedBy: createdBy,
-                    startReason: sessionReason,
-                    transactionId: Math.floor(10000000 + Math.random() * 90000000), // Random transaction ID
-                    startMeterValue: payload?.startMeterValue || 0,
-                };
+        //     console.log('status - ',status);
+        //     console.log('action - ',action);
+        //     if (status === 'Rejected') {
+        //         return res.json({
+        //             status: false,
+        //             message: 'Transaction was rejected by the charger.',
+        //         });
+        //     } else if (status === 'Accepted' && action === 'start') {
+        //         // Save the new charging session to the database
+        //         const sessionData = {
+        //             chargerId,
+        //             vehicleId,
+        //             userPhone: payload?.idTag,
+        //             startCreatedBy: createdBy,
+        //             startReason: sessionReason,
+        //             transactionId: Math.floor(10000000 + Math.random() * 90000000), // Random transaction ID
+        //             startMeterValue: payload?.startMeterValue || 0,
+        //         };
 
-                const newSession = new ChargingSession(sessionData);
-                await newSession.save();
+        //         const newSession = new ChargingSession(sessionData);
+        //         await newSession.save();
 
-                return res.json({
-                    status: true,
-                    message: `Charging session started for charger ID ${chargerId}`,
-                    messageId: messageId,
-                    sessionId: newSession._id,
-                });
-            } else if (status === 'Accepted' && action === 'stop') {
-                // Update the existing session
-                const sessionId = payload?.sessionId;
-                const sessionDetails = await ChargingSession.findOneAndUpdate(
-                    { _id: sessionId },
-                    { status: 'Stopped', endTime: new Date(), stopCreatedBy: createdBy, stopReason: sessionReason || 'User Terminated', },
-                    { new: true }
-                );
+        //         return res.json({
+        //             status: true,
+        //             message: `Charging session started for charger ID ${chargerId}`,
+        //             messageId: messageId,
+        //             sessionId: newSession._id,
+        //         });
+        //     } else if (status === 'Accepted' && action === 'stop') {
+        //         // Update the existing session
+        //         const sessionId = payload?.sessionId;
+        //         const sessionDetails = await ChargingSession.findOneAndUpdate(
+        //             { _id: sessionId },
+        //             { status: 'Stopped', endTime: new Date(), stopCreatedBy: createdBy, stopReason: sessionReason || 'User Terminated', },
+        //             { new: true }
+        //         );
 
-                return res.json({
-                    status: true,
-                    message: `Charging session stopped for charger ID ${chargerId}`,
-                    sessionDetails,
-                });
-            } else {
-                return res.json({
-                    status: false,
-                    message: 'Unknown status by charger. Please try again.',
-                });
+        //         return res.json({
+        //             status: true,
+        //             message: `Charging session stopped for charger ID ${chargerId}`,
+        //             sessionDetails,
+        //         });
+        //     } else {
+        //         return res.json({
+        //             status: false,
+        //             message: 'Unknown status by charger. Please try again.',
+        //         });
+        //     }
+        // });
+        // Handle WebSocket response
+        client.on('message', async (response) => {
+            try {
+                const parsedResponse = JSON.parse(response);
+                const messageType = parsedResponse[0]; // 3 means CALLRESULT
+                const incomingMessageId = parsedResponse[1];
+
+                // Ensure response matches the request message ID
+                if (messageType !== 3 || incomingMessageId !== messageId) {
+                    console.log('Skipping unrelated WebSocket message.');
+                    return;
+                }
+
+                const data = parsedResponse[2];
+                const status = data?.status;
+
+                if (status === 'Rejected') {
+                    return res.json({
+                        status: false,
+                        message: 'Transaction was rejected by the charger.',
+                    });
+                } else if (status === 'Accepted' && action === 'start') {
+                    const sessionData = {
+                        chargerId,
+                        vehicleId,
+                        userPhone: payload?.idTag,
+                        startCreatedBy: createdBy,
+                        startReason: sessionReason,
+                        transactionId: Math.floor(10000000 + Math.random() * 90000000),
+                        startMeterValue: payload?.startMeterValue || 0,
+                    };
+
+                    const newSession = new ChargingSession(sessionData);
+                    await newSession.save();
+
+                    return res.json({
+                        status: true,
+                        message: `Charging session started for charger ID ${chargerId}`,
+                        messageId: messageId,
+                        sessionId: newSession._id,
+                    });
+                } else if (status === 'Accepted' && action === 'stop') {
+                    const sessionId = payload?.sessionId;
+                    const sessionDetails = await ChargingSession.findOneAndUpdate(
+                        { _id: sessionId },
+                        {
+                            status: 'Stopped',
+                            endTime: new Date(),
+                            stopCreatedBy: createdBy,
+                            stopReason: sessionReason || 'User Terminated',
+                        },
+                        { new: true }
+                    );
+
+                    return res.json({
+                        status: true,
+                        message: `Charging session stopped for charger ID ${chargerId}`,
+                        sessionDetails,
+                    });
+                } else {
+                    return res.json({
+                        status: false,
+                        message: 'Unknown status by charger. Please try again.',
+                    });
+                }
+            } catch (err) {
+                console.error('WebSocket handling error:', err);
             }
         });
     } catch (error) {
