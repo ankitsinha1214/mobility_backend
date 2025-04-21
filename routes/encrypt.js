@@ -5,6 +5,7 @@ const { encryptPayload } = require("../utils/encrypt");
 const QRCode = require("qrcode");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { v4: uuidv4 } = require("uuid");
+const ChargerLocation = require('../models/chargerLocationModel');
 
 const SECRET_KEY = process.env.ENCRYPTION_KEY;
 
@@ -33,6 +34,22 @@ router.post("/", async (req, res) => {
                 status: false,
                 message: "Invalid payload format. Expected: { payload: { connectorId: Number, chargerId: String } }",
             });
+        }
+        const chargerName = payload?.chargerId;
+        const chargerLocation = await ChargerLocation.findOne({
+            'chargerInfo.name': chargerName
+        }).select('chargerInfo');
+        // }).select('locationName locationType state city address direction chargerInfo');
+
+        if (!chargerLocation) {
+            return res.json({ status: false, message: 'Charger not found' });
+        }
+
+        // Find the specific chargerInfo within the location
+        const chargerInfo = chargerLocation.chargerInfo.find(charger => charger.name === chargerName);
+
+        if (!chargerInfo) {
+            return res.json({ status: false, message: 'Charger details not found in the location' });
         }
 
         const encrypted = encryptPayload({ payload }, SECRET_KEY);
@@ -63,7 +80,9 @@ router.post("/", async (req, res) => {
         // console.log(BUCKET_NAME)
         const s3Link = `https://${BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${fileName}`;
 
-        res.status(200).json({
+        chargerInfo.qrcodeurl = s3Link;
+        await chargerLocation.save();
+        res.json({
             status: true,
             encryptedParam: s3Link,
         });

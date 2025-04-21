@@ -82,6 +82,12 @@ const chargerInfoSchema = new Schema({
         required: true,
         trim: true,
     },
+    qrcodeurl: {
+        type: String,
+        // required: true,
+        trim: true,
+        default: null
+    },
     energyConsumptions: {
         type: String,
         default: '0 kWh'
