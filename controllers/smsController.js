@@ -251,7 +251,7 @@ const getSentOrFailedNotifications = async (req, res) => {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
-        const sms = await Sms.find({ status: { $in: ["Sent", "Failed"] } })
+        const sms = await Sms.find({ status: { $in: ["Sent", "Failed", "Partially Sent"] } })
             .populate('userId', 'username')
             .sort({ createdAt: -1 });
 
