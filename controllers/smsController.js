@@ -155,8 +155,7 @@ const scheduleSMS = async (req, res) => {
         let type = "All";
 
         const smsRecord = new Sms({
-            title: "Scheduled SMS",
-            description: message,
+            message: message,
             type: phoneNumber || "All",
             status: "Scheduled",
             scheduleTime,
