@@ -3,10 +3,14 @@ const express = require("express");
 const router = express.Router();
 const { GetObjectCommand } = require("@aws-sdk/client-s3");
 const { s3 } = require("../configs/awsS3Config"); // your s3 client instance
+const fetchUser = require('../middleware/fetchuser');
 // const stream = require("stream");
 
-router.get("/", async (req, res) => {
+router.get("/", fetchUser, async (req, res) => {
   try {
+    if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
     const { key } = req.query;
     if (!key) return res.status(400).json({ status: false, message: "Key is required" });
 

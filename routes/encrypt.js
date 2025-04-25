@@ -6,6 +6,7 @@ const QRCode = require("qrcode");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { v4: uuidv4 } = require("uuid");
 const ChargerLocation = require('../models/chargerLocationModel');
+const fetchUser = require('../middleware/fetchuser');
 
 const SECRET_KEY = process.env.ENCRYPTION_KEY;
 
@@ -19,8 +20,11 @@ const s3 = new S3Client({
     region: process.env.AWS_BUCKET_REGION
 })
 
-router.post("/", async (req, res) => {
+router.post("/", fetchUser, async (req, res) => {
     try {
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
         const { payload } = req.body;
 
         // Validate the structure
