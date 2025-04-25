@@ -280,17 +280,17 @@ const getScheduledNotifications = async (req, res) => {
     }
 };
 
-const editScheduledNotification = async (req, res) => {
+const editScheduledSms = async (req, res) => {
     try {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
 
         const { id } = req.params;
-        const { title, message, scheduleTime } = req.body;
+        const { message, scheduleTime } = req.body;
 
-        if (!id || !title || !message || !scheduleTime) {
-            return res.json({ status: false, message: "ID, title, message, and scheduleTime are required." });
+        if (!id || !message || !scheduleTime) {
+            return res.json({ status: false, message: "ID, message, and scheduleTime are required." });
         }
 
         // Validate scheduleTime format
@@ -300,26 +300,25 @@ const editScheduledNotification = async (req, res) => {
         }
 
         // Update the notification
-        const updatedNotification = await Notification.findByIdAndUpdate(id, {
-            title,
-            description: message,
+        const updatedSms= await Sms.findByIdAndUpdate(id, {
+            message,
             scheduleTime,
             status: "Scheduled"
         }, { new: true });
 
-        if (!updatedNotification) {
-            return res.json({ status: false, message: "Notification not found or update failed." });
+        if (!updatedSms) {
+            return res.json({ status: false, message: "Sms not found or update failed." });
         }
 
-        return res.json({ status: true, message: "Notification updated successfully.", data: updatedNotification });
+        return res.json({ status: true, message: "Sms updated successfully.", data: updatedSms });
 
     } catch (error) {
-        console.error("❌ Error updating notification:", error);
+        console.error("❌ Error updating sms:", error);
         return res.status(500).json({ status: false, message: "Internal Server Error" });
     }
 };
 
-const deleteScheduledNotification = async (req, res) => {
+const deleteScheduledSms = async (req, res) => {
     try {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
@@ -328,7 +327,7 @@ const deleteScheduledNotification = async (req, res) => {
         const { id } = req.params;
 
         if (!id) {
-            return res.json({ status: false, message: "Notification ID is required." });
+            return res.json({ status: false, message: "Sms ID is required." });
         }
 
         // Stop the scheduled job if it exists
@@ -337,16 +336,16 @@ const deleteScheduledNotification = async (req, res) => {
             delete scheduledJobs[id];
         }
 
-        const deletedNotification = await Notification.findByIdAndDelete(id);
+        const deletedNotification = await Sms.findByIdAndDelete(id);
 
         if (!deletedNotification) {
-            return res.json({ status: false, message: "Notification not found or already deleted." });
+            return res.json({ status: false, message: "Sms not found or already deleted." });
         }
 
-        return res.json({ status: true, message: "Notification deleted successfully." });
+        return res.json({ status: true, message: "Sms deleted successfully." });
 
     } catch (error) {
-        console.error("❌ Error deleting notification:", error);
+        console.error("❌ Error deleting sms:", error);
         return res.status(500).json({ status: false, message: "Internal Server Error" });
     }
 };
@@ -358,6 +357,6 @@ module.exports = {
     scheduleSMS,
     getSentOrFailedNotifications,
     getScheduledNotifications,
-    editScheduledNotification,
-    deleteScheduledNotification
+    editScheduledSms,
+    deleteScheduledSms
 };

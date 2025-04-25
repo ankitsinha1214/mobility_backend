@@ -1,6 +1,6 @@
 // routes/smsRoutes.js
 const express = require("express");
-const { sendSMSToUser, sendSMSToAll, scheduleSMS, getSentOrFailedNotifications, getScheduledNotifications, editScheduledNotification, deleteScheduledNotification } = require("../controllers/smsController");
+const { sendSMSToUser, sendSMSToAll, scheduleSMS, getSentOrFailedNotifications, getScheduledNotifications, editScheduledSms, deleteScheduledSms } = require("../controllers/smsController");
 
 const fetchUser = require('../middleware/fetchuser');
 const router = express.Router();
@@ -23,8 +23,8 @@ router.get("/", fetchUser, getSentOrFailedNotifications);
 // Get all Notification of scheduled
 router.get("/scheduled", fetchUser, getScheduledNotifications);
 
-// router.put("/:id", editScheduledNotification);
+router.put("/:id", editScheduledSms);
 
-// router.delete("/:id", fetchUser, deleteScheduledNotification);
+router.delete("/:id", fetchUser, deleteScheduledSms);
 
 module.exports = router;
