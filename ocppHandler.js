@@ -234,7 +234,15 @@ async function handleMeterValues(ws, messageId, payload, chargerId) {
     sampledValue.forEach((element) => {
         const key = element?.measurand || "Unknown"; // Use measurand as the key
         const valueWithUnit = `${element?.value} ${element?.unit || ''}`.trim(); // Combine value and unit
-        m_data[key] = valueWithUnit; // Store in m_data
+        if(element?.phase === 'L2'){
+            m_data[key+'2'] = valueWithUnit; // Store in m_data
+        }
+        else if(element?.phase === 'L3'){
+            m_data[key+'3'] = valueWithUnit; // Store in m_data
+        }
+        else{
+            m_data[key] = valueWithUnit; // Store in m_data
+        }
     });
     // Add the object (with all key-value pairs) to metadata
     metadata.push({
