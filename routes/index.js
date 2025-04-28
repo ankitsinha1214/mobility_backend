@@ -4,7 +4,56 @@ const router = express.Router();
 
 // Welcome message route
 router.get('/', (_req, res) => {
-    res.send({ message: 'Welcome to Backend of Esyasoft Mobility!!' });
+    // res.send({ message: 'Welcome to Backend of Esyasoft Mobility!!' });
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Welcome to Backend Server</title>
+        <style>
+          body {
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+          }
+          h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+          }
+          p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+          }
+          .button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background 0.3s;
+          }
+          .button:hover {
+            background-color: #555;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>🚀 Esyasoft Mobility Server Running!</h1>
+        <p>Welcome to the API server landing page.</p>
+        <a href="/" class="button">Go to Home</a>
+      </body>
+      </html>
+    `);
   });
 
 router.use('/reports', require('../controllers/reportController'));
