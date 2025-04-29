@@ -96,8 +96,20 @@ const wss = new WebSocketServer({ noServer: true }); // Use noServer to manually
 
 
 server.on('upgrade', async (request, socket, head) => {
-    const urlParts = request.url.split('/'); // Split the URL path
-    const chargerId = urlParts[urlParts.length - 1]; // Extract the charger ID (last part of the URL)
+    const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
+    const urlParts = pathname.split('/'); // Split the path
+
+    // Expecting /socket/<chargerId>
+    if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
+        console.error('Invalid WebSocket URL path. Expected format: /socket/<chargerId>');
+        socket.destroy(); // Invalid path -> destroy connection
+        return;
+    }
+
+    const chargerId = urlParts[2]; // Extract the chargerId
+    console.log(`Received WebSocket upgrade request for chargerId: ${chargerId}`);
+    // const urlParts = request.url.split('/'); // Split the URL path
+    // const chargerId = urlParts[urlParts.length - 1]; // Extract the charger ID (last part of the URL)
 
     if (!chargerId) {
         console.error('Invalid WebSocket URL. Charger ID is missing.');
