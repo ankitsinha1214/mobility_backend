@@ -3,7 +3,7 @@ const cron = require('node-cron');
 
 const updateChargerStatus = async () => {
     try {
-        const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000); // check last ping for 15 mins
+        const thirtyMinutesAgo = new Date(Date.now() - 3 * 60 * 1000); // check last ping for 15 mins
 
         // const chargersToUpdate = await ChargerLocation.find({
         //     'chargerInfo.lastPing': { $lte: thirtyMinutesAgo },
@@ -21,16 +21,30 @@ const updateChargerStatus = async () => {
                 },
             },
         });
-        console.log(chargersToUpdate);
+        // console.log(chargersToUpdate);
 
         if (chargersToUpdate.length > 0) {
             for (let location of chargersToUpdate) {
-                location.chargerInfo.forEach(charger => {
+                location.chargerInfo.forEach(async charger => {
                     // if (charger.lastPing && charger.lastPing <= thirtyMinutesAgo) {
                     //     charger.status = 'Inactive';
                     // }
                     if (charger.lastPing === null || charger.lastPing <= thirtyMinutesAgo) {
                         charger.status = 'Inactive';
+                         // Automatically stop the active session
+                         const activeSession = await ChargingSession.findOne({
+                            chargerId: charger.name, // Assuming charger.name is stored in chargerId field
+                            status: 'Started'
+                        });
+                        if (activeSession) {
+                            activeSession.status = 'Stopped';
+                            activeSession.endTime = new Date();
+                            activeSession.stopReason = 'Charger not responding for over 3 minutes';
+                            activeSession.stopCreatedBy = 'System (Auto Cron Job)';
+                            // session.endMeterValue = payload?.meterStop;
+                            await activeSession.save();
+                            console.log(`Session for charger ${charger.name} has been stopped.`);
+                        }
                     }
                 });
                 await location.save();
@@ -46,7 +60,8 @@ const updateChargerStatus = async () => {
 
 // Schedule the task to run every 5 minutes
 const startChargerStatusUpdater = () => {
-    cron.schedule('*/5 * * * *', async () => {
+    // cron.schedule('*/5 * * * *', async () => {
+    cron.schedule('*/1 * * * *', async () => {
         console.log('Running charger status update...');
         await updateChargerStatus();
     });
