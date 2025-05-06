@@ -842,7 +842,7 @@ const getSessionReceipt = async (req, res) => {
             {
                 "energy-details": [
                     ["Energy", "Units", "Rate", "Amount"],
-                    ["Energy Charge", `${energyConsumed/1000} kWh`, `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}`, `₹ ${totalEnergyCost.toFixed(2)}`],
+                    ["Energy Charge", `${(energyConsumed/1000).toFixed(3)} kWh`, `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}`, `₹ ${totalEnergyCost.toFixed(2)}`],
                     // ["Energy Charge", `${energyConsumed} Wh`, `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}`, `₹ ${totalEnergyCost.toFixed(2)}`],
                     // { "Energy": "Energy Charge" },
                     // { "Units": convertTimestampToTime(session.endTime) },
