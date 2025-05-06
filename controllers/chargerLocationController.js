@@ -270,15 +270,16 @@ const updateChargerInLocation = async (req, res) => {
 
         // Ensure updated ChargerId is not already in use across all locations (except current charger)
         // console.log(updatedChargerInfo.name)
-        if (
-            updatedChargerInfo.name &&
-            (await ChargerLocation.findOne({
-                "chargerInfo.name": updatedChargerInfo.name,
-                // _id: { $ne: location_id }, // Exclude the current location
-            }))
-        ) {
-            return res.json({ success: false, message: 'ChargerId already exists in another location' });
-        }
+
+        // if (
+        //     updatedChargerInfo.name &&
+        //     (await ChargerLocation.findOne({
+        //         "chargerInfo.name": updatedChargerInfo.name,
+        //         // _id: { $ne: location_id }, // Exclude the current location
+        //     }))
+        // ) {
+        //     return res.json({ success: false, message: 'ChargerId already exists in another location' });
+        // }
 
         // Update the charger info at the specific index
         chargerLocation.chargerInfo[chargerIndex] = {
