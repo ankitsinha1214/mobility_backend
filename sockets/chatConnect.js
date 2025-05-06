@@ -12,27 +12,27 @@ let ioInstance = null;
 const app = express();
 app.use(cors());
 
-const isProduction = process.env.NODE_ENV === 'production';
-let server;
+// const isProduction = process.env.NODE_ENV === 'production';
+// let server;
 
-if (isProduction) {
-    // Load SSL certificates
-    const privateKey = fs.readFileSync('/etc/letsencrypt/live/cms.chrgup.in/privkey.pem', 'utf8');
-    const certificate = fs.readFileSync('/etc/letsencrypt/live/cms.chrgup.in/fullchain.pem', 'utf8');
-    const credentials = {
-        key: privateKey,
-        cert: certificate
-    };
-    // Create an HTTPS server
-    server = https.createServer(credentials);
-    console.log('Running Socket.IO server for Chat in HTTPS mode (Production)');
-} else {
-    server = http.createServer();
-    console.log('Running Socket.IO server for Chat in HTTP mode (Local)');
-}
+// if (isProduction) {
+//     // Load SSL certificates
+//     const privateKey = fs.readFileSync('/etc/letsencrypt/live/cms.chrgup.in/privkey.pem', 'utf8');
+//     const certificate = fs.readFileSync('/etc/letsencrypt/live/cms.chrgup.in/fullchain.pem', 'utf8');
+//     const credentials = {
+//         key: privateKey,
+//         cert: certificate
+//     };
+//     // Create an HTTPS server
+//     server = https.createServer(credentials);
+//     console.log('Running Socket.IO server for Chat in HTTPS mode (Production)');
+// } else {
+//     server = http.createServer();
+//     console.log('Running Socket.IO server for Chat in HTTP mode (Local)');
+// }
 
 const CHAT_PORT = process.env.CHAT_SOCKET_PORT || 8007;
-// const server = http.createServer(app);
+const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
