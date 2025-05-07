@@ -100,7 +100,8 @@ server.on('upgrade', async (request, socket, head) => {
     const urlParts = pathname.split('/'); // Split the path
 
     // Expecting /socket/<chargerId>
-    if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
+    if (urlParts.length !== 3 || urlParts[1] !== 'sockets') {
+    // if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
         console.error('Invalid WebSocket URL path. Expected format: /socket/<chargerId>');
         socket.destroy(); // Invalid path -> destroy connection
         return;
