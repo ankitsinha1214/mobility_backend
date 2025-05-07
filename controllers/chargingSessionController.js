@@ -5,6 +5,7 @@ const ChargerLocation = require('../models/chargerLocationModel');
 const moment = require('moment-timezone');
 const User = require('../models/userModel');
 const logger = require('../logger.js');
+const { sendChangeConfiguration } = require('../utils/ocppUtil.js')
 
 // Helper function to calculate energy consumed
 const calculateEnergyConsumed = (startMeterValue, endMeterValue) => {
@@ -531,6 +532,7 @@ const resetChargingSession = async (req, res) => {
     }
 };
 
+
 const changeConfigurationSession = async (req, res) => {
     if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
@@ -545,57 +547,31 @@ const changeConfigurationSession = async (req, res) => {
         });
     }
 
-    const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
-    if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
-        return res.status(500).json({
-            status: false,
-            message: `WebSocket connection not established for charger ID ${chargerId}`,
-        });
-    }
-
-    const messageId = generateUniqueId(); // Generate a unique ID for the message
-    const ocppMessage = [
-        2, // MessageTypeId for Call
-        messageId,
-        'ChangeConfiguration',
-        {
-            key, // Reset type (Soft/Hard)
-            value, // Reset type (Soft/Hard)
-        },
-    ];
-
     try {
-        client.send(JSON.stringify(ocppMessage)); // Send the message to the specific charger
-        // Handle WebSocket response
-        client.once('message', async (response) => {
-            const parsedResponse = JSON.parse(response);
-            const status = parsedResponse[2]?.status;
+        const result = await sendChangeConfiguration(chargerId, key, value);
 
-            if (status === 'Rejected') {
-                return res.json({
-                    status: false,
-                    message: 'Meter Value configuration command was rejected by the charger.',
-                });
-            } else if (status === 'Accepted') {
-                return res.json({
-                    status: true,
-                    message: `Meter Value configuration command (ChangeConfiguration) initiated for charger ID ${chargerId}`,
-                    messageId: messageId,
-                });
-            } else if (status === 'RebootRequired') {
-                // Reboot logic here we have to write
-
-                return res.json({
-                    status: false,
-                    message: `Reboot Required for changing configuration for charger ID ${chargerId}`
-                });
-            } else {
-                return res.json({
-                    status: false,
-                    message: 'Unknown status by charger. Please try again.',
-                });
-            }
-        });
+        if (result.status === 'Accepted') {
+            return res.json({
+                status: true,
+                message: `ChangeConfiguration accepted for charger ${chargerId}`,
+                messageId: result.messageId
+            });
+        } else if (result.status === 'Rejected') {
+            return res.json({
+                status: false,
+                message: 'ChangeConfiguration was rejected by charger.',
+            });
+        } else if (result.status === 'RebootRequired') {
+            return res.json({
+                status: false,
+                message: `Reboot required to apply ChangeConfiguration.`,
+            });
+        } else {
+            return res.json({
+                status: false,
+                message: 'Unknown response from charger.',
+            });
+        }
     } catch (error) {
         console.error('Error sending WebSocket message:', error);
         return res.status(500).json({
@@ -604,6 +580,79 @@ const changeConfigurationSession = async (req, res) => {
         });
     }
 };
+// const changeConfigurationSession = async (req, res) => {
+//     if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+//         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+//     }
+
+//     const { chargerId, key, value } = req.body;
+//     // Validate inputs
+//     if (!chargerId || !key || !value || !['MeterValueSampleInterval'].includes(key)) {
+//         return res.json({
+//             status: false,
+//             message: 'Invalid request. Ensure "chargerId", "key" and "value" (MeterValueSampleInterval) are provided.',
+//         });
+//     }
+
+//     const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
+//     if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
+//         return res.status(500).json({
+//             status: false,
+//             message: `WebSocket connection not established for charger ID ${chargerId}`,
+//         });
+//     }
+
+//     const messageId = generateUniqueId(); // Generate a unique ID for the message
+//     const ocppMessage = [
+//         2, // MessageTypeId for Call
+//         messageId,
+//         'ChangeConfiguration',
+//         {
+//             key, // Reset type (Soft/Hard)
+//             value, // Reset type (Soft/Hard)
+//         },
+//     ];
+
+//     try {
+//         client.send(JSON.stringify(ocppMessage)); // Send the message to the specific charger
+//         // Handle WebSocket response
+//         client.once('message', async (response) => {
+//             const parsedResponse = JSON.parse(response);
+//             const status = parsedResponse[2]?.status;
+
+//             if (status === 'Rejected') {
+//                 return res.json({
+//                     status: false,
+//                     message: 'Meter Value configuration command was rejected by the charger.',
+//                 });
+//             } else if (status === 'Accepted') {
+//                 return res.json({
+//                     status: true,
+//                     message: `Meter Value configuration command (ChangeConfiguration) initiated for charger ID ${chargerId}`,
+//                     messageId: messageId,
+//                 });
+//             } else if (status === 'RebootRequired') {
+//                 // Reboot logic here we have to write
+
+//                 return res.json({
+//                     status: false,
+//                     message: `Reboot Required for changing configuration for charger ID ${chargerId}`
+//                 });
+//             } else {
+//                 return res.json({
+//                     status: false,
+//                     message: 'Unknown status by charger. Please try again.',
+//                 });
+//             }
+//         });
+//     } catch (error) {
+//         console.error('Error sending WebSocket message:', error);
+//         return res.status(500).json({
+//             status: false,
+//             message: 'Error sending meter value configuration command!',
+//         });
+//     }
+// };
 
 const getSessionData = async (req, res) => {
     const { userPhone, timezone } = req.body;
@@ -1080,4 +1129,4 @@ const generateUniqueId = () => {
     return 'uuid-' + Math.random().toString(36).substring(2, 15); // Example UUID generator
 };
 
-module.exports = { startStopChargingSession, resetChargingSession, changeConfigurationSession, getSessionData, getSessionReceipt, getAllSessions, getSessionById, getSessionByChargerId };
+module.exports = { startStopChargingSession, resetChargingSession, changeConfigurationSession, getSessionData, getSessionReceipt, getAllSessions, getSessionById, getSessionByChargerId, sendChangeConfiguration };

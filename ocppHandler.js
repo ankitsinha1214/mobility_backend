@@ -2,6 +2,7 @@ const logger = require('./logger');
 const { v4: uuidv4 } = require("uuid");
 const ChargingSession = require('./models/chargerSessionModel.js');
 const ChargerLocation = require('./models/chargerLocationModel');
+const { sendChangeConfiguration } = require('./utils/ocppUtil.js')
 
 function handleOcppMessage(ws, message, chargerId) {
     const [messageType, messageId, action, payload] = message;
@@ -28,7 +29,7 @@ function handleOcppMessage(ws, message, chargerId) {
                 break;
             case "BootNotification":
                 console.log('Boot Notification:', payload);
-                handleBootNotification(ws, messageId, payload);
+                handleBootNotification(ws, messageId, payload, chargerId);
                 // handleStartTransaction(ws, messageId, payload);
                 break;
             case "Heartbeat": // Handle Heartbeat action
@@ -136,7 +137,7 @@ function handleReset(ws, messageId, payload) {
     }, 3000);
 }
 
-function handleBootNotification(ws, messageId, payload) {
+function handleBootNotification(ws, messageId, payload, chargerId) {
     const response = [
         3, // MessageTypeId for CallResult
         messageId,
@@ -149,6 +150,17 @@ function handleBootNotification(ws, messageId, payload) {
 
     ws.send(JSON.stringify(response));
     console.log('Sent BootNotification Response');
+
+     // Wait a short delay to ensure the charger processes the response
+     setTimeout(async () => {
+        try {
+            await sendChangeConfiguration(chargerId, 'MeterValueSampleInterval', '10');
+            console.log('ChangeConfiguration sent after BootNotification');
+        } catch (error) {
+            console.error('Failed to send ChangeConfiguration:', error);
+        }
+    }, 2000); // 2 second delay
+
 }
 
 async function handleStartTransaction(ws, messageId, payload, chargerId) {

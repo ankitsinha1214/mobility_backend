@@ -1,4 +1,5 @@
 const ChargerLocation = require('../models/chargerLocationModel');
+const chargerSessionModel = require('../models/chargerSessionModel');
 const cron = require('node-cron');
 
 const updateChargerStatus = async () => {
@@ -32,10 +33,11 @@ const updateChargerStatus = async () => {
                     if (charger.lastPing === null || charger.lastPing <= thirtyMinutesAgo) {
                         charger.status = 'Inactive';
                          // Automatically stop the active session
-                         const activeSession = await ChargingSession.findOne({
+                         const activeSession = await chargerSessionModel.findOne({
                             chargerId: charger.name, // Assuming charger.name is stored in chargerId field
                             status: 'Started'
                         });
+                        // console.log(activeSession);
                         if (activeSession) {
                             activeSession.status = 'Stopped';
                             activeSession.endTime = new Date();
