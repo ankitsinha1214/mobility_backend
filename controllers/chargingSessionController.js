@@ -739,6 +739,13 @@ const getSessionData = async (req, res) => {
         // Response
         const status = session?.status;
         const reason = session?.reason;
+        // if(status !== "Stopped"){
+        if(status !== "Started"){
+            return res.json({
+                status: false,
+                message:  session?.stopReason || reason || 'Unable to find charger information.',
+            });
+        }
         // const startTime = session?.startTime;
         // Format startTime as per timezone
         const startTimeIST = moment(session?.startTime).tz(timezone).format('YYYY-MM-DD HH:mm:ss');
