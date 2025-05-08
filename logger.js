@@ -49,11 +49,11 @@ const logger = createLogger({
 });
 
 // Add colorized console logs only in development
-if (process.env.NODE_ENV !== 'production') {
+// if (process.env.NODE_ENV !== 'production') {
     logger.add(new transports.Console({
         format: combine(colorize(), timestamp(), simple(), logFormat)
     }));
-}
+// }
 
 // Override console.log and others to use winston
 console.log = (...args) => {
