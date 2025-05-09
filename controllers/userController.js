@@ -169,7 +169,7 @@ const addUser = async (req, res) => {
         await newUser.save();
 
         const userDataToSend = {
-            id: newUser._id,
+            _id: newUser._id,
             firstName: newUser.firstName,
             lastName: newUser.lastName,
             phoneNumber: newUser.phoneNumber,
