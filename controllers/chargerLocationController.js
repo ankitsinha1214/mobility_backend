@@ -960,6 +960,7 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 
 const searchChargerLocations = async (req, res) => {
     const { query } = req.query;
+    // const { status } = req.body;
 
     if (!query) {
         return res.json({ success: false, message: 'Query parameter is required' });
@@ -968,6 +969,7 @@ const searchChargerLocations = async (req, res) => {
     try {
         const regex = new RegExp(query, 'i');
         const chargerLocations = await ChargerLocation.find({
+            status: 'Active',
             $or: [
                 { locationName: { $regex: regex } },
                 { address: { $regex: regex } }
