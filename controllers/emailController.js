@@ -4,6 +4,8 @@ const cron = require('node-cron');
 const nodemailer = require('nodemailer');
 const scheduledJobs = {};
 
+const { MESSAGE } = require("../message.json");
+
 // Create a Nodemailer transporter
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -255,20 +257,22 @@ const scheduleSMS = async (req, res) => {
 // };
 
 /**
- * API to get all notifications that are Sent or Failed
+ * API to get all Email that are Sent or Failed
  */
-const getSentOrFailedNotifications = async (req, res) => {
+const getSentOrFailedEmail = async (req, res) => {
     try {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
-        const sms = await Sms.find({ status: { $in: ["Sent", "Failed", "Partially Sent"] } })
+        const email = await Email.find({ status: { $in: ["Sent", "Failed", "Partially Sent"] } })
             .populate('userId', 'username')
             .sort({ createdAt: -1 });
-
-        return res.json({ status: true, data: sms });
+        if(email.length === 0){
+        return res.json({ status: false, data: MESSAGE?.USER_NOT_FOUND || "No Email Found" });
+        }
+        return res.json({ status: true, data: email });
     } catch (error) {
-        console.error("❌ Error fetching sent/failed sms:", error);
+        console.error("❌ Error fetching sent/failed email:", error);
         return res.status(500).json({ status: false, message: "Internal Server Error" });
     }
 };
@@ -367,7 +371,7 @@ module.exports = {
     sendEmailToUser,
     sendEmailToAll,
     scheduleSMS,
-    getSentOrFailedNotifications,
+    getSentOrFailedEmail,
     getScheduledNotifications,
     editScheduledSms,
     deleteScheduledSms
