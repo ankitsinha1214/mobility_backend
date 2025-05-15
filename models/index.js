@@ -11,6 +11,7 @@ const faq = require('./faqModel'); // Update the path as necessary for other mod
 const predeliveryQuestion = require('./preDeliveryQuestionModel'); // Update the path as necessary for other models
 const PreInstallation = require('./preInstallationModel'); // Update the path as necessary for other models
 const ChargerAndDcBox = require('./chargerAndDcboxModel'); // Update the path as necessary for other models
+const EmailConsumer = require('./emailConsumerModel'); // Update the path as necessary for other models
 const preDeliveryChargebox = require('./preDeliveryChargeboxResponseModel'); // Update the path as necessary for other models
 const sandmNotification = require('./notificationSandmModel'); // Update the path as necessary for other models
 const chargingSession = require('./chargerSessionModel'); // Update the path as necessary for other models
@@ -39,6 +40,7 @@ module.exports = {
   PreInstallation,
   predeliveryQuestion,
   preDeliveryChargebox,
+  EmailConsumer,
   chargingSession,
   ChargerAndDcBox,
   payment

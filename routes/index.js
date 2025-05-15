@@ -79,6 +79,7 @@ router.use('/pre-installations', require('./preInstallationRoute'));
 router.use('/charger-dc-box', require('./chargerAndDcBoxRoute'));
 router.use('/notification', require('./notificationRoute'));
 router.use('/sms', require('./smsRoute'));
+router.use('/email', require('./emailRoute'));
 router.use('/download', require('./downloadRoute'));
 
 
