@@ -1,6 +1,6 @@
-// routes/smsRoutes.js
+// routes/emailRoutes.js
 const express = require("express");
-const { sendEmailToUser, sendEmailToAll, scheduleSMS, getSentOrFailedEmail, getScheduledNotifications, editScheduledSms, deleteScheduledSms } = require("../controllers/emailController");
+const { sendEmailToUser, sendEmailToAll, scheduleEmail, getSentOrFailedEmail, getScheduledEmails, editScheduledSms, deleteScheduledEmail } = require("../controllers/emailController");
 
 const fetchUser = require('../middleware/fetchuser');
 const router = express.Router();
@@ -8,23 +8,23 @@ const router = express.Router();
 // Register FCM Token in AWS SNS
 // router.post("/register-token",fetchUser, registerToken);
 
-// Send Push Notification
+// Send Push Email
 router.post("/", fetchUser, sendEmailToUser);
 
-// Send Push Notification to All
+// Send Push Email to All
 router.post("/send-email-to-all", fetchUser, sendEmailToAll);
 
-// Send Push Notification to All
-router.post("/schedule-sms-to-all", fetchUser, scheduleSMS);
+// Send Push Email to All
+router.post("/schedule-email", fetchUser, scheduleEmail);
 
-// Get all Notification of scheduled
+// Get all Email of scheduled
 router.get("/", fetchUser, getSentOrFailedEmail);
 
-// Get all Notification of scheduled
-router.get("/scheduled", fetchUser, getScheduledNotifications);
+// Get all Email of scheduled
+router.get("/scheduled", fetchUser, getScheduledEmails);
 
 router.put("/:id", editScheduledSms);
 
-router.delete("/:id", fetchUser, deleteScheduledSms);
+router.delete("/:id", fetchUser, deleteScheduledEmail);
 
 module.exports = router;
