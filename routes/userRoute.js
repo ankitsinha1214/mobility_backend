@@ -57,6 +57,15 @@ router.post(
   userController.loginDriver
 );
 
+router.post(
+  "/driver", 
+//   upload.fields([{
+//   name: 'avatar', maxCount: 1
+// }
+// ]),
+  fetchUser,
+  userController.addDriver
+);
 // router.post(
 //   "/login",
 //   userController.loginUser

@@ -288,6 +288,95 @@ const addUser = async (req, res) => {
         return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
     }
 };
+// Add Driver
+const addDriver = async (req, res) => {
+    const { DriverId, user_vehicle } = req.body;
+
+    // Validate user_vehicle fields
+    // const requiredVehicleFields = ['make', 'model', 'variant', 'vehicle_reg', 'range'];
+    // for (const field of requiredVehicleFields) {
+    //   if (!user_vehicle || !user_vehicle[field]) {
+    //     return res.json({ success: false, message: `User vehicle ${field} is required` });
+    //   }
+    // }
+
+    try {
+
+        if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+            return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+        }
+        const existingUser = await User.findOne({ phoneNumber: DriverId });
+
+        if (existingUser) {
+            return res.json({ success: false, message: "User already exists" });
+        }
+        // prev code
+        // const newUser = new User(req.body);
+        // await newUser.save();
+
+
+        // Remove _id from each vehicle object in user_vehicle array
+        const cleanedUserVehicle = user_vehicle?.map(vehicle => {
+            const { _id, ...cleanedVehicle } = vehicle;
+            return cleanedVehicle;
+        });
+        // Prepare user data, including cleaned user_vehicle
+        const { _id: ignoredId, user_vehicle: _, ...userData } = req.body;
+        userData.user_vehicle = cleanedUserVehicle;
+        userData.phoneNumber = DriverId;
+        userData.role = "Driver";
+
+        const newUser = new User(userData);
+        await newUser.save();
+
+        const userDataToSend = {
+            _id: newUser._id,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            driverId: newUser.phoneNumber,
+            state: newUser.state,
+            city: newUser.city,
+            dob: newUser.dob,
+            gender: newUser.gender,
+            email: newUser.email,
+            profilePic: newUser.profilePic,
+            user_vehicle: newUser.user_vehicle, // Adding the user_vehicle field
+            createdAt: newUser.createdAt,
+            updatedAt: newUser.updatedAt,
+        };
+        const userId = {
+            _id: newUser._id,
+            phoneNumber: newUser.phoneNumber
+        };
+        // console.log(userId);
+        const { token } = generateToken(userId);
+        // const { token } = generateToken(userId);
+        // const decodedToken = jwt.decode(token); // Decode the token to get iat
+        // const iat = decodedToken.iat;
+        // Get the current time in seconds (this represents 'iat')
+        const iat = Math.floor(Date.now() / 1000);  // Convert to seconds
+        console.log(iat);
+        await User.findByIdAndUpdate(newUser._id, { tokenIat: iat });
+
+        return res.json({
+            success: true, data: userDataToSend, message: USER.USER_CREATED,
+            token: token,
+            sessionId: null,
+            startTime: null,
+            chargerId: null,
+            status: "No active session"
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        if (error.keyValue) {
+            return res.status(500).json({ success: false, message: `${error.keyValue.email} Email already exist. Please check!`, error: error.message });
+        }
+        // if(error.keyValue){
+        //     return res.status(500).json({ success: false, message: `${error.keyValue['user_vehicle.vehicle_reg']} Vehicle Registeration already exist. Please check!`, error: error.message });
+        // }
+        return res.status(500).json({ success: false, message: "Something went wrong", error: error.message });
+    }
+};
 
 
 // Get all users
@@ -1122,6 +1211,7 @@ const removeFavouriteLocation = async (req, res) => {
 
 module.exports = {
     addUser,
+    addDriver,
     getUser,
     getPaginatedUser,
     getUserById,
