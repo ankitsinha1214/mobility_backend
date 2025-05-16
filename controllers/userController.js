@@ -195,17 +195,17 @@ const loginDriver = async (req, res) => {
         driverId: user.phoneNumber,
         email: user.email,
         profilePic: user.profilePic,
-        sessionId: session ? session._id : null,
-        locationId: chargerLocation ? chargerLocation._id : null,
-        startTime: session ? session.startTime : null,
-        chargerId: session ? session.chargerId : null,
-        status: session ? session.status : "No active session"
       };
   
       return res.status(200).json({
         success: true,
         message: 'Login successful',
         data: driverData,
+        sessionId: session ? session._id : null,
+        locationId: chargerLocation ? chargerLocation._id : null,
+        startTime: session ? session.startTime : null,
+        chargerId: session ? session.chargerId : null,
+        status: session ? session.status : "No active session"
       });
     } catch (error) {
       console.error('Login error:', error);
