@@ -210,7 +210,7 @@ const loginDriver = async (req, res) => {
             driverId: user.phoneNumber,
             email: user.email,
             profilePic: user.profilePic,
-            userVehicle: user.user_vehicle,
+            user_vehicle: user.user_vehicle,
         };
         const userId = {
             _id: user._id,
