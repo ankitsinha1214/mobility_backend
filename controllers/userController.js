@@ -211,11 +211,18 @@ const loginDriver = async (req, res) => {
             email: user.email,
             profilePic: user.profilePic,
         };
+        const userId = {
+            _id: user._id,
+            phoneNumber: newUser.phoneNumber
+        };
+
+        const { token } = generateToken(userId);
 
         return res.status(200).json({
             success: true,
             message: 'Login successful',
             data: driverData,
+            token: token,
             sessionId: session ? session._id : null,
             locationId: chargerLocation ? chargerLocation._id : null,
             startTime: session ? session.startTime : null,
