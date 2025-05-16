@@ -132,7 +132,79 @@ const Payment = require('../models/paymentModel');
 //         res.status(500).json({ success: false, message: 'An error occurred' });
 //     }
 // };
-
+// login Driver (User)
+const loginDriver = async (req, res) => {
+    const { driverId, password } = req.body;
+  
+    // 1. Validate input
+    if (!driverId || !password) {
+      return res.json({
+        success: false,
+        message: 'driverId and password are required',
+      });
+    }
+  
+    try {
+      // 2. Find user by phoneNumber
+      const user = await User.findOne({ phoneNumber: driverId });
+  
+      if (!user) {
+        return res.json({
+          success: false,
+          message: 'Invalid driverId or password',
+        });
+      }
+  
+      // 3. Check if the role is Driver
+      if (user.role !== 'Driver') {
+        return res.json({
+          success: false,
+          message: 'Access denied: Only drivers can log in here',
+        });
+      }
+  
+      // 4. Check if password is set
+      if (!user.password) {
+        return res.json({
+          success: false,
+          message: 'Password not set for this driver',
+        });
+      }
+  
+      // 5. Compare password
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.json({
+          success: false,
+          message: 'Invalid phone number or password',
+        });
+      }
+  
+      // 6. Construct response
+      const driverData = {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        driverId: user.phoneNumber,
+        email: user.email,
+        profilePic: user.profilePic,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
+  
+      return res.status(200).json({
+        success: true,
+        message: 'Login successful',
+        data: driverData,
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+      });
+    }
+  };
 // Add user
 const addUser = async (req, res) => {
     const { phoneNumber, user_vehicle } = req.body;
@@ -1055,6 +1127,7 @@ module.exports = {
     getUserById,
     updateUser,
     deleteUser,
+    loginDriver,
     // loginUser,
     // updatepassword,
     // resetpassword,

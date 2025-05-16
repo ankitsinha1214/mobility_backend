@@ -173,12 +173,14 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
     validate: {
-      validator: function(v) {
-        return /\S+/.test(v); // Ensures it's not just whitespace
+      validator: function (v) {
+        if (this.role === 'Driver') {
+          return /\S+/.test(v); // Only validate if role is Driver
+        }
+        return true; // Skip validation for non-Driver roles
       },
-      message: 'Password cannot be empty'
+      message: 'Password cannot be empty for drivers'
     },
     default: null
   },
@@ -205,6 +207,17 @@ const userSchema = new Schema({
 }, { timestamps: true });
 
 // Hash password before saving
+userSchema.pre('save', async function (next) {
+  try {
+    if (this.password && this.isModified('password')) {
+      const hashedPassword = await bcrypt.hash(this.password, 10);
+      this.password = hashedPassword;
+    }
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+});
 // userSchema.pre('save', async function(next) {
 //   try {
 //     if (!this.isModified('password')) {

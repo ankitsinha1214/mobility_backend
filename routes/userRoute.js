@@ -52,6 +52,11 @@ router.delete(
   userController.deleteUser
 );
 
+router.post(
+  "/login",
+  userController.loginDriver
+);
+
 // router.post(
 //   "/login",
 //   userController.loginUser
