@@ -162,7 +162,7 @@ const loginDriver = async (req, res) => {
     try {
         // 2. Find user by phoneNumber
         const user = await User.findOne({ phoneNumber: driverId });
-
+        // console.log(user)
         if (!user) {
             return res.json({
                 success: false,
@@ -213,7 +213,7 @@ const loginDriver = async (req, res) => {
         };
         const userId = {
             _id: user._id,
-            phoneNumber: newUser.phoneNumber
+            phoneNumber: user.phoneNumber
         };
 
         const { token } = generateToken(userId);
