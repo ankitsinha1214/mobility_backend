@@ -75,10 +75,10 @@ router.post(
 //   "/updatepassword",
 //   userController.updatepassword
 // );
-// router.post(
-//   "/resetpassword",
-//   userController.resetpassword
-// );
+router.post(
+  "/resetpassword",
+  userController.resetpassword
+);
 // router.post(
 //   "/checkuserforresetpassword",
 //   userController.checkUserForResetPassword

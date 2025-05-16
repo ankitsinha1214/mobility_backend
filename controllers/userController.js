@@ -73,30 +73,45 @@ const Payment = require('../models/paymentModel');
 // };
 
 // Reset user password
-// const resetpassword = async (req, res) => {
-//     const { username, newpassword } = req.body;
+const resetpassword = async (req, res) => {
+    const { driverId, newpassword } = req.body;
 
-//     if (!username || !newpassword) {
-//         return res.json({ success: false, message: "Username or new password cannot be empty" });
-//     }
+    if (!driverId || !newpassword) {
+        return res.json({ success: false, message: "driverId or new password cannot be empty" });
+    }
 
-//     try {
-//         const user = await User.findOne({ username });
+    try {
+        const user = await User.findOne({ phoneNumber: driverId });
 
-//         if (user) {
-//             const hashedPassword = await bcrypt.hash(newpassword, 10);
-//             user.password = hashedPassword;
-//             await user.save();
+        if (user) {
+            // Check if the role is Driver
+            if (user.role !== 'Driver') {
+                return res.json({
+                    success: false,
+                    message: 'Access denied: Only drivers password reset is allowed',
+                });
+            }
+            const passwordMatch = await bcrypt.compare(newpassword, user.password);
+            if (passwordMatch) {
+                return res.json({
+                    success: false,
+                    message: "Previous Password and New password can't be same.",
+                });
+            }
+            // const hashedPassword = await bcrypt.hash(newpassword, 10);
+            // user.password = hashedPassword;
+            user.password = newpassword;
+            await user.save();
 
-//             return res.json({ success: true, message: "Password reset successfully" });
-//         } else {
-//             return res.json({ success: false, message: "User not found" });
-//         }
-//     } catch (error) {
-//         console.error('Error:', error);
-//         res.status(500).json({ success: false, message: 'An error occurred' });
-//     }
-// };
+            return res.json({ success: true, message: "Password reset successfully" });
+        } else {
+            return res.json({ success: false, message: "User not found" });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, message: 'An error occurred' });
+    }
+};
 
 // User login
 // const loginUser = async (req, res) => {
@@ -135,86 +150,86 @@ const Payment = require('../models/paymentModel');
 // login Driver (User)
 const loginDriver = async (req, res) => {
     const { driverId, password } = req.body;
-  
+
     // 1. Validate input
     if (!driverId || !password) {
-      return res.json({
-        success: false,
-        message: 'driverId and password are required',
-      });
+        return res.json({
+            success: false,
+            message: 'driverId and password are required',
+        });
     }
-  
+
     try {
-      // 2. Find user by phoneNumber
-      const user = await User.findOne({ phoneNumber: driverId });
-  
-      if (!user) {
-        return res.json({
-          success: false,
-          message: 'Invalid driverId or password',
-        });
-      }
-  
-      // 3. Check if the role is Driver
-      if (user.role !== 'Driver') {
-        return res.json({
-          success: false,
-          message: 'Access denied: Only drivers can log in here',
-        });
-      }
-  
-      // 4. Check if password is set
-      if (!user.password) {
-        return res.json({
-          success: false,
-          message: 'Password not set for this driver',
-        });
-      }
-  
-      // 5. Compare password
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.json({
-          success: false,
-          message: 'Invalid phone number or password',
-        });
-      }
+        // 2. Find user by phoneNumber
+        const user = await User.findOne({ phoneNumber: driverId });
+
+        if (!user) {
+            return res.json({
+                success: false,
+                message: 'Invalid driverId or password',
+            });
+        }
+
+        // 3. Check if the role is Driver
+        if (user.role !== 'Driver') {
+            return res.json({
+                success: false,
+                message: 'Access denied: Only drivers can log in here',
+            });
+        }
+
+        // 4. Check if password is set
+        if (!user.password) {
+            return res.json({
+                success: false,
+                message: 'Password not set for this driver',
+            });
+        }
+
+        // 5. Compare password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.json({
+                success: false,
+                message: 'Invalid phone number or password',
+            });
+        }
 
         // Find the most recent charging session for this user (latest createdAt)
         const session = await ChargingSession.findOne({ userPhone: driverId })
-        .sort({ createdAt: -1 }) // Sort descending (latest first)
-        .limit(1); // Get only the most recent session
+            .sort({ createdAt: -1 }) // Sort descending (latest first)
+            .limit(1); // Get only the most recent session
 
-    const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': session?.chargerId }).select('_id');
-  
-      // 6. Construct response
-      const driverData = {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        driverId: user.phoneNumber,
-        email: user.email,
-        profilePic: user.profilePic,
-      };
-  
-      return res.status(200).json({
-        success: true,
-        message: 'Login successful',
-        data: driverData,
-        sessionId: session ? session._id : null,
-        locationId: chargerLocation ? chargerLocation._id : null,
-        startTime: session ? session.startTime : null,
-        chargerId: session ? session.chargerId : null,
-        status: session ? session.status : "No active session"
-      });
+        const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': session?.chargerId }).select('_id');
+
+        // 6. Construct response
+        const driverData = {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            driverId: user.phoneNumber,
+            email: user.email,
+            profilePic: user.profilePic,
+        };
+
+        return res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            data: driverData,
+            sessionId: session ? session._id : null,
+            locationId: chargerLocation ? chargerLocation._id : null,
+            startTime: session ? session.startTime : null,
+            chargerId: session ? session.chargerId : null,
+            status: session ? session.status : "No active session"
+        });
     } catch (error) {
-      console.error('Login error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-      });
+        console.error('Login error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
     }
-  };
+};
 // Add user
 const addUser = async (req, res) => {
     const { phoneNumber, user_vehicle } = req.body;
@@ -546,11 +561,11 @@ const getUserById = async (req, res) => {
 // Update user by ID
 const updateUser = async (req, res) => {
     const { phoneNumber } = req.params;
-    const { 
+    const {
         // gender, 
         email,
         //  date_of_birth,
-         ...updateFields } = req.body;
+        ...updateFields } = req.body;
     if (req.phn && phoneNumber !== req.phn) {
         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
     }
@@ -559,7 +574,7 @@ const updateUser = async (req, res) => {
     }
     // Check if restricted fields are in the request body
     // if (gender || email || date_of_birth) {
-    if ( email) {
+    if (email) {
         return res.json({
             success: false,
             message: "Updating Email is not allowed"
@@ -1230,7 +1245,7 @@ module.exports = {
     loginDriver,
     // loginUser,
     // updatepassword,
-    // resetpassword,
+    resetpassword,
     // checkUserForResetPassword,
     addUserVehicle,
     getUserVehicles,
