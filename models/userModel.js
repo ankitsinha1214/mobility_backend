@@ -104,6 +104,11 @@ const userSchema = new Schema({
     required: true, // Adjust as per your requirement
     default: 'active' // Example default status
   },
+  role: {
+    type: String,
+    enum: ['User', 'Driver'],
+    default: 'User'
+},
   phoneNumber: {
     type: String,
     required: true,
@@ -166,16 +171,17 @@ const userSchema = new Schema({
       message: 'Email cannot be empty'
     }
   },
-  // password: {
-  //   type: String,
-  //   required: true,
-  //   validate: {
-  //     validator: function(v) {
-  //       return /\S+/.test(v); // Ensures it's not just whitespace
-  //     },
-  //     message: 'Password cannot be empty'
-  //   }
-  // },
+  password: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function(v) {
+        return /\S+/.test(v); // Ensures it's not just whitespace
+      },
+      message: 'Password cannot be empty'
+    },
+    default: null
+  },
   profilePic: {
     type: String,
     default: null

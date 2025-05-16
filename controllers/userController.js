@@ -250,13 +250,16 @@ const getPaginatedUser = async (req, res) => {
         const sortField = req.query.sortField || 'createdAt';
         const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
         const search = req.query.search || '';
+        const user = req.query.role || 'User';
 
         // Define the fields to return in the response
-        const userFields = 'firstName lastName phoneNumber email state city gender dob user_vehicle status profilePic';
+        const userFields = 'firstName lastName phoneNumber email role state city gender dob user_vehicle status profilePic';
 
         // Build filter condition for searching
         // Build filter condition for searching across multiple fields
-        let filterCondition = {};
+        let filterCondition = {
+            role: role,
+        };
         if (search) {
             filterCondition = {
                 $or: [
