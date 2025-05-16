@@ -250,7 +250,7 @@ const getPaginatedUser = async (req, res) => {
         const sortField = req.query.sortField || 'createdAt';
         const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
         const search = req.query.search || '';
-        const user = req.query.role || 'User';
+        const role = req.query.role || 'User';
 
         // Define the fields to return in the response
         const userFields = 'firstName lastName phoneNumber email role state city gender dob user_vehicle status profilePic';
@@ -262,17 +262,34 @@ const getPaginatedUser = async (req, res) => {
         };
         if (search) {
             filterCondition = {
-                $or: [
-                    { firstName: { $regex: search, $options: 'i' } },
-                    { lastName: { $regex: search, $options: 'i' } },
-                    // { email: { $regex: search, $options: 'i' } },
-                    { gender: { $regex: search, $options: 'i' } },
-                    { state: { $regex: search, $options: 'i' } },
-                    { city: { $regex: search, $options: 'i' } },
-                    // { 'phoneNumber.number': { $regex: search, $options: 'i' } }, // Adjust for nested fields
+                $and: [
+                    { role: role },
+                    {
+                        $or: [
+                            { firstName: { $regex: search, $options: 'i' } },
+                            { lastName: { $regex: search, $options: 'i' } },
+                            { gender: { $regex: search, $options: 'i' } },
+                            { state: { $regex: search, $options: 'i' } },
+                            { city: { $regex: search, $options: 'i' } },
+                            // { 'phoneNumber.number': { $regex: search, $options: 'i' } },
+                        ],
+                    },
                 ],
             };
         }
+        // if (search) {
+        //     filterCondition = {
+        //         $or: [
+        //             { firstName: { $regex: search, $options: 'i' } },
+        //             { lastName: { $regex: search, $options: 'i' } },
+        //             // { email: { $regex: search, $options: 'i' } },
+        //             { gender: { $regex: search, $options: 'i' } },
+        //             { state: { $regex: search, $options: 'i' } },
+        //             { city: { $regex: search, $options: 'i' } },
+        //             // { 'phoneNumber.number': { $regex: search, $options: 'i' } }, // Adjust for nested fields
+        //         ],
+        //     };
+        // }
         // Log the filter condition for debugging
         console.log("Filter condition:", JSON.stringify(filterCondition));
 
