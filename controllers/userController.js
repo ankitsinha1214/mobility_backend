@@ -678,7 +678,7 @@ const deleteUser = async (req, res) => {
 
             // Iterate over the user object and set all other fields to null, including phoneNumber
             for (const key in user._doc) {
-                if (key !== '_id' && key !== 'user_vehicle') {
+                if (key !== '_id' && key !== 'user_vehicle' && key !== 'role') {
                     updatedUser[key] = null;
                 }
                 // else if(key === 'phoneNumber'){&& key !== 'phoneNumber'
