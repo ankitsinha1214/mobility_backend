@@ -179,6 +179,13 @@ const loginDriver = async (req, res) => {
           message: 'Invalid phone number or password',
         });
       }
+
+        // Find the most recent charging session for this user (latest createdAt)
+        const session = await ChargingSession.findOne({ userPhone: driverId })
+        .sort({ createdAt: -1 }) // Sort descending (latest first)
+        .limit(1); // Get only the most recent session
+
+    const chargerLocation = await ChargerLocation.findOne({ 'chargerInfo.name': session?.chargerId }).select('_id');
   
       // 6. Construct response
       const driverData = {
@@ -188,8 +195,11 @@ const loginDriver = async (req, res) => {
         driverId: user.phoneNumber,
         email: user.email,
         profilePic: user.profilePic,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
+        sessionId: session ? session._id : null,
+        locationId: chargerLocation ? chargerLocation._id : null,
+        startTime: session ? session.startTime : null,
+        chargerId: session ? session.chargerId : null,
+        status: session ? session.status : "No active session"
       };
   
       return res.status(200).json({
