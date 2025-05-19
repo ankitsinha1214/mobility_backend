@@ -47,12 +47,12 @@ jobs:
           echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+        shell: bash
 
       - name: Deploy to EC2 and Restart Server
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ec2-user/chrgup-test-server  # change to your project path
-            sudo su
             git pull origin main
             npm install
             pm2 restart all  # or your specific process name
