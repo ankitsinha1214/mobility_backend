@@ -297,21 +297,21 @@ const startStopChargingSession = async (req, res) => {
             }
 
             // **Check for Active Session for User**
-            let activeUserSession;
-            if(req?.consumerUserRole === 'Driver'){
-                activeUserSession = await ChargingSession.findOne({
-                    userPhone: payload?.idTag,
-                    // status: 'Started'
-                    status: { $in: ['Started'] }
-                });
-            }
-            else{
-                activeUserSession = await ChargingSession.findOne({
+            // let activeUserSession;
+            // if(req?.consumerUserRole === 'Driver'){
+            //     activeUserSession = await ChargingSession.findOne({
+            //         userPhone: payload?.idTag,
+            //         // status: 'Started'
+            //         status: { $in: ['Started'] }
+            //     });
+            // }
+            // else{
+               const activeUserSession = await ChargingSession.findOne({
                     userPhone: payload?.idTag,
                     // status: 'Started'
                     status: { $in: ['Started', 'Stopped'] }
                 });
-            }
+            // }
             if (activeUserSession) {
                 return res.json({
                     status: false,
@@ -763,12 +763,12 @@ const getSessionData = async (req, res) => {
         const reason = session?.reason;
         // if(status !== "Stopped"){
         if(status !== "Started"){
-            if(req?.consumerUserRole !== "Driver"){
+            // if(req?.consumerUserRole !== "Driver"){
                 return res.json({
                     status: false,
                     message:  session?.stopReason || reason || 'Unable to find charger information.',
                 });
-            }
+            // }
         }
         // const startTime = session?.startTime;
         // Format startTime as per timezone
