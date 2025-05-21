@@ -28,15 +28,17 @@ const fetchUser = async (req, res, next) => {
             if (user.tokenIat && data.iat < user.tokenIat) {
                 return res.status(401).json({ success: false, message: "Session expired. Please log in again." });
             }
+            req.consumerUserRole = user?.role
         }
         if (data.role) {
             // console.log('hi')
             // Optional: Verify if the user exists in the database (based on the ID)
             const userId = data._id;
-            const userSandm = await SandmUser.findOne({ _id: userId });
+            const userSandm = await SandmUser.findOne({ _id: userId }).select('-password');
             if (!userSandm) {
                 return res.status(401).json({ success: false, message: "User not found or Inactive." });
             }
+            req.SandmUser = userSandm;
             console.log(userSandm);
         }
         // console.log(req);

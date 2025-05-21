@@ -201,6 +201,8 @@ const startStopChargingSession = async (req, res) => {
     // console.log('entered');
     // return;
     try {
+        console.log('role -- ',req?.consumerUserRole);
+        // return;
         if (!action || !['start', 'stop'].includes(action)) {
             return res.status(400).json({ status: false, message: 'Invalid action specified' });
         }
@@ -211,8 +213,6 @@ const startStopChargingSession = async (req, res) => {
             return res.json({ status: false, message: `Charger ID ${chargerId} is not connected to the Server.` });
             // return res.json({ status: false, message: `WebSocket not established for charger ID ${chargerId}` });
         }
-        console.log('role -- ',req?.consumerUserRole);
-
         let createdBy = '';
 
         if (req.phn) {
@@ -455,7 +455,7 @@ const startStopChargingSession = async (req, res) => {
                     const sessionDetails = await ChargingSession.findOneAndUpdate(
                         { _id: sessionId },
                         {
-                            status: req.consumerUserRole !== 'Driver' ? 'Stopped': 'Completed',
+                            status: req?.consumerUserRole !== 'Driver' ? 'Stopped': 'Completed',
                             endTime: new Date(),
                             stopCreatedBy: createdBy,
                             stopReason: sessionReason || 'User Terminated',
