@@ -219,6 +219,10 @@ const loginDriver = async (req, res) => {
 
         const { token } = generateToken(userId);
 
+         // Get the current time in seconds (this represents 'iat')
+         const iat = Math.floor(Date.now() / 1000);  // Convert to seconds
+         await User.findByIdAndUpdate(user._id, { tokenIat: iat });
+
         return res.status(200).json({
             success: true,
             message: 'Login successful',
