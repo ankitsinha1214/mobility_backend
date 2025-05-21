@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ChargerLocation = require('./chargerLocationModel');
+const User = require('./userModel');
 
 const chargingSessionSchema = new Schema({
     chargerId: {
@@ -76,6 +77,14 @@ const chargingSessionSchema = new Schema({
 chargingSessionSchema.pre('save', async function (next) {
     if (this.isModified('status') && this.status === 'Completed') {
         this.transactionId = undefined; // Remove transactionId
+    }
+    if (this.isModified('status') && this.status === 'Stopped' && this.userPhone) {
+        const user = await User.findOne({ 'phoneNumber': this.userPhone });
+
+        if (user && user.role === 'Driver') {
+            this.transactionId = undefined;
+            this.status = 'Completed';
+        }
     }
     // if (this.isModified('status') && this.endMeterValue !== undefined && this.startMeterValue !== undefined) {
     if (this.metadata && this.metadata?.length > 1) {
