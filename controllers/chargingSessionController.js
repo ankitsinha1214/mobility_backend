@@ -268,11 +268,13 @@ const startStopChargingSession = async (req, res) => {
 
         // Validate start/stop actions
         if (action === 'start' && activeSession) {
-            return res.json({
-                status: false,
-                message: 'Previous transaction still in progress',
-                // message: 'A previous transaction is still in progress. Please wait for it to complete before starting a new one.',
-            });
+            if(req.consumerUserRole !== 'Driver'){
+                return res.json({
+                    status: false,
+                    message: 'Previous transaction still in progress',
+                    // message: 'A previous transaction is still in progress. Please wait for it to complete before starting a new one.',
+                });
+            }
         }
         if (action === 'stop' && !activeSession) {
             return res.json({
@@ -454,7 +456,7 @@ const startStopChargingSession = async (req, res) => {
                     const sessionDetails = await ChargingSession.findOneAndUpdate(
                         { _id: sessionId },
                         {
-                            status: 'Stopped',
+                            status: req.consumerUserRole !== 'Driver' ? 'Stopped': 'Completed',
                             endTime: new Date(),
                             stopCreatedBy: createdBy,
                             stopReason: sessionReason || 'User Terminated',
