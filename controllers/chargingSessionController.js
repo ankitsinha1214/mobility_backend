@@ -753,10 +753,12 @@ const getSessionData = async (req, res) => {
         const reason = session?.reason;
         // if(status !== "Stopped"){
         if(status !== "Started"){
-            return res.json({
-                status: false,
-                message:  session?.stopReason || reason || 'Unable to find charger information.',
-            });
+            if(req?.consumerUserRole !== "Driver"){
+                return res.json({
+                    status: false,
+                    message:  session?.stopReason || reason || 'Unable to find charger information.',
+                });
+            }
         }
         // const startTime = session?.startTime;
         // Format startTime as per timezone
