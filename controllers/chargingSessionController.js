@@ -692,7 +692,17 @@ const getSessionData = async (req, res) => {
 
     try {
         // Find the session by sessionId
-        const session = await ChargingSession.findOne({ userPhone, status: { $in: ["Started", "Stopped"] } });
+        let session;
+        if(req?.consumerUserRole !== "Driver"){
+            session = await ChargingSession.findOne({ userPhone, status: { $in: ["Started", "Stopped"] } });
+        }
+        else{
+            session = await ChargingSession.findOne({
+                userPhone,
+                status: { $in: ["Started", "Stopped"] },
+            }).sort({ createdAt: -1 }); // or .sort({ startTime: -1 });
+        }
+          
         // const session = await ChargingSession.findById(sessionId);
         if (!session) {
             return res.json({
