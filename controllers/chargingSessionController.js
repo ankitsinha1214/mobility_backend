@@ -211,6 +211,7 @@ const startStopChargingSession = async (req, res) => {
             return res.json({ status: false, message: `Charger ID ${chargerId} is not connected to the Server.` });
             // return res.json({ status: false, message: `WebSocket not established for charger ID ${chargerId}` });
         }
+        console.log('role -- ',req?.consumerUserRole);
 
         let createdBy = '';
 
@@ -268,13 +269,11 @@ const startStopChargingSession = async (req, res) => {
 
         // Validate start/stop actions
         if (action === 'start' && activeSession) {
-            if(req.consumerUserRole !== 'Driver'){
                 return res.json({
                     status: false,
                     message: 'Previous transaction still in progress',
                     // message: 'A previous transaction is still in progress. Please wait for it to complete before starting a new one.',
                 });
-            }
         }
         if (action === 'stop' && !activeSession) {
             return res.json({
