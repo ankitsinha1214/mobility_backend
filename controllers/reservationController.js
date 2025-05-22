@@ -123,6 +123,7 @@ exports.createReservation = async (req, res) => {
                     reservationId,
                     idTag,
                     chargerId,
+                    vehicleId,
                     startTime: startUTC,
                     endTime: endUTC
                   });
@@ -139,6 +140,7 @@ exports.createReservation = async (req, res) => {
                     reservationId,
                     idTag,
                     chargerId,
+                    vehicleId,
                     startTime: startUTC,
                     endTime: endUTC
                   });
