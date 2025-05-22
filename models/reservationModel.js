@@ -17,6 +17,7 @@ const reservationSchema = new mongoose.Schema({
     idTag: { type: String, required: true }, // user idTag
     //   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     chargerId: { type: String, required: true },
+    connectorId: { type: Number, required: true  },
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
     status: { type: String, enum: ["Pending", "Reserved", "Cancelled", "Completed", "Rejected"], default: "Pending" },
