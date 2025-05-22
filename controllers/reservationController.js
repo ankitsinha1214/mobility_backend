@@ -3,6 +3,7 @@ const moment = require("moment-timezone");
 const { getClient } = require('../ocppConnect.js');
 const logger = require('../logger.js');
 const User = require('../models/userModel');
+const ChargingSession = require('../models/chargerSessionModel.js');
 
 // Utility function to generate next reservationId (you can improve this logic as needed)
 const generateReservationId = async () => {
