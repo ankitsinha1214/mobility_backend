@@ -19,9 +19,9 @@ exports.createReservation = async (req, res) => {
     try {
       const { idTag, chargerId, vehicleId, 
         // startTime,
-         endTime, timezone } = req.body;
+         endTime, timezone, connectorId } = req.body;
   
-      if (!idTag || !chargerId || !endTime || !timezone) {
+      if (!idTag || !chargerId || !endTime || !timezone || !vehicleId || !connectorId) {
         return res.status(400).json({ status: false, message: "All fields including timezone are required." });
       }
       const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
@@ -70,7 +70,7 @@ exports.createReservation = async (req, res) => {
         }
 
         const activeUserSession = await ChargingSession.findOne({
-            userPhone: payload?.idTag,
+            userPhone: idTag,
             status: { $in: ['Started', 'Stopped'] }
         });
     if (activeUserSession) {
@@ -81,10 +81,10 @@ exports.createReservation = async (req, res) => {
     }
       const messageId = generateUniqueId(); // Generate a unique ID for the message
       const reserveNowPayload = {
-        connectorId: 1,
+        connectorId: connectorId,
         expiryDate: endUTC,
         // expiryDate: new Date(endUTC).toISOString(),
-        idTag: "USER456",
+        idTag: idTag,
         reservationId: reservationId
       };
       const ocppMessage = [
@@ -160,11 +160,11 @@ exports.createReservation = async (req, res) => {
         }
     });
 
-      return res.json({
-        status: true,
-        message: "Reservation created successfully.",
-        // data: reservation
-      });
+    //   return res.json({
+    //     status: true,
+    //     message: "Reservation created successfully.",
+    //     // data: reservation
+    //   });
     } catch (error) {
       console.error("Reservation creation error:", error);
       return res.status(500).json({ status: false, message: "Internal Server Error" });
