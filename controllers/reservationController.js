@@ -97,7 +97,7 @@ exports.createReservation = async (req, res) => {
 
     client.send(JSON.stringify(ocppMessage)); 
 
-    client.on('message', async (response) => {
+    client.once('message', async (response) => {
         try {
             const parsedResponse = JSON.parse(response);
             const messageType = parsedResponse[0]; // 3 means CALLRESULT
@@ -154,6 +154,7 @@ exports.createReservation = async (req, res) => {
                 return res.json({
                     status: false,
                     message: 'Unknown status by charger. Please try again.',
+                    reservationId: reservationId,
                 });
             }
         } catch (err) {
