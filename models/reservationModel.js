@@ -20,10 +20,13 @@ const reservationSchema = new mongoose.Schema({
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
     status: { type: String, enum: ["Pending", "Reserved", "Cancelled", "Completed", "Rejected"], default: "Pending" },
-    vehicleId: {
-        type: Schema.Types.ObjectId,
-        required: true
+    createdBy: {
+        type: String, // in kWh 
     },
+    // vehicleId: {
+    //     type: Schema.Types.ObjectId,
+    //     required: true
+    // },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Reservation", reservationSchema);
