@@ -219,6 +219,7 @@ exports.getAllReservations = async (req, res) => {
 exports.cancelReservation = async (req, res) => {
     try {
         const { reservationId } = req.params;
+        const { chargerId } = req.body;
 
         const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
         if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
