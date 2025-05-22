@@ -1,5 +1,7 @@
 const userController = require("../controllers/userController");
 const fetchUser = require("../middleware/fetchuser");
+const SERVICES = require('../constants/services');
+const authorizeAccess = require('../middleware/authorizeAccess');
 // const multer = require('multer');
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage: storage });
@@ -25,6 +27,7 @@ router.get(
 router.get(
   "/get/pagination",
   fetchUser,
+  authorizeAccess(SERVICES.USER_MGMT),
   userController.getPaginatedUser
 );
 
@@ -49,6 +52,7 @@ router.patch(
 router.delete(
   "/:phoneNumber",
   fetchUser,
+  // authorizeAccess(SERVICES.CHARGER_MGMT),
   userController.deleteUser
 );
 
@@ -64,6 +68,7 @@ router.post(
 // }
 // ]),
   fetchUser,
+  authorizeAccess(SERVICES.DRIVER),
   userController.addDriver
 );
 // router.post(
@@ -77,6 +82,7 @@ router.post(
 // );
 router.post(
   "/resetpassword",
+  authorizeAccess(SERVICES.DRIVER),
   userController.resetpassword
 );
 // router.post(
