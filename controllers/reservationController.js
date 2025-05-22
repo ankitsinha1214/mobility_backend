@@ -157,6 +157,7 @@ exports.createReservation = async (req, res) => {
                     });
                 } else if (status === 'Accepted') {
                     const reservation = await Reservation.create({
+                        status: "Reserved",
                         reservationId,
                         idTag,
                         chargerId,
@@ -219,17 +220,93 @@ exports.cancelReservation = async (req, res) => {
     try {
         const { reservationId } = req.params;
 
-        const updated = await Reservation.findOneAndUpdate(
-            { reservationId },
-            { status: "Cancelled" },
-            { new: true }
-        );
-
-        if (!updated) {
-            return res.status(404).json({ status: false, message: "Reservation not found." });
+        const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
+        if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
+            logger.error(`WebSocket not established for charger ID ${chargerId}`)
+            return res.json({ status: false, message: `Charger ID ${chargerId} is not connected to the Server.` });
         }
 
-        return res.json({ status: true, message: "Reservation cancelled.", data: updated });
+        let cancelledBy = '';
+
+        if (req.phn) {
+            if (req.phn !== idTag) {
+                return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
+            }
+            cancelledBy = 'Consumer User';
+        }
+        if (req.user) {
+            if (req.user !== 'Admin' && req.user !== 'Manager') {
+                return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+            }
+            console.log('req -> ', req)
+            console.log(req.username)
+            cancelledBy = req.user + ' - ' + req.username;
+        }
+         // **Reservation Validation**
+         const reservation = await Reservation.findOne({ reservationId: reservationId, status: 'Reserved' });
+         if (!reservation) {
+             return res.json({
+                 status: false,
+                 message: 'reservation not found'
+             });
+         }
+
+        const messageId = generateUniqueId(); // Generate a unique ID for the message
+        const reserveCancelPayload = {
+            reservationId: reservationId,
+        };
+        const ocppMessage = [
+            2, // MessageTypeId for Call
+            messageId,
+            "ReserveNow",
+            reserveCancelPayload,
+        ];
+
+        client.send(JSON.stringify(ocppMessage));
+
+        client.once('message', async (response) => {
+            try {
+                const parsedResponse = JSON.parse(response);
+                const messageType = parsedResponse[0]; // 3 means CALLRESULT
+                const incomingMessageId = parsedResponse[1];
+
+                // Ensure response matches the request message ID
+                if (messageType !== 3 || incomingMessageId !== messageId) {
+                    console.log('Skipping unrelated WebSocket message.');
+                    return;
+                }
+
+                const data = parsedResponse[2];
+                const status = data?.status;
+
+                if (status === 'Rejected') {
+                    return res.json({
+                        status: false,
+                        message: 'Cancellation of Reservation was rejected by the charger.',
+                    });
+                } else if (status === 'Accepted') {
+                     reservation.status = "Cancelled";
+                     reservation.cancelledBy = cancelledBy;
+
+                    await reservation.save();
+
+                    return res.json({
+                        status: true,
+                        message: `Reservation was cancelled for charger ID ${chargerId}`,
+                        messageId: messageId,
+                        reservationId: reservationId,
+                    });
+                } else {
+                    return res.json({
+                        status: false,
+                        message: 'Unknown status by charger. Please try again.',
+                        reservationId: reservationId,
+                    });
+                }
+            } catch (err) {
+                console.error('WebSocket handling error:', err);
+            }
+        });
     } catch (error) {
         console.error("Cancel reservation error:", error);
         return res.status(500).json({ status: false, message: "Internal Server Error" });

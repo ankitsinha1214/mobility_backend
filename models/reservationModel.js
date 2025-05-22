@@ -22,7 +22,10 @@ const reservationSchema = new mongoose.Schema({
     endTime: { type: Date, required: true },
     status: { type: String, enum: ["Pending", "Reserved", "Cancelled", "Completed", "Rejected"], default: "Pending" },
     createdBy: {
-        type: String, // in kWh 
+        type: String,
+    },
+    cancelledBy: {
+        type: String, 
     },
     // vehicleId: {
     //     type: Schema.Types.ObjectId,
