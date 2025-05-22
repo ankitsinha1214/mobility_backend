@@ -27,7 +27,7 @@ router.get(
 router.get(
   "/get/pagination",
   fetchUser,
-  authorizeAccess(SERVICES.USER_MGMT),
+  // authorizeAccess(SERVICES.DRIVER),
   userController.getPaginatedUser
 );
 
