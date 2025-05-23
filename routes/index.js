@@ -82,6 +82,6 @@ router.use('/sms', require('./smsRoute'));
 router.use('/email', require('./emailRoute'));
 router.use('/download', require('./downloadRoute'));
 router.use("/reservations", require('./reservationRoute'));
-
+router.use('/logs', require('./logRoute'));
 
 module.exports = router;

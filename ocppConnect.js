@@ -64,7 +64,9 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const { handleOcppMessage } = require('./ocppHandler');
 const ChargerLocation = require('./models/chargerLocationModel');
+const { createChargerLog } = require('./controllers/logController');
 const isProduction = process.env.NODE_ENV === 'production';
+
 
 let server;
 if (isProduction) {
@@ -182,8 +184,13 @@ wss.on("connection", (ws) => {
 
     console.log(`Client connected with charger ID: ${chargerId}`);
 
+      // Log connection
+  createChargerLog(chargerId, "connected", { note: "WebSocket connection established" });
+
     ws.on('message', (message) => {
         console.log(`Received from charger ${chargerId}: %s`, message);
+            // Log message
+    createChargerLog(chargerId, "message_received", message);
         try {
             // Update lastPing in the database asynchronously without awaiting
             ChargerLocation.findOneAndUpdate(
@@ -203,6 +210,7 @@ wss.on("connection", (ws) => {
             handleOcppMessage(ws, parsedMessage, chargerId);
         } catch (error) {
             console.error("Invalid message format:", error);
+            createChargerLog(chargerId, "error", { error: error.message });
         }
     });
 
@@ -220,12 +228,14 @@ wss.on("connection", (ws) => {
             console.error(`Failed to update status to Inactive for charger ${chargerId}:`, error);
         });
 
+        createChargerLog(chargerId, "disconnected", { note: "WebSocket connection closed" });
         console.log(`Charger ${chargerId} disconnected`);
         clients.delete(chargerId); // Remove the client from the Map when disconnected
     });
 
     ws.on('error', (error) => {
         console.error(`WebSocket error for charger ${chargerId}:`, error);
+        createChargerLog(chargerId, "error", { error: error.message });
     });
 });
 
