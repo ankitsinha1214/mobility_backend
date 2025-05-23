@@ -1,6 +1,6 @@
 const ChargerLocation = require('../models/chargerLocationModel');
 const chargerSessionModel = require('../models/chargerSessionModel');
-const Reservation = require('../models/Reservation');
+const Reservation = require('../models/reservationModel');
 const cron = require('node-cron');
 
 const updateChargerStatus = async () => {
