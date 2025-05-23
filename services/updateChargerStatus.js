@@ -1,5 +1,6 @@
 const ChargerLocation = require('../models/chargerLocationModel');
 const chargerSessionModel = require('../models/chargerSessionModel');
+const Reservation = require('../models/Reservation');
 const cron = require('node-cron');
 
 const updateChargerStatus = async () => {
@@ -60,12 +61,41 @@ const updateChargerStatus = async () => {
     }
 };
 
+const completeExpiredReservations = async () => {
+    try {
+      const now = new Date();
+  
+      // Find all reservations that should be marked as "Completed"
+      const expiredReservations = await Reservation.find({
+        status: 'Reserved',
+        endTime: { $lte: now }
+      });
+  
+      if (expiredReservations.length > 0) {
+        const updatePromises = expiredReservations.map(reservation => {
+          reservation.status = 'Completed';
+          return reservation.save();
+        });
+  
+        await Promise.all(updatePromises);
+        console.log(`${expiredReservations.length} reservations marked as Completed.`);
+      } else {
+        console.log('No expired reservations to update.');
+      }
+  
+    } catch (error) {
+      console.error('Error updating expired reservations:', error);
+    }
+  };
+
 // Schedule the task to run every 5 minutes
 const startChargerStatusUpdater = () => {
     // cron.schedule('*/5 * * * *', async () => {
     cron.schedule('*/1 * * * *', async () => {
         console.log('Running charger status update...');
         await updateChargerStatus();
+        console.log('Running reservation status update...');
+        await completeExpiredReservations();
     });
 };
 
