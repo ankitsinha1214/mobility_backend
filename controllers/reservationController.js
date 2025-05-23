@@ -219,38 +219,40 @@ exports.getAllReservations = async (req, res) => {
 exports.cancelReservation = async (req, res) => {
     try {
         const { reservationId } = req.params;
-        const { chargerId } = req.body;
-
+        // **Reservation Validation**
+        const reservation = await Reservation.findOne({ reservationId: reservationId, status: 'Reserved' });
+        if (!reservation) {
+            return res.json({
+                status: false,
+                message: 'No active reservation found with the provided ID.'
+            });
+        }
+        const chargerId = reservation?.chargerId;
+        
         const client = getClient(chargerId); // Get the WebSocket connection for the specific charger
         if (!client || client.readyState !== 1) { // 1 means WebSocket.OPEN
             logger.error(`WebSocket not established for charger ID ${chargerId}`)
             return res.json({ status: false, message: `Charger ID ${chargerId} is not connected to the Server.` });
         }
 
+
         let cancelledBy = '';
 
         if (req.phn) {
-            if (req.phn !== idTag) {
-                return res.status(401).json({ success: false, message: "You are using some other user Idtag." });
+            if (req.phn !== reservation.idTag) {
+                return res.status(401).json({ status: false, message: "Unauthorized: You are not the owner of this reservation." });
             }
             cancelledBy = 'Consumer User';
         }
         if (req.user) {
             if (req.user !== 'Admin' && req.user !== 'Manager') {
-                return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+                return res.status(401).json({ success: false, message: "Unauthorized: Only Admin or Manager can cancel this reservation."  });
             }
-            console.log('req -> ', req)
-            console.log(req.username)
+            // console.log('req -> ', req)
+            // console.log(req.username)
             cancelledBy = req.user + ' - ' + req.username;
         }
-         // **Reservation Validation**
-         const reservation = await Reservation.findOne({ reservationId: reservationId, status: 'Reserved' });
-         if (!reservation) {
-             return res.json({
-                 status: false,
-                 message: 'reservation not found'
-             });
-         }
+        
 
         const messageId = generateUniqueId(); // Generate a unique ID for the message
         const reserveCancelPayload = {
@@ -259,7 +261,7 @@ exports.cancelReservation = async (req, res) => {
         const ocppMessage = [
             2, // MessageTypeId for Call
             messageId,
-            "ReserveNow",
+            "CancelReservation",
             reserveCancelPayload,
         ];
 
