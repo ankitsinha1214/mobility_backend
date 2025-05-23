@@ -103,7 +103,7 @@ server.on('upgrade', async (request, socket, head) => {
 
     // Expecting /socket/<chargerId>
     if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
-    // if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
+        // if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
         console.error('Invalid WebSocket URL path. Expected format: /socket/<chargerId>');
         socket.destroy(); // Invalid path -> destroy connection
         return;
@@ -184,13 +184,26 @@ wss.on("connection", (ws) => {
 
     console.log(`Client connected with charger ID: ${chargerId}`);
 
-      // Log connection
-  createChargerLog(chargerId, "connected", { note: "WebSocket connection established" });
+    // Log connection
+    createChargerLog(chargerId, "connected", { note: "WebSocket connection established" });
 
     ws.on('message', (message) => {
         console.log(`Received from charger ${chargerId}: %s`, message);
-            // Log message
-    createChargerLog(chargerId, "message_received", message);
+        // Handle Binary.createFromBase64()
+        let actualMessage = message;
+
+        const match = message.toString().match(/Binary\.createFromBase64\('(.+?)'/);
+        if (match && match[1]) {
+            const base64 = match[1];
+            const buffer = Buffer.from(base64, 'base64');
+            actualMessage = buffer.toString('utf8');
+        }
+
+        // Try to parse the actual message
+        const parsedMessage = JSON.parse(actualMessage);
+        console.log("Parsed OCPP message:", parsedMessage);
+        // Log message
+        createChargerLog(chargerId, "message_received", parsedMessage);
         try {
             // Update lastPing in the database asynchronously without awaiting
             ChargerLocation.findOneAndUpdate(
