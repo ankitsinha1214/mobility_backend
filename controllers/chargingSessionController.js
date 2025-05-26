@@ -251,7 +251,7 @@ const startStopChargingSession = async (req, res) => {
             return res.json({ status: false, message: 'Charger not found.' });
         }
         // Check if the status is valid for the action
-        if (action === 'start' && chargerInfo.status !== 'Preparing') {
+        if (action === 'start' && (chargerInfo.status !== 'Preparing' && chargerInfo.status !== 'Reserve')) {
             return res.json({
                 status: false,
                 message: `Oops! The charger isn’t connected to your Vehicle. Try again!`,
