@@ -82,6 +82,7 @@ router.post(
 // );
 router.post(
   "/resetpassword",
+  fetchUser,
   authorizeAccess(SERVICES.DRIVER),
   userController.resetpassword
 );
