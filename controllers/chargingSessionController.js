@@ -203,7 +203,7 @@ const startStopChargingSession = async (req, res) => {
     // console.log('entered');
     // return;
     try {
-        console.log('role -- ',req?.consumerUserRole);
+        console.log('role -- ', req?.consumerUserRole);
         // return;
         if (!action || !['start', 'stop'].includes(action)) {
             return res.status(400).json({ status: false, message: 'Invalid action specified' });
@@ -271,11 +271,11 @@ const startStopChargingSession = async (req, res) => {
 
         // Validate start/stop actions
         if (action === 'start' && activeSession) {
-                return res.json({
-                    status: false,
-                    message: 'Previous transaction still in progress',
-                    // message: 'A previous transaction is still in progress. Please wait for it to complete before starting a new one.',
-                });
+            return res.json({
+                status: false,
+                message: 'Previous transaction still in progress',
+                // message: 'A previous transaction is still in progress. Please wait for it to complete before starting a new one.',
+            });
         }
         if (action === 'stop' && !activeSession) {
             return res.json({
@@ -308,11 +308,11 @@ const startStopChargingSession = async (req, res) => {
             //     });
             // }
             // else{
-               const activeUserSession = await ChargingSession.findOne({
-                    userPhone: payload?.idTag,
-                    // status: 'Started'
-                    status: { $in: ['Started', 'Stopped'] }
-                });
+            const activeUserSession = await ChargingSession.findOne({
+                userPhone: payload?.idTag,
+                // status: 'Started'
+                status: { $in: ['Started', 'Stopped'] }
+            });
             // }
             if (activeUserSession) {
                 return res.json({
@@ -464,17 +464,30 @@ const startStopChargingSession = async (req, res) => {
                     });
                 } else if (status === 'Accepted' && action === 'stop') {
                     const sessionId = payload?.sessionId;
-                    const sessionDetails = await ChargingSession.findOneAndUpdate(
-                        { _id: sessionId },
-                        {
-                            // status: 'Stopped',
-                            status: req?.consumerUserRole != 'Driver' ? 'Stopped' : 'Completed',
-                            endTime: new Date(),
-                            stopCreatedBy: createdBy,
-                            stopReason: sessionReason || 'User Terminated',
-                        },
-                        { new: true }
-                    );
+                    // const sessionDetails = await ChargingSession.findOneAndUpdate(
+                    //     { _id: sessionId },
+                    //     {
+                    //         // status: 'Stopped',
+                    //         status: req?.consumerUserRole != 'Driver' ? 'Stopped' : 'Completed',
+                    //         endTime: new Date(),
+                    //         stopCreatedBy: createdBy,
+                    //         stopReason: sessionReason || 'User Terminated',
+                    //     },
+                    //     { new: true }
+                    // );
+                    const sessionDetails = await ChargingSession.findById(sessionId);
+                    if (!sessionDetails) {
+                        return res.json({ status: false, message: 'Session not found' });
+                    }
+
+                    // Apply the updates manually
+                    sessionDetails.status = req?.consumerUserRole != 'Driver' ? 'Stopped' : 'Completed';
+                    sessionDetails.endTime = new Date();
+                    sessionDetails.stopCreatedBy = createdBy;
+                    sessionDetails.stopReason = sessionReason || 'User Terminated';
+
+                    // Save to trigger pre('save') hook
+                    await sessionDetails.save();
 
                     return res.json({
                         status: true,
@@ -695,16 +708,16 @@ const getSessionData = async (req, res) => {
     try {
         // Find the session by sessionId
         let session;
-        if(req?.consumerUserRole !== "Driver"){
+        if (req?.consumerUserRole !== "Driver") {
             session = await ChargingSession.findOne({ userPhone, status: { $in: ["Started", "Stopped"] } });
         }
-        else{
+        else {
             session = await ChargingSession.findOne({
                 userPhone,
                 status: { $in: ["Started", "Stopped"] },
             }).sort({ createdAt: -1 }); // or .sort({ startTime: -1 });
         }
-          
+
         // const session = await ChargingSession.findById(sessionId);
         if (!session) {
             return res.json({
@@ -764,12 +777,12 @@ const getSessionData = async (req, res) => {
         const status = session?.status;
         const reason = session?.reason;
         // if(status !== "Stopped"){
-        if(status !== "Started"){
+        if (status !== "Started") {
             // if(req?.consumerUserRole !== "Driver"){
-                return res.json({
-                    status: false,
-                    message:  session?.stopReason || reason || 'Unable to find charger information.',
-                });
+            return res.json({
+                status: false,
+                message: session?.stopReason || reason || 'Unable to find charger information.',
+            });
             // }
         }
         // const startTime = session?.startTime;
@@ -924,7 +937,7 @@ const getSessionReceipt = async (req, res) => {
             {
                 "energy-details": [
                     ["Energy", "Units", "Rate", "Amount"],
-                    ["Energy Charge", `${(energyConsumed/1000).toFixed(3)} kWh`, `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}`, `₹ ${totalEnergyCost.toFixed(2)}`],
+                    ["Energy Charge", `${(energyConsumed / 1000).toFixed(3)} kWh`, `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}`, `₹ ${totalEnergyCost.toFixed(2)}`],
                     // ["Energy Charge", `${energyConsumed} Wh`, `${getCurrencySymbol(chargerInfo.costPerUnit.currency)} ${costPerUnit}`, `₹ ${totalEnergyCost.toFixed(2)}`],
                     // { "Energy": "Energy Charge" },
                     // { "Units": convertTimestampToTime(session.endTime) },
