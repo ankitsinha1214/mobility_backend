@@ -1173,9 +1173,9 @@ const getDashboardData = async (req, res) => {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
-        if (!currency) {
-            return res.json({ success: false, message: "Currency is required." });
-        }
+        // if (!currency) {
+        //     return res.json({ success: false, message: "Currency is required." });
+        // }
         const currencySymbol = getCurrencySymbol(currency);
 
         // Fetch charger locations
