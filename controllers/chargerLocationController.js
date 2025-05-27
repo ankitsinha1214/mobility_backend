@@ -5,6 +5,7 @@ const PreInstallation = require('../models/preInstallationModel');
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const ChargingSession = require('../models/chargerSessionModel');
 const Payment = require('../models/paymentModel');
+const { getCurrencySymbol }  = require('../utils/otherUtil')
 const s3 = new S3Client({
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -1168,9 +1169,14 @@ const getChargerSessionsDetails = async (req, res) => {
 // };
 const getDashboardData = async (req, res) => {
     try {
+        const { currency } = req.body;
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
             return res.status(401).json({ success: false, message: "You are Not a Valid User." });
         }
+        if (!currency) {
+            return res.json({ success: false, message: "Currency is required." });
+        }
+        const currencySymbol = getCurrencySymbol(currency);
 
         // Fetch charger locations
         const chargerLocations = await ChargerLocation.find({}, 'chargerInfo locationName');
@@ -1345,7 +1351,7 @@ const getDashboardData = async (req, res) => {
                 name: location.locationName,
                 visits: location.sessions,
                 energy: `${location.energyConsumed} Wh`,
-                revenue: `₹ ${location.revenue.toLocaleString("en-IN")}`, // Format with commas
+                revenue: `${currencySymbol} ${location.revenue.toLocaleString("en-IN")}`, // Format with commas
                 color: "purple"
             }));
 
