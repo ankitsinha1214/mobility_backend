@@ -44,13 +44,13 @@ const vehicleModelSchema = new Schema({
   },
   ARAI_range: {
     type: String,
-    required: true,
-    validate: {
-      validator: function(v) {
-        return /\S+/.test(v); // Ensures it's not just whitespace
-      },
-      message: 'ARAI Range cannot be empty'
-    }
+    // required: true,
+    // validate: {
+    //   validator: function(v) {
+    //     return /\S+/.test(v); // Ensures it's not just whitespace
+    //   },
+    //   message: 'ARAI Range cannot be empty'
+    // }
   },
   battery_capacity: {
     type: String,
