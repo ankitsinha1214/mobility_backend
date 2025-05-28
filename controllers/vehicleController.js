@@ -174,6 +174,40 @@ const getVehicleModelById = async (req, res) => {
     }
 };
 
+const searchVehicle = async (req, res) => {
+    if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+    const { query } = req.query;
+    // const { status } = req.body;
+
+    // if (!query) {
+    //     return res.json({ success: false, message: 'Query parameter is required' });
+    // }
+    // console.log(query)
+    try {
+        const regex = new RegExp(query, 'i');
+        const chargerLocations = await VehicleModel.find({
+            // status: 'Active',
+            $or: [
+                { make: { $regex: regex } },
+                { model: { $regex: regex } },
+                { variant: { $regex: regex } },
+                { vehicle_reg: { $regex: regex } },
+            ]
+        });
+
+        if (chargerLocations.length === 0) {
+            return res.json({ success: false, message: 'No vehicle found' });
+        }
+
+        return res.json({ success: true, data: chargerLocations, message: "Vehicle fetched successfully." });
+    } catch (error) {
+        console.error('Error:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
 // Update a vehicle model
 const updateVehicleModel = async (req, res) => {
     const { id } = req.params;
@@ -233,5 +267,6 @@ module.exports = {
     getAllVehicleModels,
     getVehicleModelById,
     updateVehicleModel,
-    deleteVehicleModel
+    deleteVehicleModel,
+    searchVehicle
 };

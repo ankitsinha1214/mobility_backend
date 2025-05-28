@@ -28,4 +28,7 @@ router.put('/:id', fetchUser, vehicleModelController.updateVehicleModel);
 // Delete a vehicle model
 router.delete('/:id', fetchUser, vehicleModelController.deleteVehicleModel);
 
+// Delete a vehicle model
+router.get('/search/query', fetchUser, vehicleModelController.searchVehicle);
+
 module.exports = router;

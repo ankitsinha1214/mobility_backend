@@ -74,6 +74,8 @@ const vehicleModelSchema = new Schema({
   },
   vehicle_reg: {
     type: String,
+    trim: true,
+    // unique: true,
     // required: true,
     // validate: {
     //   validator: function(v) {
@@ -103,6 +105,15 @@ const vehicleModelSchema = new Schema({
     }
   }
 }, { timestamps: true });
+
+// Add this index to make vehicle_reg unique **only when it's present**
+vehicleModelSchema.index(
+  { vehicle_reg: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { vehicle_reg: { $type: 'string' } }
+  }
+);
 
 const VehicleModel = mongoose.model('VehicleModel', vehicleModelSchema);
 
