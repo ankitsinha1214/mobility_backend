@@ -125,7 +125,7 @@ const createVehicleModel = async (req, res) => {
         }
         const command4 = new PutObjectCommand(params4);
         await s3.send(command4);
-        const newVehicleModel = new VehicleModel({ make, model, variant, type, ARAI_range, claimed_range, image: awsImgKey });
+        const newVehicleModel = new VehicleModel({  ...req.body, make, model, variant, type, ARAI_range, claimed_range, image: awsImgKey });
         await newVehicleModel.save();
 
         return res.json({ success: true, data: newVehicleModel, message: "Vehicle model created successfully" });
