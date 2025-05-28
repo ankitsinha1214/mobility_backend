@@ -100,7 +100,8 @@ const wss = new WebSocketServer({ noServer: true }); // Use noServer to manually
 server.on('upgrade', async (request, socket, head) => {
     const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
     const urlParts = pathname.split('/'); // Split the path
-
+    
+    console.log('url->',urlParts);
     // Expecting /socket/<chargerId>
     if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
         // if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
