@@ -164,12 +164,12 @@ const userSchema = new Schema({
     type: String,
     // required: true,
     // unique: true,
-    validate: {
-      validator: function(v) {
-        return /\S+/.test(v); // Ensures it's not just whitespace
-      },
-      message: 'Email cannot be empty'
-    }
+    // validate: {
+    //   validator: function(v) {
+    //     return /\S+/.test(v); // Ensures it's not just whitespace
+    //   },
+    //   message: 'Email cannot be empty'
+    // }
   },
   password: {
     type: String,
