@@ -102,13 +102,14 @@ server.on('upgrade', async (request, socket, head) => {
     const urlParts = pathname.split('/'); // Split the path
     
     console.log('url->',urlParts);
+    console.log('url->',urlParts[2]);
     // Expecting /socket/<chargerId>
-    if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
-        // if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
-        console.error('Invalid WebSocket URL path. Expected format: /socket/<chargerId>');
-        socket.destroy(); // Invalid path -> destroy connection
-        return;
-    }
+    // if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
+    //     // if (urlParts.length !== 3 || urlParts[1] !== 'socket') {
+    //     console.error('Invalid WebSocket URL path. Expected format: /socket/<chargerId>');
+    //     socket.destroy(); // Invalid path -> destroy connection
+    //     return;
+    // }
 
     const chargerId = urlParts[2]; // Extract the chargerId
     console.log(`Received WebSocket upgrade request for chargerId: ${chargerId}`);
