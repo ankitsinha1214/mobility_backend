@@ -170,7 +170,7 @@ async function handleBootNotification(ws, messageId, payload, chargerId) {
         } catch (error) {
             console.error('Failed to send ChangeConfiguration:', error);
         }
-    }, 2000); // 2 second delay
+    }, 10000); // 2 second delay
 
 }
 
