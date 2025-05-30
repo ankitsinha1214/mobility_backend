@@ -113,7 +113,10 @@ const chargerInfoSchema = new Schema({
     lastPing: {
         type: Date, 
         default: null // Not required, defaults to null if not provided
-    }
+    },
+    otherDatas: {
+        type: Object, // Max voltage in volts
+    },
 }, { timestamps: true });
 
 const validateFacilities = function (value) {

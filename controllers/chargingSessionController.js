@@ -195,6 +195,7 @@ function convertTimestampToTime(timestamp) {
 
 const startStopChargingSession = async (req, res) => {
     const { action, chargerId, payload, vehicleId, sessionReason } = req.body;
+    const connectorId = payload?.connectorId || 0;
     // console.log(req.phoneNumber === payload.idTag);
     // console.log((req.phoneNumber && req.phoneNumber !== payload.idTag));
     // if ((req.phoneNumber && req.phoneNumber !== payload.idTag) || (req.user && req.user !== 'Admin' && req.user !== 'Manager')) {
@@ -451,6 +452,7 @@ const startStopChargingSession = async (req, res) => {
                         startReason: sessionReason,
                         transactionId: Math.floor(10000000 + Math.random() * 90000000),
                         startMeterValue: payload?.startMeterValue || 0,
+                        connectorId: connectorId || 0,
                     };
 
                     const newSession = new ChargingSession(sessionData);

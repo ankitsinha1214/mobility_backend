@@ -137,7 +137,7 @@ function handleReset(ws, messageId, payload) {
     }, 3000);
 }
 
-function handleBootNotification(ws, messageId, payload, chargerId) {
+async function handleBootNotification(ws, messageId, payload, chargerId) {
     const response = [
         3, // MessageTypeId for CallResult
         messageId,
@@ -151,6 +151,17 @@ function handleBootNotification(ws, messageId, payload, chargerId) {
     ws.send(JSON.stringify(response));
     console.log('Sent BootNotification Response');
 
+    const chargerLocation = await ChargerLocation.findOne({
+        'chargerInfo.name': chargerId
+    }).select('chargerInfo');
+
+    // Find the charger info corresponding to the chargerId in the session
+    const chargerInfo = chargerLocation.chargerInfo.find(charger => charger.name === chargerId);
+    // const { connectorId, errorCode, status, timestamp } = ;
+    chargerInfo.otherDatas = payload;
+    // chargerInfo.lastPing = timestamp;
+    // Save the updated chargerLocation back to the database
+    await chargerLocation.save();
      // Wait a short delay to ensure the charger processes the response
      setTimeout(async () => {
         try {

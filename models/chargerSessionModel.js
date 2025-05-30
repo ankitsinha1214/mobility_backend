@@ -9,6 +9,11 @@ const chargingSessionSchema = new Schema({
         // ref: 'chargerInfoSchema',
         required: true
     },
+    connectorId: {
+        type: Number,
+        // ref: 'chargerInfoSchema',
+        // required: true
+    },
     userPhone: {
         type: String,
         required: true
