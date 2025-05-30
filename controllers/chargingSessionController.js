@@ -627,7 +627,7 @@ const changeChargingProfile = async (req, res) => {
         const now = new Date().toISOString();
 
         const csChargingProfile = {
-            chargingProfileId: 2,
+            chargingProfileId: 1,
             stackLevel: 0,
             chargingProfilePurpose: "TxProfile", // during transaction
             // chargingProfilePurpose: "ChargePointMaxProfile", // outside transaction
@@ -637,17 +637,17 @@ const changeChargingProfile = async (req, res) => {
             chargingSchedule: {
                 duration: 3600, // in seconds
                 // startSchedule: now,
-                chargingRateUnit: "A", // or "A"
-                // chargingRateUnit: "W", // or "A"
+                // chargingRateUnit: "A", // or "A"
+                chargingRateUnit: "W", // or "A"
                 chargingSchedulePeriod: [
                     {
                         startPeriod: 0,
-                        limit: 16,
+                        // limit: 16,
                         // limit: 6660, // e.g. 6660W (i.e., 90% of 7.4kW max charger)
                         // limit: 9900, // e.g. 9000W (i.e., 90% of 11kW max charger)
                         // limit: 9000, // e.g. 9000W (i.e., 90% of 10kW max charger)
                         // limit: 9000, // e.g. 9000W (i.e., 90% of 10kW max charger)
-                        // limit: 144000, // e.g. 144000W (i.e., 90% of 160kW max charger)
+                        limit: 144000, // e.g. 144000W (i.e., 90% of 160kW max charger)
                         // numberPhases: 3
                     }
                 ],
@@ -847,6 +847,8 @@ const getSessionData = async (req, res) => {
         const firstMeterValue = parseFloat(firstEntry['Energy.Active.Import.Register']?.split(' ')[0] || 0);
         const lastMeterValue = parseFloat(lastEntry['Energy.Active.Import.Register']?.split(' ')[0] || 0);
 
+        const batterypercentage = parseFloat(lastEntry['SoC']?.split(' ')[0] || 50);
+
         // Extract the unit (assuming both entries have the same unit)
         const unit = firstMeterValueParts[1] || 'Wh';
 
@@ -874,6 +876,7 @@ const getSessionData = async (req, res) => {
             data: {
                 firstMeterValue,
                 lastMeterValue,
+                batterypercentage,
                 meterValueDifference,
                 costPerUnit,
                 status,
