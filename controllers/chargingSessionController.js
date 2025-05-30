@@ -5,7 +5,7 @@ const ChargerLocation = require('../models/chargerLocationModel');
 const moment = require('moment-timezone');
 const User = require('../models/userModel');
 const logger = require('../logger.js');
-const { sendChangeConfiguration } = require('../utils/ocppUtil.js')
+const { sendChangeConfiguration, sendChangeChargingProfile } = require('../utils/ocppUtil.js')
 
 // Helper function to calculate energy consumed
 const calculateEnergyConsumed = (startMeterValue, endMeterValue) => {
@@ -607,6 +607,79 @@ const changeConfigurationSession = async (req, res) => {
         });
     }
 };
+
+const changeChargingProfile = async (req, res) => {
+    if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
+        return res.status(401).json({ success: false, message: "You are Not a Valid User." });
+    }
+
+    const { chargerId, connectorId } = req.body;
+    // Validate inputs
+    if (!chargerId || !connectorId ) {
+        return res.json({
+            status: false,
+            message: 'Invalid request. Ensure "chargerId", "connectorId" and "csChargingProfile" are provided.',
+        });
+    }
+
+    try {
+        const csChargingProfile = {
+            chargingProfileId: 1,
+            stackLevel: 0,
+            chargingProfilePurpose: "TxProfile", // constraint addition
+            chargingProfileKind: "Absolute",
+            recurrencyKind: "Daily",
+            validFrom: new Date().toISOString(),
+            chargingSchedule: {
+                duration: 3600, // in seconds
+                startSchedule: new Date().toISOString(),
+                chargingRateUnit: "W", // or "A"
+                chargingSchedulePeriod: [
+                    {
+                        startPeriod: 0,
+                        limit: 9900, // e.g. 9000W (i.e., 90% of 11kW max charger)
+                        // limit: 9000, // e.g. 9000W (i.e., 90% of 10kW max charger)
+                        // limit: 9000, // e.g. 9000W (i.e., 90% of 10kW max charger)
+                        // limit: 144000, // e.g. 144000W (i.e., 90% of 160kW max charger)
+                        numberPhases: 3
+                    }
+                ],
+                // minChargingRate: 500 // Optional
+            }
+        };
+        
+        const result = await sendChangeChargingProfile(chargerId, connectorId, csChargingProfile);
+
+        if (result.status === 'Accepted') {
+            return res.json({
+                status: true,
+                message: `Change Charging Profile accepted for charger ${chargerId}`,
+                messageId: result.messageId
+            });
+        } else if (result.status === 'Rejected') {
+            return res.json({
+                status: false,
+                message: 'Change Charging Profile was rejected by charger.',
+            });
+        } else if (result.status === 'NotSupported') {
+            return res.json({
+                status: false,
+                message: `Change Charging Profile Not Supported by charger.`,
+            });
+        } else {
+            return res.json({
+                status: false,
+                message: 'Unknown response from charger.',
+            });
+        }
+    } catch (error) {
+        console.error('Error sending WebSocket message:', error);
+        return res.status(500).json({
+            status: false,
+            message: 'Error sending meter value configuration command!',
+        });
+    }
+};
 // const changeConfigurationSession = async (req, res) => {
 //     if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
 //         return res.status(401).json({ success: false, message: "You are Not a Valid User." });
@@ -1175,4 +1248,6 @@ const generateUniqueId = () => {
     return 'uuid-' + Math.random().toString(36).substring(2, 15); // Example UUID generator
 };
 
-module.exports = { startStopChargingSession, resetChargingSession, changeConfigurationSession, getSessionData, getSessionReceipt, getAllSessions, getSessionById, getSessionByChargerId, sendChangeConfiguration };
+module.exports = { startStopChargingSession, resetChargingSession, changeConfigurationSession, getSessionData, getSessionReceipt, getAllSessions, getSessionById, getSessionByChargerId, sendChangeConfiguration,
+    changeChargingProfile
+};

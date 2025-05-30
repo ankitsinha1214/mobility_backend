@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { startStopChargingSession, resetChargingSession, getSessionData, getSessionReceipt, getAllSessions, changeConfigurationSession, getSessionById, getSessionByChargerId } = require('../controllers/chargingSessionController');
+const { startStopChargingSession, resetChargingSession, getSessionData, getSessionReceipt, getAllSessions, changeConfigurationSession, getSessionById, getSessionByChargerId, changeChargingProfile } = require('../controllers/chargingSessionController');
 const fetchUser = require('../middleware/fetchuser');
 
 router.post('/transaction',
@@ -33,6 +33,10 @@ router.post('/get-session-receipt',
 router.post('/get-session-by-charger',
     fetchUser,
     getSessionByChargerId);
+
+router.post('/change-profile-charger',
+    fetchUser,
+    changeChargingProfile);
 // router.post('/stop', stopChargingSession);
 
 module.exports = router;
