@@ -626,9 +626,10 @@ const changeChargingProfile = async (req, res) => {
         const csChargingProfile = {
             chargingProfileId: 1,
             stackLevel: 0,
-            chargingProfilePurpose: "TxProfile", // constraint addition
+            // chargingProfilePurpose: "TxProfile", // during transaction
+            chargingProfilePurpose: "ChargePointMaxProfile", // outside transaction
             chargingProfileKind: "Absolute",
-            recurrencyKind: "Daily",
+            // recurrencyKind: "Daily",
             validFrom: new Date().toISOString(),
             chargingSchedule: {
                 duration: 3600, // in seconds
@@ -641,7 +642,7 @@ const changeChargingProfile = async (req, res) => {
                         // limit: 9000, // e.g. 9000W (i.e., 90% of 10kW max charger)
                         // limit: 9000, // e.g. 9000W (i.e., 90% of 10kW max charger)
                         // limit: 144000, // e.g. 144000W (i.e., 90% of 160kW max charger)
-                        numberPhases: 3
+                        // numberPhases: 3
                     }
                 ],
                 // minChargingRate: 500 // Optional
