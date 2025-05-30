@@ -624,17 +624,19 @@ const changeChargingProfile = async (req, res) => {
     }
 
     try {
+        const now = new Date().toISOString();
+
         const csChargingProfile = {
-            chargingProfileId: 1,
+            chargingProfileId: 2,
             stackLevel: 0,
             // chargingProfilePurpose: "TxProfile", // during transaction
             chargingProfilePurpose: "ChargePointMaxProfile", // outside transaction
             chargingProfileKind: "Absolute",
             // recurrencyKind: "Daily",
-            validFrom: new Date().toISOString(),
+            validFrom: now,
             chargingSchedule: {
                 duration: 3600, // in seconds
-                startSchedule: new Date().toISOString(),
+                startSchedule: now,
                 chargingRateUnit: "W", // or "A"
                 chargingSchedulePeriod: [
                     {

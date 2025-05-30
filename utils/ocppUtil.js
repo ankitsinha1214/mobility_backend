@@ -54,6 +54,7 @@ const sendChangeChargingProfile = (chargerId, connectorId, chargingProfile) => {
                 csChargingProfiles: chargingProfile 
             },
         ];
+        console.log(ocppMessage)
 
         try {
             client.send(JSON.stringify(ocppMessage));
