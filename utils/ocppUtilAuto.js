@@ -16,6 +16,8 @@ const sendChangeConfiguration = (ws, key, value) => {
             'ChangeConfiguration',
             { key, value },
         ];
+        console.log(key);
+        console.log(value);
         console.log(JSON.stringify(ocppMessage));
 
         try {
