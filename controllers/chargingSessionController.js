@@ -629,8 +629,8 @@ const changeChargingProfile = async (req, res) => {
         const csChargingProfile = {
             chargingProfileId: 2,
             stackLevel: 0,
-            // chargingProfilePurpose: "TxProfile", // during transaction
-            chargingProfilePurpose: "ChargePointMaxProfile", // outside transaction
+            chargingProfilePurpose: "TxProfile", // during transaction
+            // chargingProfilePurpose: "ChargePointMaxProfile", // outside transaction
             chargingProfileKind: "Absolute",
             // recurrencyKind: "Daily",
             // validFrom: now,
