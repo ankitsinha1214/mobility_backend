@@ -637,11 +637,13 @@ const changeChargingProfile = async (req, res) => {
             chargingSchedule: {
                 duration: 3600, // in seconds
                 // startSchedule: now,
-                chargingRateUnit: "W", // or "A"
+                chargingRateUnit: "A", // or "A"
+                // chargingRateUnit: "W", // or "A"
                 chargingSchedulePeriod: [
                     {
                         startPeriod: 0,
-                        limit: 6660, // e.g. 6660W (i.e., 90% of 7.4kW max charger)
+                        limit: 16,
+                        // limit: 6660, // e.g. 6660W (i.e., 90% of 7.4kW max charger)
                         // limit: 9900, // e.g. 9000W (i.e., 90% of 11kW max charger)
                         // limit: 9000, // e.g. 9000W (i.e., 90% of 10kW max charger)
                         // limit: 9000, // e.g. 9000W (i.e., 90% of 10kW max charger)
