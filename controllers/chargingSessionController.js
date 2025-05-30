@@ -615,10 +615,11 @@ const changeChargingProfile = async (req, res) => {
 
     const { chargerId, connectorId } = req.body;
     // Validate inputs
-    if (!chargerId || !connectorId ) {
+    if (!chargerId ) {
         return res.json({
             status: false,
-            message: 'Invalid request. Ensure "chargerId", "connectorId" and "csChargingProfile" are provided.',
+            message: 'Invalid request. Ensure "chargerId", "connectorId" are provided.',
+            // message: 'Invalid request. Ensure "chargerId", "connectorId" and "csChargingProfile" are provided.',
         });
     }
 
