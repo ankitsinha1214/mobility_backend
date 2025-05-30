@@ -165,7 +165,9 @@ async function handleBootNotification(ws, messageId, payload, chargerId) {
      // Wait a short delay to ensure the charger processes the response
      setTimeout(async () => {
         try {
-            await sendChangeConfiguration(ws, chargerId, 'MeterValueSampleInterval', '10');
+            await sendChangeConfiguration(ws,
+                //  chargerId,
+                  'MeterValueSampleInterval', '10');
             console.log('ChangeConfiguration sent after BootNotification');
         } catch (error) {
             console.error('Failed to send ChangeConfiguration:', error);
