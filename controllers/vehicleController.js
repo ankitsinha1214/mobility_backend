@@ -211,7 +211,14 @@ const searchVehicle = async (req, res) => {
 // Update a vehicle model
 const updateVehicleModel = async (req, res) => {
     const { id } = req.params;
-    const { make, model, variant, type, ARAI_range, claimed_range, image } = req.body;
+    const { make, model, variant, type, 
+        // ARAI_range,
+         claimed_range, 
+         battery_capacity, 
+         vehicle_reg, 
+         connector_type, 
+        //  image
+         } = req.body;
 
     try {
         if (!req.user || (req.user !== 'Admin' && req.user !== 'Manager')) {
@@ -220,16 +227,19 @@ const updateVehicleModel = async (req, res) => {
         const vehicleModel = await VehicleModel.findById(id);
 
         if (!vehicleModel) {
-            return res.status(404).json({ success: false, message: "Vehicle model not found" });
+            return res.json({ success: false, message: "Vehicle model not found" });
         }
 
         vehicleModel.make = make;
         vehicleModel.model = model;
         vehicleModel.variant = variant;
         vehicleModel.type = type;
-        vehicleModel.ARAI_range = ARAI_range;
+        vehicleModel.battery_capacity = battery_capacity;
+        vehicleModel.connector_type = connector_type;
+        vehicleModel.vehicle_reg = vehicle_reg;
+        // vehicleModel.ARAI_range = ARAI_range;
         vehicleModel.claimed_range = claimed_range;
-        vehicleModel.image = image;
+        // vehicleModel.image = image;
 
         await vehicleModel.save();
 
