@@ -2,7 +2,7 @@ const logger = require('./logger');
 const { v4: uuidv4 } = require("uuid");
 const ChargingSession = require('./models/chargerSessionModel.js');
 const ChargerLocation = require('./models/chargerLocationModel');
-const { sendChangeConfiguration } = require('./utils/ocppUtil.js')
+const { sendChangeConfiguration } = require('./utils/ocppUtilAuto.js')
 
 function handleOcppMessage(ws, message, chargerId) {
     const [messageType, messageId, action, payload] = message;
@@ -154,7 +154,7 @@ function handleBootNotification(ws, messageId, payload, chargerId) {
      // Wait a short delay to ensure the charger processes the response
      setTimeout(async () => {
         try {
-            await sendChangeConfiguration(chargerId, 'MeterValueSampleInterval', '10');
+            await sendChangeConfiguration(ws, chargerId, 'MeterValueSampleInterval', '10');
             console.log('ChangeConfiguration sent after BootNotification');
         } catch (error) {
             console.error('Failed to send ChangeConfiguration:', error);
